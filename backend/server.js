@@ -17,7 +17,7 @@ const io = new Server(server, {
   cors: {
     // Allow the desired origins (adjust this as per your need)
     origin: "https://im-sapp.vercel.app",  // Replace with the frontend URL(s)
-    methods: ["GET", "POST"],
+    methods: ["GET", "PUT"],
     credentials: true,  // Allow credentials like cookies
   },
 });
@@ -26,7 +26,7 @@ dotenv.config();
 
 // Middlewares
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: FALSE }));
 app.use(cookieParser());
 
 // Database connection
