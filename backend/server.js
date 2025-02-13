@@ -7,22 +7,26 @@ import connectdb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
 
-const port = 3000;
+dotenv.config();
 
+const port = 3000;
 const app = express();
 const server = createServer(app);
 
-// Initialize Socket.IO
+// Allowed Origins
+const allowedOrigins = [
+  "https://imsapp-palx.onrender.com", 
+  "https://im-sapp.vercel.app"
+];
+
+// Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    // Allow the desired origins (adjust this as per your need)
-    origin: "https://im-sapp.vercel.app",  // Replace with the frontend URL(s)
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true,  // Allow credentials like cookies
+    credentials: true,
   },
 });
-
-dotenv.config();
 
 // Middlewares
 app.use(express.json());
@@ -35,11 +39,14 @@ connectdb();
 // CORS middleware for Express
 app.use(
   cors({
-    origin: "https://imsapp-palx.onrender.com",  // Adjust this as per your need
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true,  // Allow credentials like cookies
+    credentials: true,
   })
 );
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 // Routes
 app.use("/api", auth);
@@ -89,6 +96,6 @@ app.get("/", (req, res) => {
 });
 
 // Start the server
-server.listen(port, '0.0.0.0', () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
