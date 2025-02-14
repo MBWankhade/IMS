@@ -16,9 +16,9 @@ const server = createServer(app);
 const io = new Server(server, {
   cors: {
     // Allow the desired origins (adjust this as per your need)
-    origin: "http://localhost:5173",  // Replace with the frontend URL(s)
+    origin: process.env.FRONTEND_URL,  // Replace with the frontend URL(s)
     methods: ["GET", "POST"],
-    credentials: true,  // Allow credentials like cookies
+    credentials: true,  // Allow credentials like cookies 
   },
 });
 
@@ -35,7 +35,7 @@ connectdb();
 // CORS middleware for Express
 app.use(
   cors({
-    origin: "http://localhost:5173",  // Adjust this as per your need
+    origin: process.env.FRONTEND_URL,  // Adjust this as per your need
     methods: ["GET", "POST"],
     credentials: true,  // Allow credentials like cookies
   })
