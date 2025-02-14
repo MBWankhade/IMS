@@ -18,7 +18,7 @@ export const DataProvider = ({ children }) => {
   const peerInstance = useRef(null);
 
   useEffect(() => {
-    const socket = io("https://imsapp-4lhx.onrender.com/", {
+    const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, { 
       withCredentials: true,
     });
 
