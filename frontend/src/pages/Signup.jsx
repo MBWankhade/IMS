@@ -3,12 +3,15 @@ import { DataContext } from "../context/DataProvider";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
 
 function Signup() {
   const { setUser } = useContext(DataContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
@@ -61,45 +64,83 @@ function Signup() {
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 flex flex-col justify-center items-center">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all hover:scale-105">
+      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Welcome to MockInt</h1>
-        <div className="space-y-6"> 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Name
-            </label> 
-            <input type="text" placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
-          </div>    
-          <div>
+        <div className="space-y-6">  
+           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Email 
             </label>  
-            <input type="email" placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)}
+            <input type="email" placeholder="john@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" /> 
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>  
-            <input type="text" placeholder="Enter your username" value={username} onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" /> 
-          </div>  
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>  
-            <input type="password" placeholder="Enter your password" value={password} onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>   
-            <input type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
-          </div> 
-           <button onClick={handleSignup} className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">Sign Up</button>   
+          </div>     
+          <div className="flex space-x-5">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Name
+                </label> 
+                <input type="text" placeholder="Full Name" value={name} onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
+              </div>  
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Username
+                </label>  
+                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" /> 
+              </div> 
+          </div>    
+          <div className="flex space-x-5">
+      <div className="relative w-full">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="********"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {!showPassword ? (
+              <EyeOffIcon className="h-5 w-5 text-gray-500" />
+            ) : (
+              <EyeIcon className="h-5 w-5 text-gray-500" />
+            )}
+          </button> 
+        </div>
+      </div>
+
+      <div className="relative w-full">
+        <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+        <div className="relative">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-3 flex items-center"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {!showConfirmPassword ? (
+              <EyeOffIcon className="h-5 w-5 text-gray-500" />
+            ) : (
+              <EyeIcon className="h-5 w-5 text-gray-500" />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+          
+           <button onClick={handleSignup} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105">Sign Up</button>   
            {/* Divider */}
            <div className="flex items-center justify-center">
             <div className="border-t border-gray-300 flex-grow"></div>
