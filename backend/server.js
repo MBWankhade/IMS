@@ -13,11 +13,17 @@ const port = 3000;
 const app = express();
 const server = createServer(app);
 
-// Initialize Socket.IO
+// Allowed Origins
+const allowedOrigins = [
+  "https://imsapp-palx.onrender.com", 
+  "https://im-sapp.vercel.app",
+  "http://localhost:5173"
+];
+
+// Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    // Allow the desired origins (adjust this as per your need)
-    origin: process.env.FRONTEND_URL,  // Replace with the frontend URL(s)
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,  // Allow credentials like cookies 
   },
@@ -34,11 +40,14 @@ connectdb();
 // CORS middleware for Express
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,  // Adjust this as per your need
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true,  // Allow credentials like cookies
   })
 );
+
+// Handle preflight requests explicitly
+app.options("*", cors());
 
 // Routes
 app.use("/api", auth);
