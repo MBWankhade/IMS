@@ -1,5 +1,5 @@
 import React from "react";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DataContext } from "../context/DataProvider";
 import heroGif from "../assets/job-interview.gif";
 import textEditorImg from "../assets/Text Editor.png";
@@ -8,33 +8,82 @@ import { useNavigate } from "react-router-dom";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaLinkedin } from "react-icons/fa";
 import { FaSquareGithub } from "react-icons/fa6";
+import { useLocation } from "react-router-dom";
 import InputModal from "../components/InputModal";
 import PopupModal from "../components/PopupModal";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+  const location = useLocation();      
+
+  useEffect(() => {   
+    if (localStorage.getItem("googleLoginSuccess")) {
+      toast.success(`Google Login successful! Welcome back ${user.name}.`);
+      localStorage.removeItem("googleLoginSuccess"); // ✅ Clear after showing
+    }    
+  }, []);
+  
+  
+
+  useEffect(() => {   
+    const state = location.state;  
+    // Check if loginSuccess state is true
+    if (location.state?.loginSuccess) {
+      toast.success(`Login successful! Welcome back ${user.name}`);
+    }    
+    else if (location.state?.signupSuccess) {
+      toast.success(`Signup successful! Welcome aboard ${user.name}`);
+    }     
+    
+    // Clear the state to avoid showing the toast again on page reload
+    window.history.replaceState({}, document.title, location.pathname);
+  }, [location.state]);
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("https://imsapp-4lhx.onrender.com/api/logout", {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/logout`, { 
         method: "POST",
         credentials: "include",
       });
-
-      const data = await res.json();
-      console.log(data);
+  
+      if (!res.ok) {
+        throw new Error("Logout failed!");
+      }
+  
+      await res.json(); // No need to store data unless required
       setUser(null);
       localStorage.removeItem("token");
+      
+      toast.success("Logged out successfully!");
+  
+      // Redirect to login after logout
+      navigate("/login");
     } catch (error) {
-      console.log(error);
+      console.error("Logout Error:", error);
+      toast.error("Logout failed. Please try again.");
     }
   };
+  
 
   return (
     <>
-      <div className="flex p-4 bg-blue-400 justify-between items-center shadow-xl">
+      <div className="flex p-4 bg-blue-400 justify-between items-center shadow-xl"> 
+         {/* Toast Container */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        /> 
         <div className="text-4xl font-bold text-white">MockInt</div>
         <div className="flex w-3/12 justify-around items-center">
           <p className="text-2xl font-semibold text-white">Home</p>

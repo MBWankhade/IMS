@@ -16,7 +16,8 @@ const server = createServer(app);
 // Allowed Origins
 const allowedOrigins = [
   "https://imsapp-palx.onrender.com", 
-  "https://im-sapp.vercel.app"
+  "https://im-sapp.vercel.app",
+  "http://localhost:5173"
 ];
 
 // Initialize Socket.IO with CORS
@@ -24,7 +25,7 @@ const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true,
+    credentials: true,  // Allow credentials like cookies 
   },
 });
 
