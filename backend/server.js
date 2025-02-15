@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import connectdb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
-dotenv.config();
 
 dotenv.config();
 
