@@ -8,8 +8,9 @@ import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
 dotenv.config();
 
-const port = 3000;
+dotenv.config();
 
+const port = 3000;
 const app = express();
 const server = createServer(app);
 
@@ -42,7 +43,7 @@ app.use(
   cors({
     origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true,  // Allow credentials like cookies
+    credentials: true,
   })
 );
 
@@ -97,6 +98,6 @@ app.get("/", (req, res) => {
 });
 
 // Start the server
-server.listen(port, '0.0.0.0', () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`Server running on port ${port}`);
 });
