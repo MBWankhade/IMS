@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import connectdb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
+dotenv.config();
 
 const port = 3000;
 
@@ -21,8 +22,6 @@ const io = new Server(server, {
     credentials: true,  // Allow credentials like cookies 
   },
 });
-
-dotenv.config();
 
 // Middlewares
 app.use(express.json());

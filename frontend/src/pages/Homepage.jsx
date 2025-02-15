@@ -18,16 +18,25 @@ function Homepage() {
   const { setUser, user } = useContext(DataContext);
 
   const navigate = useNavigate(); 
-  const location = useLocation();
+  const location = useLocation();      
+
+  useEffect(() => {   
+    if (localStorage.getItem("googleLoginSuccess")) {
+      toast.success(`Google Login successful! Welcome back ${user.name}.`);
+      localStorage.removeItem("googleLoginSuccess"); // ✅ Clear after showing
+    }    
+  }, []);
+  
+  
 
   useEffect(() => {   
     const state = location.state;  
     // Check if loginSuccess state is true
     if (location.state?.loginSuccess) {
-      toast.success("Login successful! Welcome back.");
+      toast.success(`Login successful! Welcome back ${user.name}`);
     }    
     else if (location.state?.signupSuccess) {
-      toast.success("Signup successful! Welcome aboard.");
+      toast.success(`Signup successful! Welcome aboard ${user.name}`);
     }     
     
     // Clear the state to avoid showing the toast again on page reload

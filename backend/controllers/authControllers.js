@@ -3,31 +3,47 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
-    try {
-        const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-        const user = await User.findOne({ username: username });   
-
-        const isMatch = await bcrypt.compare(password, user.password); 
-
-        if (user) {
-            if (isMatch) {
-                const token = jwt.sign({
-                    id: user._id,
-                }, process.env.JWT_SECRET);
-                res.cookie("token", token);
-                return res.status(200).send({ message: "login success", data: token });
-            } else {
-                return res.status(401).send({message: "Incorrect Password."});
-            }
-        } else {
-            return res.status(404).send({message: "Invalid Credentials."});
-        }
-    } catch (error) {
-        console.log(error);
-        return res.status(500).send("internal server error");
+    // Check if user exists
+    const user = await User.findOne({ username });   
+    if (!user) {
+      return res.status(404).json({ message: "Invalid Credentials." });
     }
-}
+
+    // Validate password
+    const isMatch = await bcrypt.compare(password, user.password); 
+    if (!isMatch) {
+      return res.status(401).json({ message: "Incorrect Password." });
+    }
+
+    // Generate token
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" } // Optional: Set token expiration
+    ); 
+
+    // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
+    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+
+    // Return user data along with token
+    return res.status(200).json({
+      message: "Login success",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 
 export const logout = (req, res) => {
     res.clearCookie('token');
