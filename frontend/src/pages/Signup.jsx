@@ -88,7 +88,21 @@ function Signup() {
     <div className="min-h-screen bg-gradient-to-r from-blue-50 to-purple-50 flex flex-col justify-center items-center">
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md transform transition-all">
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Welcome to MockInt</h1>
+        <h1 className="text-4xl font-bold text-center text-gray-800 my-5">Welcome to MockInt</h1> 
+          {/* Google Sign-In Button */}
+          <div className="flex justify-center items-center my-5">
+          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}> 
+          <GoogleLogin onSuccess={handleGoogleLogin} onError={() => toast.error("Google login failed.")} cookiePolicy={"single_host_origin"} uxMode="redirect" />
+          </GoogleOAuthProvider> 
+          </div>      
+
+          {/* Divider */}
+        <div className="flex items-center justify-center my-5">
+            <div className="border-t border-gray-300 flex-grow"></div>
+            <span className="mx-4 text-gray-500">Or, sign up with</span>
+            <div className="border-t border-gray-300 flex-grow"></div>
+          </div>
+
         <div className="space-y-6">  
            <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -164,19 +178,7 @@ function Signup() {
     </div>
           
            <button onClick={handleSignup} className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105">Sign Up</button>   
-           {/* Divider */}
-           <div className="flex items-center justify-center">
-            <div className="border-t border-gray-300 flex-grow"></div>
-            <span className="mx-4 text-gray-500">or</span>
-            <div className="border-t border-gray-300 flex-grow"></div>
-          </div>
-
-          {/* Google Sign-In Button */}
-          <div className="flex justify-center items-center">
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}> 
-          <GoogleLogin onSuccess={handleGoogleLogin} onError={() => toast.error("Google login failed.")} cookiePolicy={"single_host_origin"} uxMode="redirect" />
-          </GoogleOAuthProvider> 
-          </div> 
+            
 
           <p className="text-center text-gray-600">Already have an account? <Link to="/login" className="text-blue-600 hover:text-blue-700 font-semibold">Log In</Link></p>  
           
