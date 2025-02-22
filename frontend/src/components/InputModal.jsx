@@ -22,7 +22,7 @@ function InputModal() {
         className="font-semibold text-lg  px-4 py-1 rounded-md border border-gray-300 shadow-md"
         onClick={openModal}
       >
-        Join an Interview
+        Join an  Interview
       </button>
 
       {isOpen && (
