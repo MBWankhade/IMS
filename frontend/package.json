@@ -18,7 +18,7 @@
     "@mui/material": "^5.15.19",
     "@react-oauth/google": "^0.12.1",
     "@tldraw/tldraw": "^2.2.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.1",
     "draft-js": "^0.11.7",
     "peerjs": "^1.5.4",
     "react": "^18.2.0",

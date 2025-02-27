@@ -11,6 +11,7 @@ const Comments = ({ postId, currentUserId }) => {
   const [editContent, setEditContent] = useState("");
   const [showAllComments, setShowAllComments] = useState(false); // State to track "Show all"
 
+  // Create a ref to track the bottom of the comments section
   const commentsEndRef = useRef(null);
 
   useEffect(() => {
@@ -29,11 +30,12 @@ const Comments = ({ postId, currentUserId }) => {
     fetchComments();
   }, [postId]);
 
-  // useEffect(() => {
-  //   if (commentsEndRef.current) {
-  //     commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // }, [comments]);
+  // Scroll to the bottom whenever comments are updated
+  useEffect(() => {
+    if (commentsEndRef.current) {
+      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [comments]);
 
   const handleAddComment = async (parentCommentId = null) => {
     if (!newComment.trim() && !replyContent[parentCommentId]?.trim()) return;
@@ -52,13 +54,15 @@ const Comments = ({ postId, currentUserId }) => {
         { withCredentials: true }
       );
 
+      // Update comments state
       setComments((prev) => [res.data, ...prev]);
 
+      // Reset states
       if (parentCommentId) {
-        setReplyContent((prev) => ({ ...prev, [parentCommentId]: "" }));
-        setReplyingTo(null);
+        setReplyContent((prev) => ({ ...prev, [parentCommentId]: "" })); // Clear reply content
+        setReplyingTo(null); // Hide reply box
       } else {
-        setNewComment("");
+        setNewComment(""); // Clear new comment
       }
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -66,11 +70,72 @@ const Comments = ({ postId, currentUserId }) => {
     setLoading(false);
   };
 
-  const renderComments = (commentList = [], parentId = null, showAll = false) => {
+  const handleSaveEdit = async (commentId) => {
+    if (!editContent.trim()) return; // Ensure the edited content is not empty
+
+    setLoading(true);
+    try {
+      const res = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}`,
+        { content: editContent },
+        { withCredentials: true }
+      );
+
+      // Update the comments state with the edited content
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment._id === commentId ? { ...comment, content: res.data.content } : comment
+        )
+      );
+
+      // Reset editing state
+      setEditingCommentId(null);
+      setEditContent("");
+    } catch (error) {
+      console.error("Error saving edit:", error);
+    }
+    setLoading(false);
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    setLoading(true);
+    try {
+      await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}`,
+        { withCredentials: true }
+      );
+
+      setComments((prev) => prev.filter((comment) => comment._id !== commentId));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+    setLoading(false);
+  };
+
+  const handleLikeComment = async (commentId) => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}/like`,
+        { userId: currentUserId },
+        { withCredentials: true }
+      );
+
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment._id === commentId ? { ...comment, likes: res.data.likes } : comment
+        )
+      );
+    } catch (error) {
+      console.error("Error liking comment:", error);
+    }
+  };
+
+  const renderComments = (commentList = [], parentId = null) => {
     const filteredComments = (commentList || [])
       .filter((comment) => comment.parentComment === parentId);
 
-    const commentsToRender = showAll ? filteredComments : filteredComments.slice(0, 7);
+    // Limit the number of comments to 7 unless "Show all" is enabled
+    const commentsToRender = showAllComments ? filteredComments : filteredComments.slice(0, 7);
 
     return commentsToRender.map((comment) => (
       <div key={comment._id} className="p-2 border-b">
@@ -167,7 +232,7 @@ const Comments = ({ postId, currentUserId }) => {
         )}
 
         <div className="ml-6 mt-2">
-          {renderComments(comments || [], comment._id, showAll)}
+          {renderComments(comments || [], comment._id)}
         </div>
       </div>
     ));
@@ -175,15 +240,18 @@ const Comments = ({ postId, currentUserId }) => {
 
   return (
     <div className="mt-4">
+      {/* Scrollable comments container */}
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {comments?.length > 0 ? (
-          renderComments(comments, null, showAllComments)
+          renderComments(comments)
         ) : (
           <p className="text-gray-500">No comments yet. Be the first to comment!</p>
         )}
+        {/* Add a ref to the bottom of the comments section */}
         <div ref={commentsEndRef} />
       </div>
 
+      {/* Show more button */}
       {comments?.length > 7 && !showAllComments && (
         <button
           onClick={() => setShowAllComments(true)}
@@ -193,6 +261,7 @@ const Comments = ({ postId, currentUserId }) => {
         </button>
       )}
 
+      {/* Add new comment section */}
       <div className="mt-4">
         <textarea
           value={newComment}
