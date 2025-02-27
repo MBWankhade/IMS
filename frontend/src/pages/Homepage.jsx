@@ -7,26 +7,33 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
 import axios from "axios";
+import { useApiMutation } from "../hooks/hooks";
+import {Loader} from "../../src/pages/Loaders"
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
+  // console.log(user)
   const navigate = useNavigate();
   const location = useLocation();
 
   const [posts, setPosts] = useState([]);
+  const [getPosts, response, loading] = useApiMutation("Fetching posts...", "/posts", "get", { withCredentials: true });
+
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true })
-      .then((res) => setPosts(res.data))
-      .catch((err) => console.error("Error fetching posts", err));
-  }, []);
+    if(posts.length===0){
+      getPosts();
+    }
+    if (response) {
+      setPosts(response.data?.posts);
+    }
+  }, [response]);
   
 
   useEffect(() => {
     if (localStorage.getItem("googleLoginSuccess")) {
       toast.success(`Google Login successful! Welcome back ${user?.name}.`);
       localStorage.removeItem("googleLoginSuccess");
-      setUser(user);
+      // setUser(user);
     }
   }, []);
 
@@ -87,7 +94,9 @@ function Homepage() {
           </div>
 
           {/* Posts Feed */}
-          <div className="m-5">
+          {
+            loading ? <Loader /> : 
+            <div className="m-5">
             {posts?.map((post) => (
               <div key={post._id} className="mb-6 p-4 border border-blue-300 rounded-lg">
                 {/* Post Header */}
@@ -136,6 +145,8 @@ function Homepage() {
               </div>
             ))}
           </div>
+          }
+          
         </div>
 
         {/* Trending Now Card (Right) */}

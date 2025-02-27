@@ -13,6 +13,7 @@ import {ToastContainer} from "react-toastify";
 
 function App() {
   const { user ,setUser } = useContext(DataContext);
+  // console.log(user)
   useEffect(() => {
     getMyProfile();
   }, []

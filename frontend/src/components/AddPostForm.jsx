@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { getContent } from "../utils/utils";
+import { useApiMutation } from "../hooks/hooks";
 
 const AddPostForm = () => {
   const location=useLocation();
@@ -20,25 +21,36 @@ const AddPostForm = () => {
   const [submitAsAnonymous, setSubmitAsAnonymous] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-        { postTitle, postContent },
-        { withCredentials: true } 
-      );
-      toast.success("Post created successfully!");
-    } catch (err) {
-      toast.error("Failed to create post.");
-      console.error("Error creating post", err);
-    }
-    finally {
-      setPostContent(initialPostContent);
-      setPostTitle("");
-    }
-  };
+  const [createPost, response, loading] = useApiMutation("Creating New Post...","/posts", "post", { withCredentials: true });
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    await createPost({ postTitle, postContent });
+
+    setPostContent(initialPostContent);
+    setPostTitle("");
+};
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   try {
+  //     const res = await axios.post(
+  //       `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
+  //       { postTitle, postContent },
+  //       { withCredentials: true } 
+  //     );
+  //     toast.success("Post created successfully!");
+  //   } catch (err) {
+  //     toast.error("Failed to create post.");
+  //     console.error("Error creating post", err);
+  //   }
+  //   finally {
+  //     setPostContent(initialPostContent);
+  //     setPostTitle("");
+  //   }
+  // };
 
   const handleChange = (value) => {
     setPostContent(value);
