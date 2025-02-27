@@ -145,7 +145,8 @@ function Homepage() {
             <li className="mb-2">VIT'24 Interview Experiences</li>
             <li className="mb-2">Placement Preparations</li>
             <li className="mb-2">Mock Interviews Results</li>
-            <li className="mb-2">Weekly Rankings</li>
+            <li className="mb-2">Weekly Rankings</li> 
+            <li className="mb-2">Top Placements VIT'24</li> 
           </ul>
         </div>
       </div>
