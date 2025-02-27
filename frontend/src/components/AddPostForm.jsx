@@ -1,71 +1,56 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
+import { getContent } from "../utils/utils";
 
 const AddPostForm = () => {
+  const location=useLocation();
+  const cardId=location.state?.id;
+
+  const initialPostContent=getContent(cardId);
+
   const [postTitle, setPostTitle] = useState("");
-  const [postContent, setPostContent] = useState(`
-    <h2>Candidate Information:</h2> <br /> 
-    <ul>
-      <li>Status: [Briefly state if you are employed, seeking opportunities, etc.], [Total years of relevant experience], [Target position for this interview]</li>
-      <li>Location: [City, State, Country]</li>
-      <li>Interview Date: [Month Day, Year]</li>
-    </ul>    <br />    
-    <h2>Overview of Interview Process:</h2> <br />  
-    <p><strong>Initial Screening</strong></p> <br />  
-    <ul>
-      <li>Duration: [e.g., 30 minutes]</li>
-      <li>Method: [Phone/Video/In-person]</li>
-      <li>Focus: [e.g., Background check, Skill assessment]</li>
-      <li>Key Questions: [Summarize main questions asked]</li>
-      <li>Obstacles: [Note any particular challenges faced during this stage]</li>
-    </ul> <br />  
-    <p><strong>Technical Round</strong></p> <br /> 
-    <ul>
-      <li>Duration: [e.g., 1 hour]</li>
-      <li>Method: [Phone/Video/In-person]</li>
-      <li>Focus: [e.g., Specific skills or projects relevant to the job]</li>
-      <li>Key Questions: [Summarize technical or case study questions]</li>
-      <li>Obstacles: [Any difficult moments or topics]</li>
-    </ul> <br /> 
-    <p>[Include additional rounds as necessary, such as Managerial Round, HR Round, etc.]</p> <br /> 
-    <h2>Post-Interview Reflections:</h2> <br /> 
-    <ul>
-      <li>Company Culture Insights: [Describe the culture as perceived during the interview, interactions with team members if any]</li>
-      <li>Work Environment: [Observations about the physical or virtual setting]</li>
-      <li>Benefits Highlight: [Notable perks or benefits discussed]</li>
-      <li>Evaluator Feedback: [General impressions from interactions with the interviewers]</li>
-      <li>Suggestions for Improvement: [Constructive feedback on the interview process based on your experience]</li>
-    </ul> <br />  
-    <h2>Additional Information:</h2> <br /> 
-    <ul>
-      <li>[Any further details about the interview timeline, next steps, or miscellaneous notes]</li>
-    </ul> <br /> 
-    <h2>Closing Note:</h2> <br /> 
-    <ul>
-      <li>[A personal note or a general comment about the overall experience or expectations moving forward]</li>
-    </ul>
-  `);
+  const [postContent, setPostContent] = useState(initialPostContent);
+  const quillRef = useRef(null);
+
   const [publishOnCommunity, setPublishOnCommunity] = useState(true);
   const [submitAsAnonymous, setSubmitAsAnonymous] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const postData = {
-      title: postTitle,
-      content: postContent,
-      publishOnCommunity,
-      submitAsAnonymous,
-    };
+
     try {
-      // Uncomment this when you have the API endpoint ready
-      // const response = await axios.post("/api/posts", postData);
-      console.log("Post submitted successfully:", postData);
-      alert("Post submitted successfully!");
-    } catch (error) {
-      console.error("Error submitting post:", error);
-      alert("Failed to submit post.");
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
+        { postTitle, postContent },
+        { withCredentials: true } 
+      );
+      toast.success("Post created successfully!");
+    } catch (err) {
+      toast.error("Failed to create post.");
+      console.error("Error creating post", err);
+    }
+    finally {
+      setPostContent(initialPostContent);
+      setPostTitle("");
+    }
+  };
+
+  const handleChange = (value) => {
+    setPostContent(value);
+
+    if (quillRef.current) {
+      const quill = quillRef.current.getEditor();
+      const images = quill.container.querySelectorAll("img");
+
+      images.forEach((image) => {
+        image.style.width = "150px";
+        image.style.height = "auto";
+      });
     }
   };
 
@@ -98,8 +83,9 @@ const AddPostForm = () => {
               Post Content
             </label> 
             <ReactQuill 
+              ref={quillRef}
               value={postContent}
-              onChange={setPostContent}
+              onChange={handleChange}
               modules={{
                 toolbar: [
                   [{ header: [1, 2, 3, false] }],
@@ -114,10 +100,8 @@ const AddPostForm = () => {
             /> 
           </div>        
 
-          <div className="flex">
-            
-        
 
+          <div className="flex">
               {/* Word and Character Count */}
               <div className="mb-6 w-1/3">
               <div className="text-sm text-gray-600">
@@ -215,5 +199,7 @@ const AddPostForm = () => {
     </div>
   );
 };
+
+
 
 export default AddPostForm;

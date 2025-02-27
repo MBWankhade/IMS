@@ -64,6 +64,7 @@ function Login() {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include", // Ensure cookies (if used) are included
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
       const data = await res.json();

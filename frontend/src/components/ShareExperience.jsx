@@ -88,7 +88,7 @@ const ShareExperience = () => {
         {cards.map((card) => (
           <a
             key={card.id}
-            onClick={()=>navigate('/write')}
+            onClick={()=>navigate('/write',{state:{id:card.id}})}
             className="block bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 size-80 h-60 hover:-translate-y-1 cursor-pointer"
           >
             <div className="overflow-hidden rounded-t-lg">

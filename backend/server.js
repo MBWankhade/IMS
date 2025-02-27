@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import connectdb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
+import post from "./routes/post.js";
 
 dotenv.config();
 
@@ -30,8 +31,8 @@ const io = new Server(server, {
 });
 
 // Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({limit: "10mb"}));
+app.use(express.urlencoded({limit: "10mb", extended: true }));
 app.use(cookieParser());
 
 // Database connection
@@ -51,6 +52,7 @@ app.options("*", cors());
 
 // Routes
 app.use("/api", auth);
+app.use("/api", post);  
 
 // Socket.io connection
 io.on("connection", (socket) => {
