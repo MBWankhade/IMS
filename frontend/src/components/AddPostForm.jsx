@@ -31,7 +31,7 @@ const AddPostForm = () => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },  
-          withCredentials: "include",
+          withCredentials: true
         }
       );
       toast.success("Post created successfully!");
