@@ -3,14 +3,15 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getContent } from "../utils/utils";
 
 const AddPostForm = () => {
-  const location=useLocation();
-  const cardId=location.state?.id;
+  const location = useLocation();
+  const navigate = useNavigate();
+  const cardId = location.state?.id;
 
-  const initialPostContent=getContent(cardId);
+  const initialPostContent = getContent(cardId);
 
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState(initialPostContent);
@@ -22,24 +23,35 @@ const AddPostForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(localStorage.getItem('token'))
-    try {
 
+    // Validate post content
+    if (!postTitle.trim() || !postContent.trim()) {
+      toast.error("Post title and content are required.");
+      return;
+    }
+
+    try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-        { postTitle, postContent },{
+        { postTitle, postContent },
+        {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },  
-          withCredentials: true
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          withCredentials: true,
         }
       );
       toast.success("Post created successfully!");
     } catch (err) {
-      toast.error("Failed to create post.");
-      console.error("Error creating post", err);
-    }
-    finally {
+      if (err.response?.status === 401) {
+        // Token is invalid or expired
+        localStorage.removeItem("token"); // Clear the invalid token
+        navigate("/sign-in"); // Redirect to login page
+      } else {
+        toast.error("Failed to create post.");
+        console.error("Error creating post", err);
+      }
+    } finally {
       setPostContent(initialPostContent);
       setPostTitle("");
     }
@@ -86,8 +98,8 @@ const AddPostForm = () => {
           <div className="mb-6">
             <label htmlFor="postContent" className="block text-sm font-medium text-gray-700">
               Post Content
-            </label> 
-            <ReactQuill 
+            </label>
+            <ReactQuill
               ref={quillRef}
               value={postContent}
               onChange={handleChange}
@@ -102,52 +114,45 @@ const AddPostForm = () => {
                 ],
               }}
               className="bg-white rounded-md shadow-sm custom-quill-editor"
-            /> 
-          </div>        
-
+            />
+          </div>
 
           <div className="flex">
-              {/* Word and Character Count */}
-              <div className="mb-6 w-1/3">
+            {/* Word and Character Count */}
+            <div className="mb-6 w-1/3">
               <div className="text-sm text-gray-600">
-              Words: {postContent.split(/\s+/).filter(Boolean).length} | Characters:{" "}
-              {postContent.length}
+                Words: {postContent.split(/\s+/).filter(Boolean).length} | Characters: {postContent.length}
               </div>
-              </div>    
+            </div>
 
-
-              {/* Extract Image Size Button */}
-              <div className="mb-6 w-1/3">
+            {/* Extract Image Size Button */}
+            <div className="mb-6 w-1/3">
               <button
-              type="button"
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                type="button"
+                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               >
-              Extract Image Size
+                Extract Image Size
               </button>
-              </div>  
+            </div>
 
-              <div className="w-1/3">
-
+            <div className="w-1/3">
               {/* Buttons */}
               <div className="flex justify-end space-x-4">
-              <button
-              type="button"
-              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              >
-              Save for Later
-              </button>
-              <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-              Submit for Review
-              </button>
-              </div> 
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                >
+                  Save for Later
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Submit for Review
+                </button>
               </div>
-            
-          </div> 
-
-          
+            </div>
+          </div>
         </div>
 
         {/* Second Div (1/3 width) */}
@@ -204,7 +209,5 @@ const AddPostForm = () => {
     </div>
   );
 };
-
-
 
 export default AddPostForm;
