@@ -22,15 +22,16 @@ const AddPostForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    console.log(localStorage.getItem('token'))
     try {
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
         { postTitle, postContent },{
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          // withCredentials: "include",
+          },  
+          withCredentials: "include",
         }
       );
       toast.success("Post created successfully!");
