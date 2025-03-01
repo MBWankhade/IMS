@@ -20,13 +20,29 @@ const AddPostForm = () => {
   const [publishOnCommunity, setPublishOnCommunity] = useState(true);
   const [submitAsAnonymous, setSubmitAsAnonymous] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const stripHtmlTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     // Validate post content
-    if (!postTitle.trim() || !postContent.trim()) {
+    if (!postTitle.trim() || !stripHtmlTags(postContent).trim()) {
       toast.error("Post title and content are required.");
+      setIsLoading(false);
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You must be logged in to create a post.");
+      navigate("/sign-in");
+      setIsLoading(false);
       return;
     }
 
@@ -36,24 +52,28 @@ const AddPostForm = () => {
         { postTitle, postContent },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
           withCredentials: true,
         }
       );
       toast.success("Post created successfully!");
+      setPostContent(initialPostContent);
+      setPostTitle("");
     } catch (err) {
       if (err.response?.status === 401) {
-        // Token is invalid or expired
-        localStorage.removeItem("token"); // Clear the invalid token
-        navigate("/sign-in"); // Redirect to login page
+        localStorage.removeItem("token");
+        toast.error("Your session has expired. Please log in again.");
+        navigate("/sign-in");
+      } else if (err.response?.data?.message) {
+        toast.error(err.response.data.message);
       } else {
-        toast.error("Failed to create post.");
+        toast.error("Failed to create post. Please try again.");
         console.error("Error creating post", err);
       }
     } finally {
-      setPostContent(initialPostContent);
-      setPostTitle("");
+      setIsLoading(false);
     }
   };
 
@@ -62,12 +82,13 @@ const AddPostForm = () => {
 
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
-      const images = quill.container.querySelectorAll("img");
-
-      images.forEach((image) => {
-        image.style.width = "150px";
-        image.style.height = "auto";
-      });
+      if (quill) {
+        const images = quill.container.querySelectorAll("img");
+        images.forEach((image) => {
+          image.style.width = "150px";
+          image.style.height = "auto";
+        });
+      }
     }
   };
 
@@ -146,9 +167,10 @@ const AddPostForm = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  disabled={isLoading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
                 >
-                  Submit for Review
+                  {isLoading ? "Submitting..." : "Submit for Review"}
                 </button>
               </div>
             </div>
