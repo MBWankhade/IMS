@@ -18,7 +18,8 @@ const server = createServer(app);
 const allowedOrigins = [
   "https://imsapp-palx.onrender.com", 
   "https://im-sapp.vercel.app",
-  "http://localhost:5173"
+  "http://localhost:5173",
+  "https://imsapp-4lhx.onrender.com"
 ];
 
 // Initialize Socket.IO with CORS
