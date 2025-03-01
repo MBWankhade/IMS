@@ -32,7 +32,7 @@ const LanguageDropdown = ({
         {languages.map((lang) => (
           <option key={lang.name} value={lang.name} className="bg-blue-900">
             {lang.name.toUpperCase()}{" "}
-            <span className="font-">{lang.version}</span>
+            {/* <span className="font-">{lang.version}</span> */}
           </option>
         ))}
       </select>

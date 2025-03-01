@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-
 function Notepad({ socket, roomId }) {
   const [value, setValue] = useState("");
+  const quillRef = useRef(null);
 
   useEffect(() => {
-    // socket.emit("joinRoom", roomId);
-
     socket.on("recieve-text", (data) => {
       setValue(data);
     });
@@ -17,7 +15,7 @@ function Notepad({ socket, roomId }) {
       socket.emit("leaveRoom", roomId);
       socket.disconnect();
     };
-  }, [roomId]);
+  }, [roomId, socket]);
 
   const handleChange = (newValue) => {
     setValue(newValue);
@@ -25,12 +23,16 @@ function Notepad({ socket, roomId }) {
   };
 
   return (
-    <ReactQuill
-      theme="snow"
-      value={value}
-      onChange={handleChange}
-      className="w-10/12 h-5/6 px-4 text-white"
-    />
+    <div className="w-10/12 h-5/6 px-4 text-white">
+      <ReactQuill
+        theme="snow"
+        value={value}
+        onChange={handleChange}
+        ref={(el) => {
+          if (el) quillRef.current = el;
+        }}
+      />
+    </div>
   );
 }
 
