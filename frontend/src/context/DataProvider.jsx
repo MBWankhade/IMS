@@ -15,8 +15,9 @@ export const DataProvider = ({ children }) => {
   const [status, setStatus] = useState("");
   const [roomId, setRoomId] = useState("");
   const [peerId, setPeerId] = useState("");
-  const peerInstance = useRef(null);
-
+  const peerInstance = useRef(null);     
+  
+ 
   useEffect(() => {
     const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, { 
       withCredentials: true,

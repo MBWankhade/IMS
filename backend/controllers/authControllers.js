@@ -34,6 +34,7 @@ export const login = async (req, res) => {
       user: {
         id: user._id,
         username: user.username,
+        name: user.name,
         email: user.email,
       },
       token,
@@ -125,3 +126,16 @@ export const signup = async (req, res) => {
         return res.status(500).send({ message: "Internal server error. Please try again later." });
     }
 };
+
+export const getMyProfile= async (req,res)=>{
+    try{
+        const user = await User.findById(req.user.id).select("-password");
+        if(!user){
+            return res.status(404).send({message:"User not found"});
+        }
+        return res.status(200).send(user);
+    }catch(error){
+        console.error("Error getting user profile:",error);
+        return res.status(500).send({message:"Internal server error"});
+    }
+}

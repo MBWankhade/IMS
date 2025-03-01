@@ -6,7 +6,7 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateJWTToken = (user) => {
   return jwt.sign(
-    { id: user._id, email: user.email },
+    { id: user._id, email: user.email, profilePicture:user.profilePicture },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
   );
@@ -45,11 +45,21 @@ export const googleLogin = async (req, res) => {
 
     // Generate JWT token
     const jwtToken = generateJWTToken(user);
+    res.cookie("token", jwtToken, {
+      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+      // secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
+      maxAge: 3600000, // 1 hour in milliseconds
+    });
 
     res.status(200).json({
       success: true,
       message: "Google login successful",
-      user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture, 
+      },
       token: jwtToken, // Send token separately
     });
 
