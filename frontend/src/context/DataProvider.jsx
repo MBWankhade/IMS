@@ -20,7 +20,7 @@ export const DataProvider = ({ children }) => {
  
   useEffect(() => {
     const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, { 
-      withCredentials: true,
+      withCredentials: "include",
     });
 
     setSocket(socket);

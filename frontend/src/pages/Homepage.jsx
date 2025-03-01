@@ -18,7 +18,7 @@ function Homepage() {
   const [posts, setPosts] = useState([]);
   useEffect(() => {
     axios
-      .get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true })
+      .get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: "include" })
       .then((res) => setPosts(res.data))
       .catch((err) => console.error("Error fetching posts", err));
   }, []);
