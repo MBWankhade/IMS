@@ -21,7 +21,13 @@ const Comments = ({ postId, currentUserId }) => {
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/comments`,
           { withCredentials: true }
         );
-        setComments(Array.isArray(res.data) ? res.data : []);
+
+        // Sort comments by createdAt in descending order (newest first)
+        const sortedComments = Array.isArray(res.data)
+          ? res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          : [];
+
+        setComments(sortedComments);
       } catch (error) {
         console.error("Error fetching comments:", error);
         setComments([]);
@@ -29,13 +35,6 @@ const Comments = ({ postId, currentUserId }) => {
     };
     fetchComments();
   }, [postId]);
-
-  // Scroll to the bottom whenever comments are updated
-  useEffect(() => {
-    if (commentsEndRef.current) {
-      commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [comments]);
 
   const handleAddComment = async (parentCommentId = null) => {
     if (!newComment.trim() && !replyContent[parentCommentId]?.trim()) return;
@@ -54,7 +53,7 @@ const Comments = ({ postId, currentUserId }) => {
         { withCredentials: true }
       );
 
-      // Update comments state
+      // Update comments state by adding the new comment to the top
       setComments((prev) => [res.data, ...prev]);
 
       // Reset states
@@ -69,6 +68,16 @@ const Comments = ({ postId, currentUserId }) => {
     }
     setLoading(false);
   };
+
+  // Scroll to the top whenever comments are updated
+  useEffect(() => {
+    if (comments.length > 0) {
+      const commentsContainer = document.querySelector(".max-h-96"); // Adjust the selector if needed
+      if (commentsContainer) {
+        commentsContainer.scrollTop = 0; // Scroll to the top
+      }
+    }
+  }, [comments]);
 
   const handleSaveEdit = async (commentId) => {
     if (!editContent.trim()) return; // Ensure the edited content is not empty
