@@ -3,15 +3,14 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { getContent } from "../utils/utils";
 
 const AddPostForm = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const cardId = location.state?.id;
+  const location=useLocation();
+  const cardId=location.state?.id;
 
-  const initialPostContent = getContent(cardId);
+  const initialPostContent=getContent(cardId);
 
   const [postTitle, setPostTitle] = useState("");
   const [postContent, setPostContent] = useState(initialPostContent);
@@ -20,60 +19,29 @@ const AddPostForm = () => {
   const [publishOnCommunity, setPublishOnCommunity] = useState(true);
   const [submitAsAnonymous, setSubmitAsAnonymous] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const stripHtmlTags = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    // Validate post content
-    if (!postTitle.trim() || !stripHtmlTags(postContent).trim()) {
-      toast.error("Post title and content are required.");
-      setIsLoading(false);
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      toast.error("You must be logged in to create a post.");
-      navigate("/sign-in");
-      setIsLoading(false);
-      return;
-    }
-
+    console.log(localStorage.getItem('token'))
     try {
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-        { postTitle, postContent },
-        {
+        { postTitle, postContent },{
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },  
+          withCredentials: true
         }
       );
       toast.success("Post created successfully!");
+    } catch (err) {
+      toast.error("Failed to create post.");
+      console.error("Error creating post", err);
+    }
+    finally {
       setPostContent(initialPostContent);
       setPostTitle("");
-    } catch (err) {
-      if (err.response?.status === 401) {
-        localStorage.removeItem("token");
-        toast.error("Your session has expired. Please log in again.");
-        navigate("/sign-in");
-      } else if (err.response?.data?.message) {
-        toast.error(err.response.data.message);
-      } else {
-        toast.error("Failed to create post. Please try again.");
-        console.error("Error creating post", err);
-      }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -82,13 +50,12 @@ const AddPostForm = () => {
 
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
-      if (quill) {
-        const images = quill.container.querySelectorAll("img");
-        images.forEach((image) => {
-          image.style.width = "150px";
-          image.style.height = "auto";
-        });
-      }
+      const images = quill.container.querySelectorAll("img");
+
+      images.forEach((image) => {
+        image.style.width = "150px";
+        image.style.height = "auto";
+      });
     }
   };
 
@@ -119,8 +86,8 @@ const AddPostForm = () => {
           <div className="mb-6">
             <label htmlFor="postContent" className="block text-sm font-medium text-gray-700">
               Post Content
-            </label>
-            <ReactQuill
+            </label> 
+            <ReactQuill 
               ref={quillRef}
               value={postContent}
               onChange={handleChange}
@@ -135,46 +102,52 @@ const AddPostForm = () => {
                 ],
               }}
               className="bg-white rounded-md shadow-sm custom-quill-editor"
-            />
-          </div>
+            /> 
+          </div>        
+
 
           <div className="flex">
-            {/* Word and Character Count */}
-            <div className="mb-6 w-1/3">
+              {/* Word and Character Count */}
+              <div className="mb-6 w-1/3">
               <div className="text-sm text-gray-600">
-                Words: {postContent.split(/\s+/).filter(Boolean).length} | Characters: {postContent.length}
+              Words: {postContent.split(/\s+/).filter(Boolean).length} | Characters:{" "}
+              {postContent.length}
               </div>
-            </div>
+              </div>    
 
-            {/* Extract Image Size Button */}
-            <div className="mb-6 w-1/3">
+
+              {/* Extract Image Size Button */}
+              <div className="mb-6 w-1/3">
               <button
-                type="button"
-                className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              type="button"
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               >
-                Extract Image Size
+              Extract Image Size
               </button>
-            </div>
+              </div>  
 
-            <div className="w-1/3">
+              <div className="w-1/3">
+
               {/* Buttons */}
               <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-                >
-                  Save for Later
-                </button>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
-                >
-                  {isLoading ? "Submitting..." : "Submit for Review"}
-                </button>
+              <button
+              type="button"
+              className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+              >
+              Save for Later
+              </button>
+              <button
+              type="submit"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+              Submit for Review
+              </button>
+              </div> 
               </div>
-            </div>
-          </div>
+            
+          </div> 
+
+          
         </div>
 
         {/* Second Div (1/3 width) */}
@@ -231,5 +204,7 @@ const AddPostForm = () => {
     </div>
   );
 };
+
+
 
 export default AddPostForm;
