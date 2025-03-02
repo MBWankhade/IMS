@@ -24,11 +24,19 @@ function Homepage() {
 
   // Fetch posts and parent comment counts
   useEffect(() => {
-    
     const fetchPosts = async () => {
-      
       try {
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        if (!token) {
+          toast.error("Please login to view posts.");
+          return;
+        }
+
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        });
         setPosts(res.data);
 
         // Fetch parent comment counts for each post
@@ -36,6 +44,11 @@ function Homepage() {
           fetchParentCommentCount(post._id);
         });
       } catch (err) {
+        if (err.response && err.response.status === 401) {
+          toast.error("Please login to view posts.");
+        } else {
+          toast.error("Failed to fetch posts. Please try again.");
+        }
         console.error("Error fetching posts", err);
       }
     };
@@ -46,13 +59,28 @@ function Homepage() {
   // Fetch parent comment count for a specific post
   const fetchParentCommentCount = async (postId) => {
     try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      if (!token) {
+        toast.error("Please login to view comments.");
+        return;
+      }
+
       const res = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/parent-comments-count`,
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        }
       );
       console.log("API Response:", res.data); // Debugging: Log the response
       setParentCommentCounts((prev) => ({ ...prev, [postId]: res.data.count }));
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        toast.error("Please login to view comments.");
+      } else {
+        toast.error("Failed to fetch comments. Please try again.");
+      }
       console.error("Error fetching parent comment count:", error);
     }
   };
@@ -188,60 +216,59 @@ function Homepage() {
 
         {/* Trending Now Card (Right) */}  
         <div className="w-1/5 m-5">
-  {/* Sticky Container */}
-  <div className="sticky top-20"> {/* Adjust `top-5` to control the distance from the top */}
-    {/* Trending Now Card */}
-    <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
-      <h2 className="text-xl font-bold mb-4">Trending Now</h2>
-      <ul className="list-disc list-inside">
-        <li className="mb-2">VIT'24 Interview Experiences</li>
-        <li className="mb-2">Placement Preparations</li>
-        <li className="mb-2">Mock Interviews Results</li>
-        <li className="mb-2">Weekly Rankings</li>
-      </ul>
-    </div>
+          {/* Sticky Container */}
+          <div className="sticky top-20"> {/* Adjust `top-5` to control the distance from the top */}
+            {/* Trending Now Card */}
+            <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
+              <h2 className="text-xl font-bold mb-4">Trending Now</h2>
+              <ul className="list-disc list-inside">
+                <li className="mb-2">VIT'24 Interview Experiences</li>
+                <li className="mb-2">Placement Preparations</li>
+                <li className="mb-2">Mock Interviews Results</li>
+                <li className="mb-2">Weekly Rankings</li>
+              </ul>
+            </div>
 
-    {/* Mock Interviews Card */}
-    <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
-      {user ? (
-        <div className="flex flex-col">
-          <div className="mb-4">
-            <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
-            <div className="flex gap-4">
-              <div>
-                <PopupModal />
-              </div>
-              <div>
-                <InputModal />
-              </div>
+            {/* Mock Interviews Card */}
+            <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
+              {user ? (
+                <div className="flex flex-col">
+                  <div className="mb-4">
+                    <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
+                    <div className="flex gap-4">
+                      <div>
+                        <PopupModal />
+                      </div>
+                      <div>
+                        <InputModal />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
+                  <div className="flex gap-8">
+                    <button
+                      className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
+                      onClick={() => navigate("/login")}
+                    >
+                      Login
+                    </button>
+                    <button
+                      className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
+                      onClick={() => navigate("/signup")}
+                    >
+                      Signup
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
         </div>
-      ) : (
-        <div className="flex flex-col items-center">
-          <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
-          <div className="flex gap-8">
-            <button
-              className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-            <button
-              className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
-              onClick={() => navigate("/signup")}
-            >
-              Signup
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-        
       </div>
     </>
   );

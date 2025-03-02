@@ -17,9 +17,19 @@ const Comments = ({ postId, currentUserId }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
+        const token = localStorage.getItem("token"); // Retrieve token from localStorage
+        if (!token) {
+          console.error("No token found. Please login.");
+          return;
+        }
+
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/comments`,
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the Authorization header
+            },
+          }
         );
 
         // Sort comments by createdAt in descending order (newest first)
@@ -41,6 +51,12 @@ const Comments = ({ postId, currentUserId }) => {
 
     setLoading(true);
     try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      if (!token) {
+        console.error("No token found. Please login.");
+        return;
+      }
+
       const content = parentCommentId ? replyContent[parentCommentId] : newComment;
 
       const res = await axios.post(
@@ -50,7 +66,11 @@ const Comments = ({ postId, currentUserId }) => {
           parentComment: parentCommentId,
           user: currentUserId,
         },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        }
       );
 
       // Update comments state by adding the new comment to the top
@@ -84,10 +104,20 @@ const Comments = ({ postId, currentUserId }) => {
 
     setLoading(true);
     try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      if (!token) {
+        console.error("No token found. Please login.");
+        return;
+      }
+
       const res = await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}`,
         { content: editContent },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        }
       );
 
       // Update the comments state with the edited content
@@ -109,9 +139,19 @@ const Comments = ({ postId, currentUserId }) => {
   const handleDeleteComment = async (commentId) => {
     setLoading(true);
     try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      if (!token) {
+        console.error("No token found. Please login.");
+        return;
+      }
+
       await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}`,
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        }
       );
 
       setComments((prev) => prev.filter((comment) => comment._id !== commentId));
@@ -123,10 +163,20 @@ const Comments = ({ postId, currentUserId }) => {
 
   const handleLikeComment = async (commentId) => {
     try {
+      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      if (!token) {
+        console.error("No token found. Please login.");
+        return;
+      }
+
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}/like`,
         { userId: currentUserId },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the Authorization header
+          },
+        }
       );
 
       setComments((prev) =>

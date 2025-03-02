@@ -25,12 +25,23 @@ const AddPostForm = () => {
     e.preventDefault();
     setIsLoading(true); // Set loading state
 
+    // Retrieve the token from localStorage
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Please login to create a post.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
         { postTitle, postContent },
         {
-          withCredentials: true, // Include cookies
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          },
         }
       );
 

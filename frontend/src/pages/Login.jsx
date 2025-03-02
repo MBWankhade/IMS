@@ -37,14 +37,21 @@ function Login() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ username, password }),
-        credentials: "include", // Include cookies
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setUser(data.user); // Set user in context
+        // Store token in local storage
+        localStorage.setItem("token", data.token);
+
+        // Update user context
+        setUser(data.user);
+
+        // Redirect to homepage
         navigate("/", { state: { loginSuccess: true } });
+
+        // Show success message
         toast.success("Login successful! Welcome back.");
       } else {
         toast.error(data.message || "Invalid credentials. Please try again.");
@@ -68,15 +75,22 @@ function Login() {
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include", // Include cookies
           body: JSON.stringify({ token: credentialResponse.credential }),
         }
       );
       const data = await res.json();
 
       if (res.ok) {
-        setUser(data.user); // Set user in context
-        navigate("/"); // Redirect to homepage
+        // Store token in local storage
+        localStorage.setItem("token", data.token);
+
+        // Update user context
+        setUser(data.user);
+
+        // Redirect to homepage
+        navigate("/");
+
+        // Show success message
         toast.success("Google Login successful!");
       } else {
         toast.error(data.message || "Google login failed. Please try again.");

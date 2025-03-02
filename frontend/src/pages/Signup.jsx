@@ -38,7 +38,6 @@ function Signup() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, email, username, password, confirmPassword }),
-        credentials: "include", // Include cookies
       });
 
       const data = await res.json();
@@ -48,8 +47,13 @@ function Signup() {
         return;
       }
 
+      // Store token in local storage
+      localStorage.setItem("token", data.token);
+
+      // Update user context
+      setUser(data.user);
+
       toast.success("Signup successful!");
-      setUser(data.data); // Assuming the backend returns user data
       navigate("/", { state: { signupSuccess: true } });
     } catch (error) {
       toast.error(error.message);
@@ -65,13 +69,17 @@ function Signup() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ token: credentialResponse.credential }),
-        credentials: "include", // Include cookies
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setUser(data.user); // Assuming the backend returns user data
+        // Store token in local storage
+        localStorage.setItem("token", data.token);
+
+        // Update user context
+        setUser(data.user);
+
         toast.success("Google Login successful!");
         navigate("/"); // Redirect to homepage
       } else {
