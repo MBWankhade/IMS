@@ -6,6 +6,7 @@ const commentSchema = new mongoose.Schema({
   content: { type: String, required: true, trim: true },
   parentComment: { type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: null },
   likes: { type: Number, default: 0 },
+  likedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Ensure this is defined,
   createdAt: { type: Date, default: Date.now }
 });
 

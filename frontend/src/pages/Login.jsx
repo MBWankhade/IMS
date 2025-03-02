@@ -65,6 +65,7 @@ function Login() {
   };
 
   const handleGoogleLogin = async (credentialResponse) => {
+    console.log(localStorage.getItem('token'));
     setIsLoading(true); // Set loading state
 
     try {

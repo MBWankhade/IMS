@@ -20,6 +20,7 @@
     "@tldraw/tldraw": "^2.2.0",
     "axios": "^1.8.1",
     "draft-js": "^0.11.7",
+    "jwt-decode": "^4.0.0",
     "peerjs": "^1.5.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

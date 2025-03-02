@@ -13,6 +13,49 @@ const Comments = ({ postId, currentUserId }) => {
 
   // Create a ref to track the bottom of the comments section
   const commentsEndRef = useRef(null);
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setCurrentUserId(decoded._id);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
+  }, []);
+
+  // Fetch comments
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          console.error("No token found. Please login.");
+          return;
+        }
+
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/comments`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const sortedComments = Array.isArray(res.data)
+          ? res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+          : [];
+
+        setComments(sortedComments);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+        setComments([]);
+      }
+    };
+    fetchComments();
+  }, [postId]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -163,22 +206,25 @@ const Comments = ({ postId, currentUserId }) => {
 
   const handleLikeComment = async (commentId) => {
     try {
-      const token = localStorage.getItem("token"); // Retrieve token from localStorage
+      // Retrieve token from localStorage
+      const token = localStorage.getItem("token");
       if (!token) {
         console.error("No token found. Please login.");
         return;
       }
-
+  
+      // Send the like request to the backend
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/comments/${commentId}/like`,
-        { userId: currentUserId },
+        {}, // No need to send userId in the body since it's extracted from the token
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include token in the Authorization header
           },
         }
       );
-
+  
+      // Update the comments state with the new likes count
       setComments((prev) =>
         prev.map((comment) =>
           comment._id === commentId ? { ...comment, likes: res.data.likes } : comment
@@ -188,7 +234,7 @@ const Comments = ({ postId, currentUserId }) => {
       console.error("Error liking comment:", error);
     }
   };
-
+  
   const renderComments = (commentList = [], parentId = null) => {
     const filteredComments = (commentList || [])
       .filter((comment) => comment.parentComment === parentId);

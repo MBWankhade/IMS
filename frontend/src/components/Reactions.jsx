@@ -20,9 +20,16 @@ const Reactions = ({ postId }) => {
   useEffect(() => {
     const fetchReactions = async () => {
       try {
+        // Retrieve token from local storage
+        const token = localStorage.getItem("token");
+
         const response = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/reactions`,
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // Include token in the header
+            },
+          }
         );
         console.log("Fetched reactions:", response.data); // Debugging
         setReactionCounts(response.data.reactionCounts);
@@ -59,11 +66,18 @@ const Reactions = ({ postId }) => {
       // Update total reactions
       setTotalReactions((prevTotal) => prevTotal + (selectedReaction ? 0 : 1));
 
+      // Retrieve token from local storage
+      const token = localStorage.getItem("token");
+
       // Send the reaction to the backend
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/react`,
         { reactionType },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include token in the header
+          },
+        }
       );
       console.log("Reaction response:", response.data); // Debugging
 
