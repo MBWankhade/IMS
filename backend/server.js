@@ -17,6 +17,7 @@ const server = createServer(app);
 const allowedOrigins = [
   "https://imsapp-palx.onrender.com", 
   "https://im-sapp.vercel.app",
+  "https://ims-for-self.vercel.app",
   "http://localhost:5173"
 ];
 
