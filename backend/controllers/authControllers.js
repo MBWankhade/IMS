@@ -29,8 +29,9 @@ export const login = async (req, res) => {
     res.cookie("token", token, {
         httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
         secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-        sameSite: "lax", // Allows cookies to be sent with top-level navigations
-        path: "/", // Makes the cookie accessible across all routes
+        sameSite: "none", // Allows cookies to be sent with top-level navigations
+        path: "/", // Makes the cookie accessible across all routes,
+        domain: 'imsapp-4lhx.onrender.com'
       });
 
     // Return user data along with token
@@ -113,8 +114,9 @@ export const signup = async (req, res) => {
         res.cookie("token", token, {
             httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
             secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-            sameSite: "lax", // Allows cookies to be sent with top-level navigations
-            path: "/", // Makes the cookie accessible across all routes
+            sameSite: "none", // Allows cookies to be sent with top-level navigations
+            path: "/", // Makes the cookie accessible across all routes,
+            domain: 'imsapp-4lhx.onrender.com'
           });
 
         // Return success response
