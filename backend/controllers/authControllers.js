@@ -26,7 +26,12 @@ export const login = async (req, res) => {
     ); 
 
     // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
-    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production" });
+    res.cookie("token", token, {
+        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+        secure: false, // Allow cookies to be sent over HTTP (not just HTTPS)
+        sameSite: "lax", // Allows cookies to be sent with top-level navigations
+        path: "/", // Makes the cookie accessible across all routes
+      });
 
     // Return user data along with token
     return res.status(200).json({
@@ -106,10 +111,11 @@ export const signup = async (req, res) => {
 
         // Set the token in a cookie
         res.cookie("token", token, {
-            httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-            secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
-            maxAge: 3600000, // 1 hour in milliseconds
-        });
+            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+            secure: false, // Allow cookies to be sent over HTTP (not just HTTPS)
+            sameSite: "lax", // Allows cookies to be sent with top-level navigations
+            path: "/", // Makes the cookie accessible across all routes
+          });
 
         // Return success response
         return res.status(201).send({

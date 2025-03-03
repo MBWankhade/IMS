@@ -44,11 +44,11 @@ export const googleLogin = async (req, res) => {
     }
 
     // Generate JWT token
-    const jwtToken = generateJWTToken(user);
-    res.cookie("token", jwtToken, {
-      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
-      // secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
-      maxAge: 3600000, // 1 hour in milliseconds
+    res.cookie("token", token, {
+      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      secure: false, // Allow cookies to be sent over HTTP (not just HTTPS)
+      sameSite: "lax", // Allows cookies to be sent with top-level navigations
+      path: "/", // Makes the cookie accessible across all routes
     });
 
     res.status(200).json({
