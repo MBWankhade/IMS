@@ -28,7 +28,7 @@ export const login = async (req, res) => {
     // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
     res.cookie("token", token, {
         httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-        secure: false, // Allow cookies to be sent over HTTP (not just HTTPS)
+        secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
         sameSite: "lax", // Allows cookies to be sent with top-level navigations
         path: "/", // Makes the cookie accessible across all routes
       });
@@ -112,7 +112,7 @@ export const signup = async (req, res) => {
         // Set the token in a cookie
         res.cookie("token", token, {
             httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-            secure: false, // Allow cookies to be sent over HTTP (not just HTTPS)
+            secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
             sameSite: "lax", // Allows cookies to be sent with top-level navigations
             path: "/", // Makes the cookie accessible across all routes
           });
