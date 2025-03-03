@@ -26,13 +26,7 @@ export const login = async (req, res) => {
     ); 
 
     // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
-    res.cookie("token", token, {
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-        secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-        sameSite: "none", // Allows cookies to be sent with top-level navigations
-        path: "/", // Makes the cookie accessible across all routes,
-        domain: 'imsapp-4lhx.onrender.com'
-      });
+    res.cookie("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", domain: 'imsapp-4lhx.onrender.com' });
 
     // Return user data along with token
     return res.status(200).json({
@@ -112,12 +106,11 @@ export const signup = async (req, res) => {
 
         // Set the token in a cookie
         res.cookie("token", token, {
-            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-            secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-            sameSite: "none", // Allows cookies to be sent with top-level navigations
-            path: "/", // Makes the cookie accessible across all routes,
-            domain: 'imsapp-4lhx.onrender.com'
-          });
+            httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
+            secure: process.env.NODE_ENV === "production", // Ensure cookies are only sent over HTTPS in production
+            maxAge: 3600000, // 1 hour in milliseconds,
+            domain: 'imsapp-4lhx.onrender.com',
+        });
 
         // Return success response
         return res.status(201).send({
