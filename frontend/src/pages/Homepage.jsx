@@ -7,7 +7,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
 import axios from "axios";
-
+import InputModal from "../components/InputModal";
+import PopupModal from "../components/PopupModal";
 import Reactions from "../components/Reactions";
 import Comments from "../components/Comments";
 
@@ -82,8 +83,9 @@ function Homepage() {
   };
 
   return (
-    <>
-      <div className="flex h-full w-full p-20 shadow-sm bg-gray-50">
+    <> 
+      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} pauseOnHover /> */}
+      <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
         {/* Profile Card (Left) */}
         <div className="w-1/5 m-5 p-5 bg-white border border-blue-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ height: "250px", overflowY: "auto" }}>
           <div className="flex flex-col items-center">
@@ -183,16 +185,62 @@ function Homepage() {
           </div>
         </div>
 
-        {/* Trending Now Card (Right) */}
-        <div className="w-1/5 m-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
-          <h2 className="text-xl font-bold mb-4">Trending Now</h2>
-          <ul className="list-disc list-inside">
-            <li className="mb-2">VIT'24 Interview Experiences</li>
-            <li className="mb-2">Placement Preparations</li>
-            <li className="mb-2">Mock Interviews Results</li>
-            <li className="mb-2">Weekly Rankings</li>
-          </ul>
+        {/* Trending Now Card (Right) */}  
+        <div className="w-1/5 m-5">
+  {/* Sticky Container */}
+  <div className="sticky top-20"> {/* Adjust `top-5` to control the distance from the top */}
+    {/* Trending Now Card */}
+    <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
+      <h2 className="text-xl font-bold mb-4">Trending Now</h2>
+      <ul className="list-disc list-inside">
+        <li className="mb-2">VIT'24 Interview Experiences</li>
+        <li className="mb-2">Placement Preparations</li>
+        <li className="mb-2">Mock Interviews Results</li>
+        <li className="mb-2">Weekly Rankings</li>
+      </ul>
+    </div>
+
+    {/* Mock Interviews Card */}
+    <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
+      <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
+      {user ? (
+        <div className="flex flex-col">
+          <div className="mb-4">
+            <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
+            <div className="flex gap-4">
+              <div>
+                <PopupModal />
+              </div>
+              <div>
+                <InputModal />
+              </div>
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
         </div>
+      ) : (
+        <div className="flex flex-col items-center">
+          <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
+          <div className="flex gap-8">
+            <button
+              className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
+              onClick={() => navigate("/login")}
+            >
+              Login
+            </button>
+            <button
+              className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
+              onClick={() => navigate("/signup")}
+            >
+              Signup
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+        
       </div>
     </>
   );
