@@ -7,12 +7,15 @@ import connectdb from "./db/connectDb.js";
 import cookieParser from "cookie-parser";
 import auth from "./routes/auth.js";
 import post from "./routes/post.js";
+import likeComment from "./routes/likeandcomment.js";
+
 
 dotenv.config();
 
 const port = 3000;
 const app = express();
 const server = createServer(app);
+
 
 // Allowed Origins
 const allowedOrigins = [
@@ -25,7 +28,7 @@ const allowedOrigins = [
 const io = new Server(server, {
   cors: {
     origin: allowedOrigins,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,  // Allow credentials like cookies 
   },
 });
@@ -42,7 +45,7 @@ connectdb();
 app.use(
   cors({
     origin: allowedOrigins,
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
@@ -52,7 +55,9 @@ app.options("*", cors());
 
 // Routes
 app.use("/api", auth);
-app.use("/api", post);  
+app.use("/api", post);
+app.use("/api", likeComment);
+
 
 // Socket.io connection
 io.on("connection", (socket) => {
