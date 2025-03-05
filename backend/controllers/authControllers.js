@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
+    let configurationForCookies;
 
     // Check if user exists
     const user = await User.findOne({ username });   
@@ -25,14 +26,23 @@ export const login = async (req, res) => {
       { expiresIn: "7d" } // Optional: Set token expiration
     ); 
 
-    // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
-    res.cookie("token", token, {
+    if (process.env?.NODE_ENV === "production") {
+      configurationForCookies = {
         httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
         secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
         sameSite: "none", // Allows cookies to be sent with top-level navigations
         path: "/", // Makes the cookie accessible across all routes,
-        domain: 'imsapp-4lhx.onrender.com'
-      });
+        domain: "imsapp-4lhx.onrender.com",
+      };
+    } else {
+      configurationForCookies = {
+        httpOnly: true,
+        secure: false,
+      };
+    }
+
+    // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
+    res.cookie("token", token, configurationForCookies);
 
 
     // Return user data along with token
@@ -112,13 +122,7 @@ export const signup = async (req, res) => {
         );
 
         // Set the token in a cookie
-        res.cookie("token", token, {
-            httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-            secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-            sameSite: "none", // Allows cookies to be sent with top-level navigations
-            path: "/", // Makes the cookie accessible across all routes,
-            domain: 'imsapp-4lhx.onrender.com'
-          });
+        res.cookie("token", token, configurationForCookies);
 
         // Return success response
         return res.status(201).send({
