@@ -24,7 +24,7 @@ function Homepage() {
   // Fetch posts and parent comment counts
   useEffect(() => {
     
-    const fetchPosts = async () => {
+    const fetchPosts = async () => { 
       
       try {
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
