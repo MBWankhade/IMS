@@ -56,7 +56,7 @@ export const googleLogin = async (req, res) => {
       configurationForCookies = {
         httpOnly: true,
         secure: false,
-      };
+      }; 
     }
 
     // Generate JWT token

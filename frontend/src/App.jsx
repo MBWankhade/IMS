@@ -12,11 +12,11 @@ import Navbar from "./components/Navbar";
 
 function App() {
   const { user, setUser } = useContext(DataContext);
-  const [loading, setLoading] = useState(true); // ✅ Add loading state
+  const [loading, setLoading] = useState(true); // ✅ Add loading state   
 
   useEffect(() => {
-    getMyProfile();
-  }, []);
+    getMyProfile(); 
+  }, []); 
 
   const getMyProfile = async () => {
     try {
@@ -27,7 +27,9 @@ function App() {
         },
         credentials: "include",
       });
-      const data = await res.json();
+      const data = await res.json();     
+
+      
       if (res.ok) {
         setUser(data);
         localStorage.setItem("token", data.token);
@@ -114,4 +116,3 @@ function AuthRedirect({ user, Component }) {
 }
 
 export default App;
-
