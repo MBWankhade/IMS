@@ -70,6 +70,7 @@ export const logout = (req, res) => {
 
 export const signup = async (req, res) => {
     try {
+      let configurationForCookies;
         const { name, email, username, password, confirmPassword } = req.body;
 
         // Check if required fields are provided
