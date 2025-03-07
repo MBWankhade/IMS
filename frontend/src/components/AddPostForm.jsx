@@ -2,13 +2,18 @@ import React, { useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { getContent } from "../utils/utils";
+import CompanyRoleSelector from "./CompanyRoleSelector";
 
 const AddPostForm = () => {
   const location=useLocation();
-  const cardId=location.state?.id;
+  const cardId=location.state?.id; 
+
+  const [company, setCompany] = useState('');
+  const [role, setRole] = useState('');
+  const [placementType, setPlacementType] = useState('');
 
   const initialPostContent=getContent(cardId);
 
@@ -23,12 +28,34 @@ const AddPostForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
+    try { 
+      // Determine postType based on cardId
+      const postType = cardId; // cardId corresponds to postType in the model
+
+      // Prepare the data to be sent to the backend
+      const postData = {
+        postType,
+        content: postContent,
+      };
+
+      // If postType is 1 (Interview Experience), include company, role, and placementType
+      if (postType === 1) {
+        postData.company = company;
+        postData.role = role;
+        postData.placementType = placementType;
+        postData.title = `${postData.company} | Interview Experience | ${postData.role} | ${postData.placementType}`;
+      } else {
+        // For other post types, include the manually entered title
+        postData.title = postTitle;
+      }
+
+      // Send the data to the backend
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-        { postTitle, postContent },
-        { withCredentials: true } 
-      );
+        postData,
+        { withCredentials: true }
+      );    
+
       toast.success("Post created successfully!");
     } catch (err) {
       toast.error("Failed to create post.");
@@ -37,6 +64,9 @@ const AddPostForm = () => {
     finally {
       setPostContent(initialPostContent);
       setPostTitle("");
+      setCompany('');
+      setRole('');
+      setPlacementType('');
     }
   };
 
@@ -55,27 +85,41 @@ const AddPostForm = () => {
   };
 
   return (
-    <div className="h-full w-full p-20 shadow-sm bg-gray-50">
+    <div className="h-full w-full p-20 shadow-sm bg-gray-50"> 
+    <ToastContainer position="top-right" autoClose={3000} /> 
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md flex gap-6">
         {/* First Div (2/3 width) */}
         <div className="w-3/4">
           {/* Post Title */}
-          <div className="mb-6">
-            <label htmlFor="postTitle" className="block text-sm font-medium text-gray-700">
-              Post Title
-            </label>
-            <div className="flex items-center">
-              <input
-                id="postTitle"
-                type="text"
-                value={postTitle}
-                onChange={(e) => setPostTitle(e.target.value)}
-                placeholder="For eg: ABC Company | Interview Experience | Role | Full Time"
-                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
-          </div>
+          <div className="mb-6">       
+              { 
+                cardId === 1 ? 
+                <div>    
+                <CompanyRoleSelector
+                  onCompanyChange={(selectedCompany) => setCompany(selectedCompany)}
+                  onRoleChange={(selectedRole) => setRole(selectedRole)}
+                  onPlacementTypeChange={(selectedPlacementType) => setPlacementType(selectedPlacementType)}
+                /> 
+                </div> : 
+                  <div>
+                  <label htmlFor="postTitle" className="block text-sm font-medium text-gray-700">
+                  Post Title
+                  </label>
+                  <div className="flex items-center">
+                    <input
+                      id="postTitle"
+                      type="text"
+                      value={postTitle}
+                      onChange={(e) => setPostTitle(e.target.value)} 
+                      className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+              }  
+
+          </div>      
+
 
           {/* Post Content (Rich Text Editor) */}
           <div className="mb-6">
@@ -135,7 +179,7 @@ const AddPostForm = () => {
               type="submit"
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-              Submit for Review
+              Submit Post
               </button>
               </div> 
               </div>
@@ -190,7 +234,7 @@ const AddPostForm = () => {
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
               >
-                <strong>Explore Contest</strong>
+                <strong>How to write an Interview Experience?</strong>
               </a>
             </div>
           </div>
