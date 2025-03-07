@@ -59,19 +59,19 @@ function Output({ language, version, value, socket, roomId }) {
     <div className="flex flex-col w-full py-4">
       <div>
         <button
-          className="text-lg font-semibold text-white bg-blue-500 rounded-xl shadow-xl px-4 py-1"
+          className="text-lg font-semibold text-white bg-black rounded-xl shadow-xl px-4 py-1"
           onClick={handleRun}
         >
           Run
         </button>
       </div>
-      <p className="text-lg font-semibold mt-3 text-white">Input</p>
+      <p className="text-lg font-semibold mt-3 text-black">Input</p>
       <textarea
         className="h-full w-full outline-none border-2 border-gray-500 rounded-lg shadow-xl text-semibold p-2"
         value={input}
         onChange={handleChange}
       />
-      <p className="text-lg font-semibold mt-3 text-white">Output</p>
+      <p className="text-lg font-semibold mt-3 text-black">Output</p>
       <div className="h-full w-full border-2 border-gray-500 rounded-lg shadow-xl text-semibold bg-white p-2">
         {output}
       </div>

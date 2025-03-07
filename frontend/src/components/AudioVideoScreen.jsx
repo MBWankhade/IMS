@@ -21,7 +21,7 @@ function AudioVideoScreen() {
       navigator.mozGetUserMedia;
 
     if (!peerInstance.current) {
-      peerInstance.current = new Peer(); 
+      peerInstance.current = new Peer();
     }
 
     peerInstance.current.on("call", (call) => {
@@ -78,30 +78,42 @@ function AudioVideoScreen() {
   };
 
   return (
-    <>
-      <div className="flex w-full justify-between h-2/6 items-center px-12">
-        <div className="w-4/12 ">
+    <div className="h-screen w-screen bg-white">
+      <div
+        className="flex w-full justify-between h-2/6 items-center p-3 "
+        // style={{ backgroundColor: "rgb(146, 235, 140)" }}
+      >
+        <div className="w-3/12 h-full">
           <video
             ref={currentUserVideoRef}
             autoPlay
             playsInline
-            className="rounded-xl shadow-xl"
+            className="rounded-xl shadow-xl w-full h-full border-2 border-gray-300"
           />
         </div>
-        <Notepad socket={socket} roomId={roomId} />
-        <div className="w-4/12 ">
+        <div
+          className="w-6/12 h-full overflow-y-auto"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
+          <Notepad socket={socket} roomId={roomId} />
+        </div>
+        <div className="w-3/12 h-full ">
           <video
             ref={remoteVideoRef}
             autoPlay
             playsInline
-            className="rounded-xl shadow-xl"
+            className="rounded-xl shadow-xl w-full h-full border-2 border-gray-300"
           />
         </div>
       </div>
-      <div>
+
+      <div
+        className=" w-full h-4/6  px-3"
+        style={{ backgroundColor: "rgb(222, 219, 229)" }}
+      >
         <CodeEditor socket={socket} roomId={roomId} />
       </div>
-    </>
+    </div>
   );
 }
 

@@ -23,8 +23,9 @@ function Notepad({ socket, roomId }) {
   };
 
   return (
-    <div className="w-10/12 h-5/6 px-4 text-white">
+    <div className="w-full h-full px-4 ">
       <ReactQuill
+        className="w-full h-full"
         theme="snow"
         value={value}
         onChange={handleChange}
