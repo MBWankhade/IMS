@@ -96,6 +96,7 @@ export const addComment = async (req, res) => {
       return res.status(400).json({ error: "Comment content is required" });
     }
 
+    // Create the comment
     const comment = new Comment({
       user: new mongoose.Types.ObjectId(user),
       post: new mongoose.Types.ObjectId(postId),
@@ -103,8 +104,14 @@ export const addComment = async (req, res) => {
       parentComment: parentComment ? new mongoose.Types.ObjectId(parentComment) : null,
     });
 
+    // Save the comment
     await comment.save();
-    res.status(201).json(comment);
+
+    // Populate the user field in the response
+    const populatedComment = await Comment.findById(comment._id).populate("user", "name profilePicture");
+
+    // Send the populated comment as the response
+    res.status(201).json(populatedComment);
   } catch (error) {
     console.error("Error adding comment:", error);
     res.status(500).json({ error: "Internal Server Error" });
