@@ -25,7 +25,7 @@ const LanguageDropdown = ({
   return (
     <div>
       <select
-        className="p-1 text-lg outline-none bg-white-500 rounded-md text-black"
+        className=" text-lg outline  rounded-md text-black"
         value={lang}
         onChange={handleChange}
       >
