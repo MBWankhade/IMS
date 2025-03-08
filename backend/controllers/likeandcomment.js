@@ -6,38 +6,35 @@ import mongoose from "mongoose";
 export const reactToPost = async (req, res) => {
   const { postId } = req.params;
   const { reactionType } = req.body;
-  const userId = req.user.id;
+  const userId = req.user._id.toString(); // Ensure user ID is a string
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ message: "Invalid post ID" });
+  }
 
   try {
     const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
-    // Check if the user already has a reaction
-    const existingReactionIndex = post.reactions.findIndex(
-      (r) => r.user.toString() === userId
-    );
-
-    if (existingReactionIndex !== -1) {
-      // Update existing reaction
-      post.reactions[existingReactionIndex].type = reactionType;
+    // Check if user already reacted
+    const existingReaction = post.reactions.find((r) => r.user.toString() === userId);
+    if (existingReaction) {
+      existingReaction.type = reactionType; // Update reaction
     } else {
-      // Add new reaction
-      post.reactions.push({ user: userId, type: reactionType });
+      post.reactions.push({ user: userId, type: reactionType }); // Add new reaction
     }
 
     await post.save();
 
     // Count reactions by type
-    const reactionCounts = post.reactions.reduce((acc, reaction) => {
-      acc[reaction.type] = (acc[reaction.type] || 0) + 1;
+    const reactionCounts = post.reactions.reduce((acc, { type }) => {
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
     res.json({ message: "Reaction updated", reactionCounts });
-  } catch (err) {
-    console.error("Error reacting to post", err);
+  } catch (error) {
+    console.error("Error reacting to post:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -45,27 +42,28 @@ export const reactToPost = async (req, res) => {
 // Get reactions for a post
 export const getPostReactions = async (req, res) => {
   const { postId } = req.params;
+  const userId = req.user._id.toString();
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ message: "Invalid post ID" });
+  }
 
   try {
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
+    const post = await Post.findById(postId).lean(); // Use lean() for read-only efficiency
+    if (!post) return res.status(404).json({ message: "Post not found" });
 
-    // Count reactions by type
-    const reactionCounts = post.reactions.reduce((acc, reaction) => {
-      acc[reaction.type] = (acc[reaction.type] || 0) + 1;
+    // Count reactions
+    const reactionCounts = post.reactions.reduce((acc, { type }) => {
+      acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
     // Find the user's reaction
-    const userReaction = post.reactions.find(
-      (r) => r.user.toString() === req.user.id
-    )?.type;
+    const userReaction = post.reactions.find((r) => r.user.toString() === userId)?.type;
 
     res.json({ reactionCounts, userReaction });
-  } catch (err) {
-    console.error("Error fetching reactions", err);
+  } catch (error) {
+    console.error("Error fetching reactions:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -73,33 +71,21 @@ export const getPostReactions = async (req, res) => {
 // Add a new comment
 export const addComment = async (req, res) => {
   try {
-    const { user, content, parentComment } = req.body;
+    const { content, parentComment } = req.body;
     const { postId } = req.params;
+    const userId = req.user._id.toString();
 
-    console.log("Received payload:", { user, content, postId, parentComment });
-
-    // Validate user ID
-    if (!mongoose.Types.ObjectId.isValid(user)) {
-      console.error("Invalid user ID:", user);
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
-
-    // Validate post ID
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      console.error("Invalid post ID:", postId);
+    if (!mongoose.isValidObjectId(postId)) {
       return res.status(400).json({ error: "Invalid post ID" });
     }
 
-    // Ensure content is not empty
     if (!content || content.trim() === "") {
-      console.error("Empty content:", content);
       return res.status(400).json({ error: "Comment content is required" });
     }
 
-    // Create the comment
     const comment = new Comment({
-      user: new mongoose.Types.ObjectId(user),
-      post: new mongoose.Types.ObjectId(postId),
+      user: userId,
+      post: postId,
       content,
       parentComment: parentComment ? new mongoose.Types.ObjectId(parentComment) : null,
     });
@@ -122,28 +108,60 @@ export const addComment = async (req, res) => {
 export const likeComment = async (req, res) => {
   try {
     const { commentId } = req.params;
-    const comment = await Comment.findById(commentId);
-    if (!comment) return res.status(404).json({ error: "Comment not found" });
+    const userId = req.user._id; // Ensure user ID is available
 
-    comment.likes = (comment.likes || 0) + 1;
+    // Validate comment ID
+    if (!mongoose.Types.ObjectId.isValid(commentId)) {
+      return res.status(400).json({ error: "Invalid comment ID" });
+    }
+
+    // Find the comment
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    // Check if the user has already liked the comment
+    const userIndex = comment.likedBy.indexOf(userId);
+
+    if (userIndex !== -1) {
+      // User has already liked the comment, so remove the like
+      comment.likes -= 1;
+      comment.likedBy.splice(userIndex, 1); // Remove the user from the likedBy array
+    } else {
+      // User has not liked the comment, so add the like
+      comment.likes += 1;
+      comment.likedBy.push(userId); // Add the user to the likedBy array
+    }
+
+    // Save the updated comment
     await comment.save();
-    res.json(comment);
+
+    // Return the updated comment
+    res.status(200).json(comment);
   } catch (error) {
-    console.error("Error liking comment:", error);
+    console.error("Error liking comment:", error.message, error.stack);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
+
 // Edit a comment
 export const editComment = async (req, res) => {
+  const { commentId } = req.params;
+  const { content } = req.body;
+  const userId = req.user._id.toString();
+
+  if (!mongoose.isValidObjectId(commentId)) {
+    return res.status(400).json({ error: "Invalid comment ID" });
+  }
+
   try {
-    const { commentId } = req.params;
-    const { content } = req.body;
-    const comment = await Comment.findByIdAndUpdate(
-      commentId,
-      { content },
-      { new: true }
-    );
+    const comment = await Comment.findOne({ _id: commentId, user: userId });
+    if (!comment) return res.status(403).json({ error: "You are not authorized to edit this comment" });
+
+    comment.content = content;
+    await comment.save();
     res.json(comment);
   } catch (error) {
     console.error("Error editing comment:", error);
@@ -153,8 +171,17 @@ export const editComment = async (req, res) => {
 
 // Delete a comment
 export const deleteComment = async (req, res) => {
+  const { commentId } = req.params;
+  const userId = req.user._id.toString();
+
+  if (!mongoose.isValidObjectId(commentId)) {
+    return res.status(400).json({ error: "Invalid comment ID" });
+  }
+
   try {
-    const { commentId } = req.params;
+    const comment = await Comment.findOne({ _id: commentId, user: userId });
+    if (!comment) return res.status(403).json({ error: "You are not authorized to delete this comment" });
+
     await Comment.findByIdAndDelete(commentId);
     res.status(204).send();
   } catch (error) {
@@ -165,18 +192,16 @@ export const deleteComment = async (req, res) => {
 
 // Get all comments for a post
 export const getPostComments = async (req, res) => {
+  const { postId } = req.params;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ error: "Invalid post ID" });
+  }
+
   try {
-    const { postId } = req.params;
-
-    // Validate post ID
-    if (!mongoose.Types.ObjectId.isValid(postId)) {
-      return res.status(400).json({ error: "Invalid post ID" });
-    }
-
-    const comments = await Comment.find({ post: postId }).populate(
-      "user",
-      "name email profilePicture"
-    );
+    const comments = await Comment.find({ post: postId })
+      .populate("user", "name email profilePicture")
+      .lean();
 
     res.json(comments);
   } catch (error) {
@@ -187,8 +212,13 @@ export const getPostComments = async (req, res) => {
 
 // Get parent comment count for a post
 export const getParentCommentCount = async (req, res) => {
+  const { postId } = req.params;
+
+  if (!mongoose.isValidObjectId(postId)) {
+    return res.status(400).json({ message: "Invalid post ID" });
+  }
+
   try {
-    const postId = req.params.postId;
     const count = await Comment.countDocuments({ post: postId, parentComment: null });
     res.json({ count });
   } catch (error) {
