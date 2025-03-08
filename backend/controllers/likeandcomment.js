@@ -53,7 +53,7 @@ export const getPostReactions = async (req, res) => {
     if (!post) return res.status(404).json({ message: "Post not found" });
 
     // Count reactions
-    const reactionCounts = post.reactions.reduce((acc, { type }) => {
+    const reactionCounts = post.reactions?.reduce((acc, { type }) => {
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
