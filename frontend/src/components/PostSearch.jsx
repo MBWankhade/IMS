@@ -7,6 +7,7 @@ import { FaSearch, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import PostContent from "./PostContent";
 import { useNavigate } from "react-router-dom";
+import { formatDate } from "../utils/utils"; 
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -109,8 +110,8 @@ const PostSearch = () => {
 
   const recommendedPosts = searchResults
     .filter((post) => post._id !== selectedPost?._id) // Exclude selected post
-    .slice(0, 5);
-
+    .slice(0, 5); 
+    
   return (
     <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
       <ToastContainer position="top-right" autoClose={3000} />
@@ -150,7 +151,7 @@ const PostSearch = () => {
             </div>
 
             {/* Results Count */}
-            {resultsCount > 0 && <div className="text-sm text-gray-600 mb-4">Found {resultsCount} results.</div>}
+            {resultsCount > 0 && <div className="text-md text-gray-600 mb-4">Found {resultsCount} results.</div>}
 
             {/* Posts List Section */}
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -162,8 +163,14 @@ const PostSearch = () => {
                 <>
                   <div className="space-y-6">
                     {searchResults.map((post) => (
-                      <div key={post._id} className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onClick={() => handlePostClick(post)}>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{post.title}</h3>
+                      <div key={post._id} className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onClick={() => handlePostClick(post)}>    
+                        <div className="flex justify-between items-center"> 
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{post.title}</h3>
+                          <div className="text-sm text-gray-500">
+                          {formatDate(post.updatedAt)}
+                          </div> 
+                        </div>
+                        
                         <PostContent content={post.content} />
                       </div>
                     ))}

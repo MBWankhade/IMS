@@ -420,6 +420,12 @@ export const truncateHTML = (html, maxLength) => {
 
   // Add ellipsis and a "read more" link
   return `${truncated}<a href="#" class="read-more"></a>`;
+}; 
+
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return `Last Updated: ${date.toLocaleDateString('en-GB', options)}`;
 };
 
 export const getContent= (cardId)=>{
