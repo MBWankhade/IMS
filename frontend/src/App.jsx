@@ -9,6 +9,7 @@ import MainPage from "./pages/MainPage";
 import AddPostForm from "./components/AddPostForm";
 import ShareExperience from "./components/ShareExperience";
 import Navbar from "./components/Navbar";
+import PostSearch from "./components/PostSearch";
 
 function App() {
   const { user, setUser } = useContext(DataContext);
@@ -82,6 +83,8 @@ function App() {
         <Route path="/room" element={<ProtectedRoute user={user} Component={MainPage} />} />
         <Route path="/write" element={<ProtectedRoute user={user} Component={AddPostForm} />} />
         <Route path="/share-experience" element={<ProtectedRoute user={user} Component={ShareExperience} />} /> 
+        <Route path="/search" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
+        <Route path="/search/:id" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
 
         {/* Fallback route for unmatched paths */}
         <Route path="*" element={<AuthRedirect user={user} Component={Homepage} />} />

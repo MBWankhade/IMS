@@ -136,7 +136,7 @@ const CompanyRoleSelector = ({ onCompanyChange, onRoleChange, onPlacementTypeCha
             className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
           >
-            <option value="" disabled>Select Placement Type</option>
+            <option value="">Not Selected</option>
             {placementTypes.map((type, index) => (
               <option key={index} value={type}>
                 {type}
