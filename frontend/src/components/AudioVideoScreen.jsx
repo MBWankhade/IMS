@@ -9,6 +9,8 @@ function AudioVideoScreen() {
   const remoteVideoRef = useRef(null);
   const currentUserVideoRef = useRef(null);
 
+  let bgColor = "rgb(228, 233, 235)";
+
   useEffect(() => {
     socket.on("connect", () => {
       console.log("connected", socket.id);
@@ -21,7 +23,7 @@ function AudioVideoScreen() {
       navigator.mozGetUserMedia;
 
     if (!peerInstance.current) {
-      peerInstance.current = new Peer(); 
+      peerInstance.current = new Peer();
     }
 
     peerInstance.current.on("call", (call) => {
@@ -78,30 +80,72 @@ function AudioVideoScreen() {
   };
 
   return (
-    <>
-      <div className="flex w-full justify-between h-2/6 items-center px-12">
-        <div className="w-4/12 ">
-          <video
-            ref={currentUserVideoRef}
-            autoPlay
-            playsInline
-            className="rounded-xl shadow-xl"
-          />
-        </div>
-        <Notepad socket={socket} roomId={roomId} />
-        <div className="w-4/12 ">
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="rounded-xl shadow-xl"
-          />
-        </div>
-      </div>
-      <div>
+    <div
+      className="h-full w-full flex gap-2 p-2"
+      style={{ backgroundColor: "black" }}
+    >
+      <div
+        className=" w-[50vw] h-full px-3 rounded-[10px]"
+        style={{
+          backgroundColor: `${bgColor}`,
+          // border: "1px solid red",
+        }}
+      >
         <CodeEditor socket={socket} roomId={roomId} />
       </div>
-    </>
+
+      <div className="flex flex-col  w-[50vw] h-full gap-2 rounded-[10px]">
+        <div
+          className="flex justify-evenly h-[30%] rounded-[10px] p-1"
+          style={{
+            backgroundColor: `${bgColor}`,
+            // border: "1px solid blue"
+          }}
+        >
+          <div
+            className="h-[100%] aspect-square rounded-[50%] flex items-center justify-center"
+            // style={{ backgroundColor: "rgb(249, 251, 249)" }}
+            style={{
+              border: "2px solid",
+            }}
+          >
+            <video
+              ref={currentUserVideoRef}
+              autoPlay
+              playsInline
+              className="rounded-[50%]  w-full h-full border-2 border-gray-300"
+            />
+          </div>
+
+          <div
+            className="h-[100%] aspect-square rounded-[50%] flex items-center justify-center"
+            // style={{ backgroundColor: "rgb(249, 251, 249)" }}
+            style={{ border: "2px solid" }}
+          >
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className="rounded-[50%]  w-full h-full border-2 border-gray-300"
+            />
+          </div>
+        </div>
+
+        <div
+          className="w-full h-[70%]  rounded-[10px] overflow-y-auto" // overflow-y-auto
+          style={{
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            backgroundColor: `${bgColor}`,
+            // border: "1px solid green",
+          }}
+        >
+          <div className="h-[87%] p-2">
+            <Notepad socket={socket} roomId={roomId} />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

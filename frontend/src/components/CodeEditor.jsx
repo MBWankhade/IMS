@@ -41,10 +41,10 @@ function CodeEditor({ socket, roomId }) {
 
   return (
     <>
-      <div className="flex mt-10 gap-4 px-10">
-        <div>
-          <div className="flex items-center gap-4 px-4 mt-3">
-            <p className="text-xl font-semibold text-white">Language:</p>
+      <div className="flex flex-col gap-4 px-10 h-full w-full">
+        <div className="h-[60%]">
+          <div className="flex items-center gap-4 px-4 mt-1">
+            <p className="text-xl font-semibold text-black">Language :</p>
             <LanguageDropdown
               langSetter={setLanguage}
               verSetter={setVersion}
@@ -55,9 +55,9 @@ function CodeEditor({ socket, roomId }) {
             />
           </div>
           <Editor
-            height="50vh"
+            // height="90%"
             theme="vs-dark"
-            width="50vw"
+            // width="50vw"
             language={language}
             value={value}
             onChange={handleEditorChange}
@@ -65,13 +65,15 @@ function CodeEditor({ socket, roomId }) {
             className="my-4"
           />
         </div>
-        <Output
-          version={version}
-          language={language}
-          value={value}
-          socket={socket}
-          roomId={roomId}
-        />
+        <div className="h-[40%]">
+          <Output
+            version={version}
+            language={language}
+            value={value}
+            socket={socket}
+            roomId={roomId}
+          />
+        </div>
       </div>
     </>
   );

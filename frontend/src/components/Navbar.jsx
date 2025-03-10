@@ -18,10 +18,13 @@ function Navbar() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/api/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
 
       if (!res.ok) {
         throw new Error("Logout failed!");
@@ -53,16 +56,24 @@ function Navbar() {
 
 
       </div>
-      
-      <div className="flex w-4/12 justify-around items-center mr-20">      
-      <div className="flex flex-col items-center cursor-pointer">
-          <AiOutlineHome size={30} className="text-black" onClick={() => navigate("/")} />
+
+      <div className="flex w-4/12 justify-around items-center mr-20">
+        <div className="flex flex-col items-center cursor-pointer">
+          <AiOutlineHome
+            size={30}
+            className="text-black"
+            onClick={() => navigate("/")}
+          />
           <p className="text-xs">Home</p>
         </div>
         <div className="flex flex-col items-center cursor-pointer">
-          <HiUsers size={30} className="text-black" onClick={() => navigate("/features")} />
+          <HiUsers
+            size={30}
+            className="text-black"
+            onClick={() => navigate("/features")}
+          />
           <p className="text-xs">My Network</p>
-        </div>    
+        </div>
         <div className="flex flex-col items-center cursor-pointer">
           <AiOutlineMessage size={30} className="text-black" />
           <p className="text-xs">Messaging</p>
@@ -70,8 +81,8 @@ function Navbar() {
         <div className="flex flex-col items-center cursor-pointer">
           <AiOutlineBell size={30} className="text-black" />
           <p className="text-xs">Notifications</p>
-        </div> 
-        
+        </div>
+
         {user ? (
           <button
             onClick={handleLogout}
@@ -81,10 +92,16 @@ function Navbar() {
           </button>
         ) : (
           <div>
-            <button className="text-xl font-semibold text-white bg-blue-700 rounded-xl  py-2 px-4" onClick={() => navigate("/login")}>
+            <button
+              className="text-xl font-semibold text-white bg-blue-700 rounded-xl  py-2 px-4"
+              onClick={() => navigate("/login")}
+            >
               Login
             </button>
-            <button className="text-xl font-semibold text-blue-700 bg-white rounded-xl  py-2 px-4" onClick={() => navigate("/signup")}>
+            <button
+              className="text-xl font-semibold text-blue-700 bg-white rounded-xl  py-2 px-4"
+              onClick={() => navigate("/signup")}
+            >
               Signup
             </button>
           </div>

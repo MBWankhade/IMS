@@ -56,23 +56,27 @@ function Output({ language, version, value, socket, roomId }) {
   }, [socket]);
 
   return (
-    <div className="flex flex-col w-full py-4">
-      <div>
+    <div className="flex flex-col h-full py-1">
+      <div className="flex py-1 mb-1">
+        <p className="text-lg font-semibold text-black text-center">Output :</p>
         <button
-          className="text-lg font-semibold text-white bg-blue-500 rounded-xl shadow-xl px-4 py-1"
+          className=" font-semibold text-black outline  rounded-xl shadow-xl px-3 py-1 ml-auto"
           onClick={handleRun}
         >
-          Run
+          Run Code
         </button>
       </div>
-      <p className="text-lg font-semibold mt-3 text-white">Input</p>
-      <textarea
+      {/* <p className="text-lg font-semibold mt-3 text-black">Input</p> */}
+      {/* <textarea
         className="h-full w-full outline-none border-2 border-gray-500 rounded-lg shadow-xl text-semibold p-2"
         value={input}
         onChange={handleChange}
-      />
-      <p className="text-lg font-semibold mt-3 text-white">Output</p>
-      <div className="h-full w-full border-2 border-gray-500 rounded-lg shadow-xl text-semibold bg-white p-2">
+      /> */}
+
+      <div
+        className="h-full w-full border-2 border-gray-500 rounded-lg shadow-xl text-semibold text-white p-2"
+        style={{ backgroundColor: "rgb(20, 19, 19)" }}
+      >
         {output}
       </div>
     </div>
