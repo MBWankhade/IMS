@@ -404,6 +404,30 @@ export const companies = [
   "Renishaw"
 ];
 
+export const truncateHTML = (html, maxLength) => {
+  if (html.length <= maxLength) return html;
+
+  // Truncate the HTML content
+  let truncated = html.substr(0, maxLength); 
+
+  // Ensure we don't cut off in the middle of a tag
+  const lastOpenTag = truncated.lastIndexOf("<");
+  const lastCloseTag = truncated.lastIndexOf(">");
+
+  if (lastOpenTag > lastCloseTag) {
+    truncated = truncated.substr(0, lastOpenTag);
+  }
+
+  // Add ellipsis and a "read more" link
+  return `${truncated}<a href="#" class="read-more"></a>`;
+}; 
+
+export const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return `Last Updated: ${date.toLocaleDateString('en-GB', options)}`;
+};
+
 export const getContent= (cardId)=>{
     switch(cardId){
       case 1:

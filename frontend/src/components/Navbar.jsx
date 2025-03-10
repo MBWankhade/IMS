@@ -40,26 +40,21 @@ function Navbar() {
   };
 
   return (
-    <div className="flex p-2 bg-white justify-between items-center shadow-sm fixed top-0 w-screen z-50">
-      <div className="flex space-x-2 ml-20">
-        <img
-          className="size-12 border border-gray-300 rounded-md p-1 cursor-pointer bg-white"
-          src={Logo}
-          alt="IMS Logo"
-          onClick={() => navigate("/")}
-        />
-        <div className="relative w-80">
-          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <AiOutlineSearch className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-          </div>
-          <input
-            type="search"
-            id="default-search"
-            className="block w-full p-3 ps-10 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-0 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-0 dark:focus:border-gray-800"
-            placeholder="Search"
-            required
-          />
-        </div>
+    <div className="flex p-2 bg-white justify-between items-center shadow-sm fixed top-0 w-full z-50">    
+      <div className="flex space-x-2 ml-20">    
+     <img className="size-12 border border-gray-300 rounded-md p-1 cursor-pointer bg-white" src={Logo}  alt="IMS Logo" onClick={() => navigate("/")} />  
+     <div className="relative w-80">
+  <button
+    id="search-button"
+    className="flex items-center justify-center w-full gap-2 p-3 text-md font-medium text-white bg-blue-600 rounded-3xl hover:bg-blue-700 transition-all duration-300 focus:ring-2 focus:ring-blue-400 dark:bg-gray-700 dark:hover:bg-gray-800" 
+    onClick={() => navigate("/search")} 
+  >
+    <AiOutlineSearch className="w-6 h-6 text-white" />
+    Search Interview Experiences
+  </button> 
+</div>
+
+
       </div>
 
       <div className="flex w-4/12 justify-around items-center mr-20">

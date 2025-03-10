@@ -38,11 +38,11 @@ const Comments = ({ postId, currentUserId }) => {
 
   const handleAddComment = async (parentCommentId = null) => {
     if (!newComment.trim() && !replyContent[parentCommentId]?.trim()) return;
-
+  
     setLoading(true);
     try {
       const content = parentCommentId ? replyContent[parentCommentId] : newComment;
-
+  
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/comments`,
         {
@@ -52,10 +52,10 @@ const Comments = ({ postId, currentUserId }) => {
         },
         { withCredentials: true }
       );
-
+  
       // Update comments state by adding the new comment to the top
       setComments((prev) => [res.data, ...prev]);
-
+  
       // Reset states
       if (parentCommentId) {
         setReplyContent((prev) => ({ ...prev, [parentCommentId]: "" })); // Clear reply content

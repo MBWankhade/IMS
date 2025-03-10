@@ -90,7 +90,7 @@ function Homepage() {
     } else {
       setOpenCommentSection(postId); // Open the comment section for this post
     }
-  };
+  }; 
 
   return (
     <>
