@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { HiPhoneMissedCall } from "react-icons/hi";
 import { useNavigate } from "react-router-dom"; // For navigation
-import AudioVideoScreen from "../components/AudioVideoScreen";
+import AudioVideoScreen from "../components/InterviewPage";
 
 function MainPage() {
   const navigate = useNavigate(); // Hook for navigation
