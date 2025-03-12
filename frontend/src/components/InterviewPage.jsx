@@ -7,7 +7,7 @@ import { Box, Paper } from "@mui/material";
 import { styled } from "@mui/system";
 
 // Fullscreen SVG
-const fullScreenSVG = (
+const exitFullScreenSVG = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -24,7 +24,7 @@ const fullScreenSVG = (
 );
 
 // Exit Fullscreen SVG
-const exitFullScreenSVG = (
+const fullScreenSVG = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
