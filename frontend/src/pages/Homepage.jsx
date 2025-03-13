@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { DataContext } from "../context/DataProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -7,6 +7,7 @@ import {
   FaComment,
   FaShare,
   FaRetweet,
+  FaSpinner,
 } from "react-icons/fa";
 import { Icon } from "semantic-ui-react";
 import { ToastContainer, toast } from "react-toastify";
@@ -25,28 +26,36 @@ function Homepage() {
   const location = useLocation();
 
   const [posts, setPosts] = useState([]);
+  const [visiblePosts, setVisiblePosts] = useState([]);
   const [openCommentSection, setOpenCommentSection] = useState(null);
   const [parentCommentCounts, setParentCommentCounts] = useState({});
+  const [loadIndex, setLoadIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false); // State to track loading status
+  const loaderRef = useRef(null);
 
   // Fetch posts and parent comment counts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-          { withCredentials: true }
-        );
-        setPosts(res.data);
-
-        // Fetch parent comment counts for each post
-        res.data.forEach((post) => {
-          fetchParentCommentCount(post._id);
-        });
+        setIsLoading(true);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
+        setTimeout(() => {
+          setPosts(res.data);
+          setVisiblePosts(res.data.slice(0, 1));
+          setLoadIndex(1);
+          setIsLoading(false);
+  
+          // Fetch parent comment counts for each post
+          res.data.forEach((post) => {
+            fetchParentCommentCount(post._id);
+          });
+        }, 1000);
       } catch (err) {
         console.error("Error fetching posts", err);
+        setIsLoading(false);
       }
     };
-
+  
     fetchPosts();
   }, []);
 
@@ -54,12 +63,10 @@ function Homepage() {
   const fetchParentCommentCount = async (postId) => {
     try {
       const res = await axios.get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
+        `${import.meta.env.VITE_BACKEND_URL
         }/api/posts/${postId}/parent-comments-count`,
         { withCredentials: true }
       );
-      console.log("API Response:", res.data); // Debugging: Log the response
       setParentCommentCounts((prev) => ({ ...prev, [postId]: res.data.count }));
     } catch (error) {
       console.error("Error fetching parent comment count:", error);
@@ -90,7 +97,36 @@ function Homepage() {
     } else {
       setOpenCommentSection(postId); // Open the comment section for this post
     }
-  }; 
+  };
+
+  // Load more posts when the loader is in view
+  // Infinite Scroll for More Posts
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading && loadIndex < posts.length) {
+          setIsLoading(true);
+          setTimeout(() => {
+            const nextPosts = posts.slice(loadIndex, loadIndex + 1);
+            setVisiblePosts((prev) => [...prev, ...nextPosts]);
+            setLoadIndex((prev) => prev + 1);
+            setIsLoading(false);
+          }, 1000); // 2-second delay before loading new posts
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [loadIndex, posts, isLoading]);
 
   return (
     <>
@@ -160,11 +196,8 @@ function Homepage() {
 
           {/* Posts Feed */}
           <div className="m-5">
-            {posts?.map((post) => (
-              <div
-                key={post._id}
-                className="mb-6 p-4 border border-blue-300 rounded-lg"
-              >
+            {visiblePosts?.map((post) => (
+              <div key={post._id} className="mb-6 p-4 border border-blue-300 rounded-lg">
                 {/* Post Header */}
                 <div className="flex items-center mb-4">
                   {post?.user?.profilePicture ? (
@@ -220,6 +253,25 @@ function Homepage() {
                 )}
               </div>
             ))}
+            {/* Loader */}
+            {/* {isLoading && (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            )} */}
+            {/* Load more trigger */}
+            {/* {loadIndex < posts.length && !isLoading && (
+              <div ref={loaderRef} className="text-center py-4">Scroll to load more posts...</div>
+            )} */}
+            {isLoading && (
+              <div className="flex justify-center items-center w-full h-40">
+                <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+              </div>
+            )}
+
+            <div ref={loaderRef} ></div>
           </div>
         </div>
 
@@ -227,13 +279,8 @@ function Homepage() {
         <div className="w-1/5 m-5">
           {/* Sticky Container */}
           <div className="sticky top-20">
-            {" "}
-            {/* Adjust `top-5` to control the distance from the top */}
             {/* Trending Now Card */}
-            <div
-              className="p-5 bg-white border border-blue-300 rounded-lg"
-              style={{ height: "200px", overflowY: "auto" }}
-            >
+            <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
               <h2 className="text-xl font-bold mb-4">Trending Now</h2>
               <ul className="list-disc list-inside">
                 <li className="mb-2">VIT'24 Interview Experiences</li>
@@ -242,20 +289,14 @@ function Homepage() {
                 <li className="mb-2">Weekly Rankings</li>
               </ul>
             </div>
+
             {/* Mock Interviews Card */}
-            <div
-              className="mt-5 p-5 bg-white border border-blue-300 rounded-lg"
-              style={{ height: "230px", overflowY: "auto" }}
-            >
-              <h2 className="text-xl font-bold text-gray-800 mb-4">
-                Mock Interviews
-              </h2>
+            <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
               {user ? (
                 <div className="flex flex-col">
                   <div className="mb-4">
-                    <p className="text-gray-600 mb-2">
-                      Practice and improve your interview skills with our tools:
-                    </p>
+                    <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
                     <div className="flex gap-4">
                       <div>
                         <PopupModal />
@@ -265,15 +306,11 @@ function Homepage() {
                       </div>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500">
-                    Get feedback, track progress, and ace your interviews!
-                  </p>
+                  <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <p className="text-gray-600 mb-4">
-                    Login or sign up to start practicing for mock interviews:
-                  </p>
+                  <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
                   <div className="flex gap-8">
                     <button
                       className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"

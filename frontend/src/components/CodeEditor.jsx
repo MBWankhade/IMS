@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import Editor, { DiffEditor, useMonaco, loader } from "@monaco-editor/react";
 import LanguageDropdown from "./LanguageDropdown";
 import Output from "./Output";
+import { FaCode, FaPlay } from "react-icons/fa"; // Icons for code and output
 
 function CodeEditor({ socket, roomId }) {
   const [value, setValue] = useState("");
   const [language, setLanguage] = useState("c");
   const [version, setVersion] = useState("10.2.0");
+  const [showOutput, setShowOutput] = useState(false); // State to toggle between code and output
 
   const editorRef = useRef(null);
 
