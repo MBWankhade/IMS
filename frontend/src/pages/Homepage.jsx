@@ -18,7 +18,8 @@ import InputModal from "../components/InputModal";
 import PopupModal from "../components/PopupModal";
 import Reactions from "../components/Reactions";
 import Comments from "../components/Comments";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/Navbar"; 
+import PostContent from "../components/PostContent";
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
@@ -219,10 +220,7 @@ function Homepage() {
                 </div>
 
                 {/* Post Content */}
-                <div
-                  dangerouslySetInnerHTML={{ __html: post.content }}
-                  className="prose max-w-none"
-                />
+                <PostContent content={post.content} />
 
                 {/* Divider Line */}
                 <hr className="my-4 border-gray-200" />
