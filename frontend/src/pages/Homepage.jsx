@@ -7,6 +7,7 @@ import {
   FaComment,
   FaShare,
   FaRetweet,
+  FaSpinner,
 } from "react-icons/fa";
 import { Icon } from "semantic-ui-react";
 import { ToastContainer, toast } from "react-toastify";
@@ -36,23 +37,25 @@ function Homepage() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const res = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
-          { withCredentials: true }
-        );
-        setPosts(res.data);
-        setVisiblePosts(res.data.slice(0, 2)); // Initially show first 2 posts
-        setLoadIndex(2); // Set the index to load the next set of posts
-
-        // Fetch parent comment counts for each post
-        res.data.forEach((post) => {
-          fetchParentCommentCount(post._id);
-        });
+        setIsLoading(true);
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
+        setTimeout(() => {
+          setPosts(res.data);
+          setVisiblePosts(res.data.slice(0, 1));
+          setLoadIndex(1);
+          setIsLoading(false);
+  
+          // Fetch parent comment counts for each post
+          res.data.forEach((post) => {
+            fetchParentCommentCount(post._id);
+          });
+        }, 1000);
       } catch (err) {
         console.error("Error fetching posts", err);
+        setIsLoading(false);
       }
     };
-
+  
     fetchPosts();
   }, []);
 
@@ -60,8 +63,7 @@ function Homepage() {
   const fetchParentCommentCount = async (postId) => {
     try {
       const res = await axios.get(
-        `${
-          import.meta.env.VITE_BACKEND_URL
+        `${import.meta.env.VITE_BACKEND_URL
         }/api/posts/${postId}/parent-comments-count`,
         { withCredentials: true }
       );
@@ -98,17 +100,18 @@ function Homepage() {
   };
 
   // Load more posts when the loader is in view
+  // Infinite Scroll for More Posts
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isLoading && loadIndex < posts.length) {
-          setIsLoading(true); // Set loading state to true
+          setIsLoading(true);
           setTimeout(() => {
-            const nextPosts = posts.slice(loadIndex, loadIndex + 2); // Load 2 more posts
+            const nextPosts = posts.slice(loadIndex, loadIndex + 1);
             setVisiblePosts((prev) => [...prev, ...nextPosts]);
-            setLoadIndex((prev) => prev + 2);
-            setIsLoading(false); // Set loading state to false after loading
-          }, 1000); // Simulate a delay for loading (optional)
+            setLoadIndex((prev) => prev + 1);
+            setIsLoading(false);
+          }, 1000); // 2-second delay before loading new posts
         }
       },
       { threshold: 1.0 }
@@ -251,17 +254,24 @@ function Homepage() {
               </div>
             ))}
             {/* Loader */}
-            {isLoading && (
+            {/* {isLoading && (
               <div className="text-center py-4">
                 <div className="spinner-border text-primary" role="status">
                   <span className="sr-only">Loading...</span>
                 </div>
               </div>
-            )}
+            )} */}
             {/* Load more trigger */}
-            {loadIndex < posts.length && !isLoading && (
+            {/* {loadIndex < posts.length && !isLoading && (
               <div ref={loaderRef} className="text-center py-4">Scroll to load more posts...</div>
+            )} */}
+            {isLoading && (
+              <div className="flex justify-center items-center w-full h-40">
+                <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+              </div>
             )}
+
+            <div ref={loaderRef} ></div>
           </div>
         </div>
 
