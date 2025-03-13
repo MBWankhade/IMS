@@ -8,6 +8,7 @@ import axios from "axios";
 import PostContent from "./PostContent";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/utils"; 
+import Navbar from "./Navbar";
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -114,7 +115,8 @@ const PostSearch = () => {
     
   return (
     <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} /> 
+      <Navbar /> 
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (
           <SinglePost onBack={handleBackToSearch} recommendedPosts={recommendedPosts}/>
