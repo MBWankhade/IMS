@@ -43,10 +43,10 @@ function CodeEditor({ socket, roomId }) {
 
   return (
     <>
-      <div className="flex mt-10 gap-4 px-10">
-        <div>
-          <div className="flex items-center gap-4 px-4 mt-3">
-            <p className="text-xl font-semibold text-white">Language:</p>
+      <div className="flex flex-col gap-4 px-10 h-full w-full">
+        <div className="h-[60%]">
+          <div className="flex items-center gap-4 px-4 mt-1">
+            <p className="text-xl font-semibold text-black">Language :</p>
             <LanguageDropdown
               langSetter={setLanguage}
               verSetter={setVersion}
@@ -56,53 +56,25 @@ function CodeEditor({ socket, roomId }) {
               roomId={roomId}
             />
           </div>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-blue-400">
-              {showOutput ? "Output" : "Code Editor"}
-            </h2>
-            <div className="flex space-x-2">
-              <button
-                onClick={() => setShowOutput(false)}
-                className={`p-2 rounded-lg flex items-center ${
-                  !showOutput
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-700 text-gray-400"
-                } hover:bg-blue-600 transition transform hover:scale-105`}
-              >
-                <FaCode className="mr-2" /> Code
-              </button>
-              <button
-                onClick={() => setShowOutput(true)}
-                className={`p-2 rounded-lg flex items-center ${
-                  showOutput
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-700 text-gray-400"
-                } hover:bg-blue-600 transition transform hover:scale-105`}
-              >
-                <FaPlay className="mr-2" /> Output
-              </button>
-            </div>
-          </div>
-          {!showOutput ? (
-            <Editor
-              height="50vh"
-              theme="vs-dark"
-              width="50vw"
-              language={language}
-              value={value}
-              onChange={handleEditorChange}
-              onMount={handleEditorDidMount}
-              className="my-4"
-            />
-          ) : (
-            <Output
-              version={version}
-              language={language}
-              value={value}
-              socket={socket}
-              roomId={roomId}
-            />
-          )}
+          <Editor
+            // height="90%"
+            theme="vs-dark"
+            // width="50vw"
+            language={language}
+            value={value}
+            onChange={handleEditorChange}
+            onMount={handleEditorDidMount}
+            className="my-4"
+          />
+        </div>
+        <div className="h-[40%]">
+          <Output
+            version={version}
+            language={language}
+            value={value}
+            socket={socket}
+            roomId={roomId}
+          />
         </div>
       </div>
     </>
