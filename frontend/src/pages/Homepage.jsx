@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { DataContext } from "../context/DataProvider";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle, FaThumbsUp, FaComment, FaShare, FaRetweet } from "react-icons/fa";
@@ -18,17 +18,21 @@ function Homepage() {
   const location = useLocation();
 
   const [posts, setPosts] = useState([]);
+  const [visiblePosts, setVisiblePosts] = useState([]);
   const [openCommentSection, setOpenCommentSection] = useState(null);
   const [parentCommentCounts, setParentCommentCounts] = useState({});
+  const [loadIndex, setLoadIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(false); // State to track loading status
+  const loaderRef = useRef(null);
 
   // Fetch posts and parent comment counts
   useEffect(() => {
-    
-    const fetchPosts = async () => { 
-      
+    const fetchPosts = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
         setPosts(res.data);
+        setVisiblePosts(res.data.slice(0, 2)); // Initially show first 2 posts
+        setLoadIndex(2); // Set the index to load the next set of posts
 
         // Fetch parent comment counts for each post
         res.data.forEach((post) => {
@@ -49,7 +53,6 @@ function Homepage() {
         `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/parent-comments-count`,
         { withCredentials: true }
       );
-      console.log("API Response:", res.data); // Debugging: Log the response
       setParentCommentCounts((prev) => ({ ...prev, [postId]: res.data.count }));
     } catch (error) {
       console.error("Error fetching parent comment count:", error);
@@ -82,9 +85,36 @@ function Homepage() {
     }
   };
 
+  // Load more posts when the loader is in view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading && loadIndex < posts.length) {
+          setIsLoading(true); // Set loading state to true
+          setTimeout(() => {
+            const nextPosts = posts.slice(loadIndex, loadIndex + 2); // Load 2 more posts
+            setVisiblePosts((prev) => [...prev, ...nextPosts]);
+            setLoadIndex((prev) => prev + 2);
+            setIsLoading(false); // Set loading state to false after loading
+          }, 1000); // Simulate a delay for loading (optional)
+        }
+      },
+      { threshold: 1.0 }
+    );
+
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      if (loaderRef.current) {
+        observer.unobserve(loaderRef.current);
+      }
+    };
+  }, [loadIndex, posts, isLoading]);
+
   return (
-    <> 
-      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} pauseOnHover /> */}
+    <>
       <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
         {/* Profile Card (Left) */}
         <div className="w-1/5 m-5 p-5 bg-white border border-blue-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ height: "250px", overflowY: "auto" }}>
@@ -131,7 +161,7 @@ function Homepage() {
 
           {/* Posts Feed */}
           <div className="m-5">
-            {posts?.map((post) => (
+            {visiblePosts?.map((post) => (
               <div key={post._id} className="mb-6 p-4 border border-blue-300 rounded-lg">
                 {/* Post Header */}
                 <div className="flex items-center mb-4">
@@ -182,65 +212,76 @@ function Homepage() {
                 )}
               </div>
             ))}
+            {/* Loader */}
+            {isLoading && (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            )}
+            {/* Load more trigger */}
+            {loadIndex < posts.length && !isLoading && (
+              <div ref={loaderRef} className="text-center py-4">Scroll to load more posts...</div>
+            )}
           </div>
         </div>
 
-        {/* Trending Now Card (Right) */}  
+        {/* Trending Now Card (Right) */}
         <div className="w-1/5 m-5">
-  {/* Sticky Container */}
-  <div className="sticky top-20"> {/* Adjust `top-5` to control the distance from the top */}
-    {/* Trending Now Card */}
-    <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
-      <h2 className="text-xl font-bold mb-4">Trending Now</h2>
-      <ul className="list-disc list-inside">
-        <li className="mb-2">VIT'24 Interview Experiences</li>
-        <li className="mb-2">Placement Preparations</li>
-        <li className="mb-2">Mock Interviews Results</li>
-        <li className="mb-2">Weekly Rankings</li>
-      </ul>
-    </div>
+          {/* Sticky Container */}
+          <div className="sticky top-20">
+            {/* Trending Now Card */}
+            <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
+              <h2 className="text-xl font-bold mb-4">Trending Now</h2>
+              <ul className="list-disc list-inside">
+                <li className="mb-2">VIT'24 Interview Experiences</li>
+                <li className="mb-2">Placement Preparations</li>
+                <li className="mb-2">Mock Interviews Results</li>
+                <li className="mb-2">Weekly Rankings</li>
+              </ul>
+            </div>
 
-    {/* Mock Interviews Card */}
-    <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
-      {user ? (
-        <div className="flex flex-col">
-          <div className="mb-4">
-            <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
-            <div className="flex gap-4">
-              <div>
-                <PopupModal />
-              </div>
-              <div>
-                <InputModal />
-              </div>
+            {/* Mock Interviews Card */}
+            <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
+              {user ? (
+                <div className="flex flex-col">
+                  <div className="mb-4">
+                    <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
+                    <div className="flex gap-4">
+                      <div>
+                        <PopupModal />
+                      </div>
+                      <div>
+                        <InputModal />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
+                  <div className="flex gap-8">
+                    <button
+                      className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
+                      onClick={() => navigate("/login")}
+                    >
+                      Login
+                    </button>
+                    <button
+                      className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
+                      onClick={() => navigate("/signup")}
+                    >
+                      Signup
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-          <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
         </div>
-      ) : (
-        <div className="flex flex-col items-center">
-          <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
-          <div className="flex gap-8">
-            <button
-              className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </button>
-            <button
-              className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
-              onClick={() => navigate("/signup")}
-            >
-              Signup
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  </div>
-</div>
-        
       </div>
     </>
   );
