@@ -84,7 +84,7 @@ const CodeEditor = () => {
           <TabPanel>
             <Flex justify="space-between" align="center" mb={4}>
               <Box ml={2} mb={4} minWidth="150px">
-                <Text mb={2} fontSize="lg">Language:</Text>
+                <Text mb={2} fontSize="lg" color='wheat'>Language:</Text>
                 <Menu isLazy>
                   <MenuButton as={Button} bg="gray.800" color="white" zIndex="10">
                     {language}
