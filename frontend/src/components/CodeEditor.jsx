@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   Box,
   Tabs,
@@ -20,11 +20,12 @@ import { Editor } from "@monaco-editor/react";
 import { FaCode, FaPlay } from "react-icons/fa";
 import { CODE_SNIPPETS, LANGUAGE_VERSIONS } from "../utils/constants";
 import { executeCode } from "./api";
+import { debounce } from "lodash";
 
 const languages = Object.entries(LANGUAGE_VERSIONS);
 const ACTIVE_COLOR = "blue.400";
 
-const CodeEditor = () => {
+const CodeEditor = ({ socket, roomId }) => {
   const editorRef = useRef();
   const toast = useToast();
   const [value, setValue] = useState("");
@@ -33,14 +34,52 @@ const CodeEditor = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const debouncedEmit = useCallback(
+    debounce((newValue) => {
+      socket.emit("display-code", { room: roomId, data: newValue });
+    }, 1000),
+    [socket, roomId]
+  );
+
+  useEffect(() => {
+    const handleReceiveCode = (data) => setValue(data);
+    const handleReceiveLanguage = (newLanguage) => {
+      setLanguage(newLanguage);
+      setValue(CODE_SNIPPETS[newLanguage]);
+    };
+    const handleReceiveOutput = (data) => {
+      setOutput(data?.output?.split("\n"));
+      setIsError(data.isError);
+    };
+
+    socket.on("recieve-code", handleReceiveCode);
+    socket.on("recieve-language", handleReceiveLanguage);
+    socket.on("receive-output", handleReceiveOutput);
+
+    return () => {
+      socket.emit("leaveRoom", roomId);
+      socket.off("recieve-code", handleReceiveCode);
+      socket.off("recieve-language", handleReceiveLanguage);
+      socket.off("receive-output", handleReceiveOutput);
+    };
+  }, [socket, roomId]);
+
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
   };
 
-  const onSelect = (language) => {
-    setLanguage(language);
-    setValue(CODE_SNIPPETS[language]);
+  const onSelect = (newLanguage) => {
+    setLanguage(newLanguage);
+    setValue(CODE_SNIPPETS[newLanguage]);
+    socket.emit("change-language", { room: roomId, data: newLanguage });
+  };
+
+  const handleOutputChange = (newValue) => {
+    if (!socket.connected) {
+      alert("Please reconnect");
+    }
+    socket.emit("output-change", { room: roomId, data: newValue });
   };
 
   const runCode = async () => {
@@ -51,6 +90,7 @@ const CodeEditor = () => {
       const { run: result } = await executeCode(language, sourceCode);
       setOutput(result.output.split("\n"));
       result.stderr ? setIsError(true) : setIsError(false);
+      handleOutputChange(result);
     } catch (error) {
       console.log(error);
       toast({
@@ -62,6 +102,15 @@ const CodeEditor = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleEditorChange = (newValue) => {
+    if (!socket.connected) {
+      alert("Please reconnect");
+      return;
+    }
+    setValue(newValue);
+    debouncedEmit(newValue);
   };
 
   return (
@@ -80,11 +129,10 @@ const CodeEditor = () => {
           </Tab>
         </TabList>
         <TabPanels>
-          {/* Code Editor Panel */}
           <TabPanel>
             <Flex justify="space-between" align="center" mb={4}>
               <Box ml={2} mb={4} minWidth="150px">
-                <Text mb={2} fontSize="lg" color='wheat'>Language:</Text>
+                <Text mb={2} fontSize="lg" color="wheat">Language:</Text>
                 <Menu isLazy>
                   <MenuButton as={Button} bg="gray.800" color="white" zIndex="10">
                     {language}
@@ -114,38 +162,17 @@ const CodeEditor = () => {
               defaultValue={CODE_SNIPPETS[language]}
               onMount={onMount}
               value={value}
-              onChange={(value) => setValue(value)}
+              onChange={handleEditorChange}
             />
           </TabPanel>
-
-          {/* Output Panel with Mac Terminal Styling */}
           <TabPanel>
             <Box w="100%" maxW="800px" mx="auto">
               <Text mb={2} fontSize="lg">Output</Text>
-              <Box
-                bg="black"
-                color="white"
-                borderRadius="md"
-                border="1px solid #333"
-                fontFamily="monospace"
-                overflow="hidden"
-              >
-                {/* Mac Terminal Header */}
-                <Flex bg="gray.800" px={4} py={2} align="center">
-                  <Box w={3} h={3} bg="red.500" borderRadius="full" mr={2} />
-                  <Box w={3} h={3} bg="yellow.500" borderRadius="full" mr={2} />
-                  <Box w={3} h={3} bg="green.500" borderRadius="full" />
-                </Flex>
-
-                {/* Output Content */}
+              <Box bg="black" color="white" borderRadius="md" border="1px solid #333" fontFamily="monospace" overflow="hidden">
                 <Box height="70vh" p={4} overflowY="auto" whiteSpace="pre-wrap">
-                  {output
-                    ? output.map((line, i) => (
-                        <Text key={i} color={isError ? "red.400" : "white"}>
-                          {line}
-                        </Text>
-                      ))
-                    : 'Click "Run Code" to see the output here'}
+                  {output ? output.map((line, i) => (
+                    <Text key={i} color={isError ? "red.400" : "white"}>{line}</Text>
+                  )) : 'Click "Run Code" to see the output here'}
                 </Box>
               </Box>
             </Box>

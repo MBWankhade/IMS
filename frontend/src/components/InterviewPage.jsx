@@ -105,7 +105,6 @@ const InterviewPage = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
-    console.log('first')
     socket.on("connect", () => console.log("Connected:", socket.id));
     socket.emit("joinRoom", roomId);
 
@@ -114,9 +113,11 @@ const InterviewPage = () => {
     }
 
     peerInstance.current.on("call", (call) => {
+      console.log("peer")
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
+          console.log(mediaStream)
           currentUserVideoRef.current.srcObject = mediaStream;
           currentUserVideoRef.current.play();
           call.answer(mediaStream);
@@ -129,9 +130,7 @@ const InterviewPage = () => {
         .catch((err) => console.error("Failed to access media devices", err));
     });
 
-    if (status === "interviewee") {
       initiateCall(roomId);
-    }
 
     return () => {
       if (peerInstance.current) {

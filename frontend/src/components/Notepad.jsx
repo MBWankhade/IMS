@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { styled } from "@mui/system";
 import { DEFAULT_TEMPLATE_NOTEPAD } from "../utils/constants";
+import { debounce } from "lodash"; // Using lodash for debouncing
 
 const modules = {
   toolbar: [
@@ -72,18 +73,35 @@ const NotepadWrapper = styled("div")({
 function Notepad({ socket, roomId }) {
   const [value, setValue] = useState(DEFAULT_TEMPLATE_NOTEPAD);
 
-  useEffect(() => {
-    socket.on("recieve-text", (data) => setValue(data));
+  // Debounce the socket emit to prevent sending too many messages
+  const debouncedEmit = useCallback(
+    debounce((newValue) => {
+      socket.emit("text-change", { room: roomId, data: newValue });
+    }, 1000), // Adjust debounce delay as needed
+    [socket, roomId]
+  );
 
+  useEffect(() => {
+    // Listen for text updates from other users
+    socket.on("receive-text", (data) => {
+      setValue(data);
+    });
+
+    // Handle cleanup on component unmount or when roomId changes
     return () => {
       socket.emit("leaveRoom", roomId);
+      socket.off("receive-text"); // Unsubscribe from the event
       socket.disconnect();
     };
   }, [roomId, socket]);
 
   const handleChange = (newValue) => {
+    if(!socket.connected){
+      alert("Please reconnect")
+      return;
+    }
     setValue(newValue);
-    socket.emit("text-change", { room: roomId, data: newValue });
+    debouncedEmit(newValue); // Send change to the server with debounce
   };
 
   return (
