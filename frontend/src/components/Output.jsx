@@ -1,86 +1,61 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
+import { Box, Button, Text, useToast } from "@chakra-ui/react";
+import { executeCode } from "./api";
 
-function Output({ language, version, value, socket, roomId }) {
-  const [output, setOutput] = useState("");
-  const [input, setInput] = useState("");
+const Output = ({ editorRef, language }) => {
+  const toast = useToast();
+  const [output, setOutput] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const handleRun = async () => {
+  const runCode = async () => {
+    const sourceCode = editorRef.current.getValue();
+    if (!sourceCode) return;
     try {
-      const reqBody = {
-        language,
-        version,
-        files: [
-          {
-            content: value,
-          },
-        ],
-        stdin: input,
-      };
-      const res = await fetch("https://emkc.org/api/v2/piston/execute", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqBody),
-      });
-
-      const data = await res.json();
-      setOutput(data.run.stdout + "\n" + data.run.stderr);
-      socket.emit("output-change", {
-        room: roomId,
-        data: data.run.stdout + "\n" + data.run.stderr,
-      });
+      setIsLoading(true);
+      const { run: result } = await executeCode(language, sourceCode);
+      setOutput(result.output.split("\n"));
+      result.stderr ? setIsError(true) : setIsError(false);
     } catch (error) {
       console.log(error);
+      toast({
+        title: "An error occurred.",
+        description: error.message || "Unable to run code",
+        status: "error",
+        duration: 6000,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  function handleChange(event) {
-    const newValue = event.target.value;
-    setInput(newValue);
-    socket.emit("input-change", { room: roomId, data: newValue });
-  }
-
-  useEffect(() => {
-    socket.on("recieve-input", (data) => {
-      setInput(data);
-    });
-
-    socket.on("recieve-output", (data) => {
-      setOutput(data);
-    });
-
-    return () => {
-      socket.off("receive-input");
-    };
-  }, [socket]);
-
   return (
-    <div className="flex flex-col h-full py-1">
-      <div className="flex py-1 mb-1">
-        <p className="text-lg font-semibold text-black text-center">Output :</p>
-        <button
-          className=" font-semibold text-black outline  rounded-xl shadow-xl px-3 py-1 ml-auto"
-          onClick={handleRun}
-        >
-          Run Code
-        </button>
-      </div>
-      {/* <p className="text-lg font-semibold mt-3 text-black">Input</p> */}
-      {/* <textarea
-        className="h-full w-full outline-none border-2 border-gray-500 rounded-lg shadow-xl text-semibold p-2"
-        value={input}
-        onChange={handleChange}
-      /> */}
-
-      <div
-        className="h-full w-full border-2 border-gray-500 rounded-lg shadow-xl text-semibold text-white p-2"
-        style={{ backgroundColor: "rgb(20, 19, 19)" }}
+    <Box w="50%">
+      <Text mb={2} fontSize="lg">
+        Output
+      </Text>
+      <Button
+        variant="outline"
+        colorScheme="green"
+        mb={4}
+        isLoading={isLoading}
+        onClick={runCode}
       >
-        {output}
-      </div>
-    </div>
+        Run Code
+      </Button>
+      <Box
+        height="75vh"
+        p={2}
+        color={isError ? "red.400" : ""}
+        border="1px solid"
+        borderRadius={4}
+        borderColor={isError ? "red.500" : "#333"}
+      >
+        {output
+          ? output.map((line, i) => <Text key={i}>{line}</Text>)
+          : 'Click "Run Code" to see the output here'}
+      </Box>
+    </Box>
   );
-}
-
+};
 export default Output;

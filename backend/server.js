@@ -94,7 +94,12 @@ io.on("connection", (socket) => {
   });
 
   socket.on("text-change", ({ room, data }) => {
-    io.to(room).emit("recieve-text", data);
+    io.to(room).emit("receive-text", data);
+  });
+
+  socket.on("output-change", ({ room, data }) => {
+    io.to(room).emit("receive-output", data);
+    console.log(data);
   });
 });
 
