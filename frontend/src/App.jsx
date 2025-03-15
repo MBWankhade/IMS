@@ -11,6 +11,10 @@ import ShareExperience from "./components/ShareExperience";
 import Navbar from "./components/Navbar";
 import PostSearch from "./components/PostSearch";
 import { FaSpinner } from "react-icons/fa";
+import NewHomepage from "./pages/NewHomepage";
+import AppLayout from "./components/layout/AppLayout";
+
+import "./App.css";
 
 function App() {
   const { user, setUser } = useContext(DataContext);
@@ -54,8 +58,8 @@ function App() {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-white">
         <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-     </div> 
-    ); 
+      </div>
+    );
   }
 
   return (
@@ -73,12 +77,39 @@ function App() {
         />
 
         {/* Protected routes (user required) */}
-        <Route path="/" element={<ProtectedRoute user={user} Component={Homepage} />} />
-        <Route path="/room" element={<ProtectedRoute user={user} Component={MainPage} />} />
-        <Route path="/write" element={<ProtectedRoute user={user} Component={AddPostForm} />} />
-        <Route path="/share-experience" element={<ProtectedRoute user={user} Component={ShareExperience} />} /> 
-        <Route path="/search" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
-        <Route path="/search/:id" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
+        <Route
+          path="/"
+          element={<ProtectedRoute user={user} Component={Homepage} />}
+        />
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AppLayout(NewHomepage)}
+            />
+          }
+        />
+        <Route
+          path="/room"
+          element={<ProtectedRoute user={user} Component={MainPage} />}
+        />
+        <Route
+          path="/write"
+          element={<ProtectedRoute user={user} Component={AddPostForm} />}
+        />
+        <Route
+          path="/share-experience"
+          element={<ProtectedRoute user={user} Component={ShareExperience} />}
+        />
+        <Route
+          path="/search"
+          element={<ProtectedRoute user={user} Component={PostSearch} />}
+        />
+        <Route
+          path="/search/:id"
+          element={<ProtectedRoute user={user} Component={PostSearch} />}
+        />
 
         {/* Fallback route for unmatched paths */}
         <Route

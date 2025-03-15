@@ -29,10 +29,10 @@ function PopupModal() {
   return (
     <div>
       <button
-        className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md"
+        className="bg-white w-full font-semibold text-lg text-gray-900 px-4 py-1 rounded-md shadow-md"
         onClick={openModal}
       >
-        Start an Interview
+        Start Interview
       </button>
 
       {isOpen && (

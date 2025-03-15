@@ -40,6 +40,7 @@
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.5",
     "socket.io-client": "^4.7.5",
+    "tailwindcss-animate": "^1.0.7",
     "tldraw": "^2.2.0"
   },
   "devDependencies": {
