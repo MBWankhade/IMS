@@ -19,10 +19,10 @@ function InputModal() {
   return (
     <div>
       <button
-        className="font-semibold text-lg  px-4 py-1 rounded-md border border-gray-300 shadow-md"
+        className="bg-white w-full font-semibold text-lg text-gray-900 px-4 py-1 rounded-md shadow-md"
         onClick={openModal}
       >
-        Join an Interview
+        Join Interview
       </button>
 
       {isOpen && (
