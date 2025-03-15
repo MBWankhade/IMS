@@ -12,11 +12,9 @@ const ShareExperience = () => {
 
   return (
     <>
-      {user && <Navbar />}
-
-      <div className="h-full w-full p-20 shadow-sm bg-gray-50">
+      <div className="h-full w-full p-6 shadow-sm bg-gray-50">
         <h2 className="text-2xl font-bold mb-8 pt-3">Share your Experience</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-3 xl:grid-cols-3 gap-6">
           {cards.map((card) => (
             <a
               key={card.id}

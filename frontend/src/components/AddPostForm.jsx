@@ -88,9 +88,7 @@ const AddPostForm = () => {
 
   return (
     <>
-      {user && <Navbar />}
-
-      <div className="h-full w-full p-20 shadow-sm bg-gray-50">
+      <div className="h-full w-full p-6 shadow-sm bg-gray-50">
         <ToastContainer position="top-right" autoClose={3000} />
         <form
           onSubmit={handleSubmit}

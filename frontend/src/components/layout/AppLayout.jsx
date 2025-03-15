@@ -1,16 +1,18 @@
 import LeftSidebarr from "./LeftSidebar";
+import TopBar from "./TopBar";
+import BottomBar from "./BottomBar";
 
 const AppLayout = (MainComponent) => {
   return (
     <div className="w-full md:flex">
-      {/* <Topbar /> */}
       <LeftSidebarr />
+      <TopBar />
 
-      <section className="flex flex-1 h-full">
+      <section className="flex flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:min-h-screen scrollbar-hidden">
         <MainComponent />
       </section>
 
-      {/* <Bottombar /> */}
+      <BottomBar />
     </div>
   );
 };

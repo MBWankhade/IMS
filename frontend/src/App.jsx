@@ -4,14 +4,13 @@ import { DataContext } from "./context/DataProvider";
 import { toast, ToastContainer } from "react-toastify";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Homepage from "./pages/Homepage";
 import MainPage from "./pages/MainPage";
 import AddPostForm from "./components/AddPostForm";
 import ShareExperience from "./components/ShareExperience";
 import Navbar from "./components/Navbar";
 import PostSearch from "./components/PostSearch";
 import { FaSpinner } from "react-icons/fa";
-import NewHomepage from "./pages/NewHomepage";
+import Homepage from "./pages/Homepage";
 import AppLayout from "./components/layout/AppLayout";
 
 import "./App.css";
@@ -79,15 +78,8 @@ function App() {
         {/* Protected routes (user required) */}
         <Route
           path="/"
-          element={<ProtectedRoute user={user} Component={Homepage} />}
-        />
-        <Route
-          path="/home"
           element={
-            <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(NewHomepage)}
-            />
+            <ProtectedRoute user={user} Component={() => AppLayout(Homepage)} />
           }
         />
         <Route
@@ -96,19 +88,39 @@ function App() {
         />
         <Route
           path="/write"
-          element={<ProtectedRoute user={user} Component={AddPostForm} />}
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AppLayout(AddPostForm)}
+            />
+          }
         />
         <Route
           path="/share-experience"
-          element={<ProtectedRoute user={user} Component={ShareExperience} />}
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AppLayout(ShareExperience)}
+            />
+          }
         />
         <Route
           path="/search"
-          element={<ProtectedRoute user={user} Component={PostSearch} />}
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AppLayout(PostSearch)}
+            />
+          }
         />
         <Route
           path="/search/:id"
-          element={<ProtectedRoute user={user} Component={PostSearch} />}
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AppLayout(PostSearch)}
+            />
+          }
         />
 
         {/* Fallback route for unmatched paths */}

@@ -1,10 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
+import { useContext } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Loader } from "semantic-ui-react";
-import Logo from "../../assets/logo-vit.png";
 import { DataContext } from "../../context/DataProvider";
-import { sidebarLinks } from "../../utils/constants";
-import { hoverleftBar, leftsideBar } from "../../utils/colors";
+import {
+  AiOutlineHome,
+  AiOutlineUserSwitch,
+  AiOutlineSearch,
+  AiOutlineMessage,
+  AiOutlineBell,
+} from "react-icons/ai";
+import { HiUsers } from "react-icons/hi2";
+import { Button, Loader } from "semantic-ui-react";
+import { bottombarLinks } from "../../utils/constants";
+import Logo from "../../assets/logo-vit.png";
+import { leftsideBar } from "../../utils/colors";
 
 function Navbar() {
   const { user, setUser } = useContext(DataContext);
@@ -36,48 +45,24 @@ function Navbar() {
 
   return (
     <nav
-      className="hidden h-[100vh] md:flex px-6 py-6 flex-col justify-between min-w-[270px]  overflow-y-auto custom-scrollbar text-white"
+      className="md:hidden sticky bottom-0 overflow-x-auto custom-scrollbar h-[4rem] text-white"
       style={{ backgroundColor: `${leftsideBar}` }}
     >
-      <div className="flex flex-col gap-5">
-        <Link to="/" className="flex gap-3 items-center">
-          <img src={Logo} alt="logo" width={40} height={36} />
-        </Link>
-
-        {!user?.email ? (
-          <div className="h-14">
-            <Loader />
-          </div>
-        ) : (
-          <Link to={`/profile`} className="flex gap-3 items-center">
-            <img
-              src={user?.imageUrl || "/assets/icons/profile-placeholder.svg"}
-              alt="profile"
-              className="h-14 w-14 rounded-full"
-            />
-            <div className="flex flex-col">
-              <p className="body-bold">{user?.name}</p>
-              <p className="small-regular text-light-3">
-                @{user?.username || "Guest"}
-              </p>
-            </div>
-          </Link>
-        )}
-
-        <ul className="flex flex-col gap-6">
-          {sidebarLinks.map((link) => {
+      <div className="flex gap-5">
+        <ul className="flex justify-between gap-6 w-full">
+          {bottombarLinks.map((link) => {
             const isActive = pathname === link.route;
 
             return (
               <li
                 key={link.label}
-                className={`rounded-lg text-white base-medium hover:bg-primary-500 transition group ${
+                className={`rounded-lg w-1/5 base-medium hover:bg-primary-500 transition group ${
                   isActive && "bg-primary-500"
                 }`}
               >
                 <NavLink
                   to={link.route}
-                  className="flex gap-4 items-center p-4"
+                  className="flex flex-col gap-1 items-center p-2"
                 >
                   <img
                     src={link.imgURL}
@@ -86,23 +71,12 @@ function Navbar() {
                       isActive && "invert-white"
                     }`}
                   />
-                  <p className="group-hover:text-white">{link.label}</p>
+                  <p className="text-sm">{link.label}</p>
                 </NavLink>
               </li>
             );
           })}
         </ul>
-        <button
-          className={`flex gap-4 items-center p-4 text-white rounded-lg base-medium hover:bg-primary-500 transition group`}
-          onClick={handleLogout}
-        >
-          <img
-            src="/assets/icons/logout.svg"
-            alt="logout"
-            className="group-hover:invert-white"
-          />
-          <p className="small-medium lg:base-medium">Logout</p>
-        </button>
       </div>
     </nav>
   );

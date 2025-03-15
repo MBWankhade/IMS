@@ -64,5 +64,6 @@ const config = {
   plugins: [tailwindcssAnimate],
 };
 
+
 // Export the config as an ES module
 export default config;
