@@ -9,6 +9,7 @@ import PostContent from "./PostContent";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/utils";
 import Navbar from "./Navbar";
+import { mainContaint } from "../utils/colors";
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -124,7 +125,7 @@ const PostSearch = () => {
     .slice(0, 5);
 
   return (
-    <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
+    <div className="flex w-full p-20 bg-white shadow-sm h-full1">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (

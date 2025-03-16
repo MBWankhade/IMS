@@ -21,7 +21,7 @@ import Comments from "../components/Comments";
 import Navbar from "../components/Navbar";
 import PostContent from "../components/PostContent";
 import AppLayout from "../components/layout/AppLayout";
-import { homepage, leftsideBar } from "../utils/colors";
+import { leftsideBar, mainContaint } from "../utils/colors";
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
@@ -145,7 +145,7 @@ function Homepage() {
       <div className="flex flex-1 h-[100vh] ">
         {/* Main Feed (Middle) */}
         <div
-          style={{ backgroundColor: `${homepage}` }}
+          style={{ backgroundColor: `${mainContaint}` }}
           className="flex flex-col flex-1  gap-10 overflow-scroll py-10 px-5 md:px-8 lg:p-14 custom-scrollbar"
         >
           {/* Write for Community Div */}

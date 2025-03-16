@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Button, Loader } from "semantic-ui-react";
+import { Loader } from "semantic-ui-react";
 import Logo from "../../assets/logo-vit.png";
 import { DataContext } from "../../context/DataProvider";
-import { sidebarLinks } from "../../utils/constants";
 import { hoverleftBar, leftsideBar } from "../../utils/colors";
+import { sidebarLinks } from "../../utils/constants";
 
 function Navbar() {
   const { user, setUser } = useContext(DataContext);
@@ -49,15 +49,18 @@ function Navbar() {
             <Loader />
           </div>
         ) : (
-          <Link to={`/profile`} className="flex gap-3 items-center">
+          <Link
+            to={`/profile`}
+            className="flex gap-3 items-center hover:text-white"
+          >
             <img
               src={user?.imageUrl || "/assets/icons/profile-placeholder.svg"}
               alt="profile"
               className="h-14 w-14 rounded-full"
             />
-            <div className="flex flex-col">
+            <div className="flex flex-col ">
               <p className="body-bold">{user?.name}</p>
-              <p className="small-regular text-light-3">
+              <p className="small-regular text-light-3 ">
                 @{user?.username || "Guest"}
               </p>
             </div>
@@ -71,11 +74,26 @@ function Navbar() {
             return (
               <li
                 key={link.label}
-                className={`rounded-lg text-white base-medium hover:bg-primary-500 transition group ${
-                  isActive && "bg-primary-500"
-                }`}
+                className="rounded-[18px] text-white base-medium transition group backdrop-blur-md"
+                style={{
+                  backgroundColor: isActive ? hoverleftBar : "",
+                  boxShadow: isActive ? `0px 0px 15px ${hoverleftBar}` : "none", // Active state shadow
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = hoverleftBar;
+                  e.currentTarget.style.boxShadow = `0px 0px 25px ${hoverleftBar}`; // Stronger glow on hover
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = isActive
+                    ? hoverleftBar
+                    : "";
+                  e.currentTarget.style.boxShadow = isActive
+                    ? `0px 0px 15px ${hoverleftBar}`
+                    : "none"; // Restore active shadow or remove
+                }}
               >
                 <NavLink
+                  component={Link}
                   to={link.route}
                   className="flex gap-4 items-center p-4"
                 >
@@ -93,8 +111,14 @@ function Navbar() {
           })}
         </ul>
         <button
-          className={`flex gap-4 items-center p-4 text-white rounded-lg base-medium hover:bg-primary-500 transition group`}
+          className={`flex gap-4 items-center p-4 text-white rounded-lg base-medium  transition group`}
           onClick={handleLogout}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = hoverleftBar;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "";
+          }}
         >
           <img
             src="/assets/icons/logout.svg"

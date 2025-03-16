@@ -15,7 +15,7 @@ import {
   captionsSVG,
   reactionSVG,
   leaveCallSVG,
-  moreIconSVG
+  moreIconSVG,
 } from "../utils/icons";
 
 /* Styled wrapper with dark UI-friendly hover effects */
@@ -105,6 +105,7 @@ const InterviewPage = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
+    console.log("Connected:", socket.id);
     socket.on("connect", () => console.log("Connected:", socket.id));
     socket.emit("joinRoom", roomId);
 
@@ -113,11 +114,11 @@ const InterviewPage = () => {
     }
 
     peerInstance.current.on("call", (call) => {
-      console.log("peer")
+      console.log("peer");
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
-          console.log(mediaStream)
+          console.log(mediaStream);
           currentUserVideoRef.current.srcObject = mediaStream;
           currentUserVideoRef.current.play();
           call.answer(mediaStream);
@@ -130,7 +131,7 @@ const InterviewPage = () => {
         .catch((err) => console.error("Failed to access media devices", err));
     });
 
-      initiateCall(roomId);
+    initiateCall(roomId);
 
     return () => {
       if (peerInstance.current) {
@@ -299,11 +300,7 @@ const InterviewPage = () => {
         }}
       >
         {/* Floating Dots Button */}
-        {!isHovered && (
-          <FloatingButton>
-            {moreIconSVG}
-          </FloatingButton>
-        )}
+        {!isHovered && <FloatingButton>{moreIconSVG}</FloatingButton>}
 
         {/* Bottom Bar (Visible on Hover) */}
         {isHovered && (

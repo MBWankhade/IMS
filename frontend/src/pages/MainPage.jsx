@@ -17,7 +17,6 @@ function MainPage() {
   };
 
   const enableFullScreen = () => {
-
     const elem = document.documentElement; // Get the whole document
 
     if (document.fullscreenElement) {
@@ -44,7 +43,6 @@ function MainPage() {
   };
 
   const exitFullScreen = () => {
-
     if (!document.fullscreenElement) {
       return;
     }
@@ -72,7 +70,6 @@ function MainPage() {
     };
 
     const handleFullScreenChange = () => {
-
       setTimeout(() => {
         if (!document.fullscreenElement) {
           alert("You must stay in full-screen mode for the test.");
@@ -103,11 +100,11 @@ function MainPage() {
 
   return (
     <>
-      <div className="h-[93vh] w-screen bg-gray-800 relative">
+      <div className="h-[100vhvh] w-screen bg-gray-800 relative">
         <AudioVideoScreen />
       </div>
 
-      <div
+      {/* <div
         className="h-[7vh] w-screen flex justify-center items-center
          text-center cursor-pointer p-1"
         style={{ backgroundColor: "rgba(127, 35, 189, 0.93)" }}
@@ -122,7 +119,7 @@ function MainPage() {
         >
           <HiPhoneMissedCall className="w-8 h-8 text-black" />
         </button>
-      </div>
+      </div> */}
     </>
   );
 }

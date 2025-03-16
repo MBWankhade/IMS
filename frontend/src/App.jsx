@@ -124,10 +124,10 @@ function App() {
         />
 
         {/* Fallback route for unmatched paths */}
-        <Route
+        {/* <Route
           path="*"
           element={<AuthRedirect user={user} Component={Homepage} />}
-        />
+        /> */}
       </Routes>
       <ToastContainer
         position="top-right"
