@@ -11,6 +11,7 @@
 
   body {
     @apply bg-dark-1 text-white min-h-screen font-inter;
+    /* @apply bg-dark-1  min-h-screen font-inter; */
   }
 }
 
@@ -277,4 +278,13 @@
   .shad-button_ghost {
     @apply flex gap-4 items-center justify-start hover:bg-transparent hover:text-white !important;
   }
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hidden {
+  -ms-overflow-style: none; /* For Internet Explorer */
+  scrollbar-width: none; /* For Firefox */
 }

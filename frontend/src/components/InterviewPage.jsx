@@ -15,7 +15,7 @@ import {
   captionsSVG,
   reactionSVG,
   leaveCallSVG,
-  moreIconSVG
+  moreIconSVG,
 } from "../utils/icons";
 
 /* Styled wrapper with dark UI-friendly hover effects */
@@ -105,6 +105,7 @@ const InterviewPage = () => {
   const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
+    console.log("Connected:", socket.id);
     socket.on("connect", () => console.log("Connected:", socket.id));
     socket.emit("joinRoom", roomId);
 
@@ -113,11 +114,11 @@ const InterviewPage = () => {
     }
 
     peerInstance.current.on("call", (call) => {
-      console.log("peer")
+      console.log("peer");
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((mediaStream) => {
-          console.log(mediaStream)
+          console.log(mediaStream);
           currentUserVideoRef.current.srcObject = mediaStream;
           currentUserVideoRef.current.play();
           call.answer(mediaStream);
@@ -130,7 +131,7 @@ const InterviewPage = () => {
         .catch((err) => console.error("Failed to access media devices", err));
     });
 
-      initiateCall(roomId);
+    initiateCall(roomId);
 
     return () => {
       if (peerInstance.current) {
@@ -138,7 +139,7 @@ const InterviewPage = () => {
         peerInstance.current = null;
       }
     };
-  }, [roomId, status]);
+  }, [roomId, status, remoteVideoRef]);
 
   const initiateCall = (remotePeerId) => {
     navigator.mediaDevices
@@ -167,20 +168,94 @@ const InterviewPage = () => {
   const toggleMic = () => {
     const mediaStream = currentUserVideoRef.current.srcObject;
     if (mediaStream) {
-      mediaStream
-        .getAudioTracks()
-        .forEach((track) => (track.enabled = !track.enabled));
-      setIsMicMuted(!isMicMuted);
+      mediaStream.getAudioTracks().forEach((track) => {
+        track.enabled = !track.enabled;
+        setIsMicMuted(!track.enabled);
+      });
     }
   };
 
-  const toggleCamera = () => {
+  // Dont delete it
+  // const toggleMic = async () => {
+  //   const mediaStream = currentUserVideoRef.current.srcObject;
+  //   if (!mediaStream) return;
+
+  //   if (!isMicMuted) {
+  //     // Turn off mic: stop all audio tracks
+  //     mediaStream.getAudioTracks().forEach((track) => track.stop());
+  //     // Create a new stream containing only video tracks (if any)
+  //     const videoTracks = mediaStream.getVideoTracks();
+  //     const newStream = new MediaStream(videoTracks);
+  //     currentUserVideoRef.current.srcObject = newStream;
+  //     setIsMicMuted(true);
+  //   } else {
+  //     // Turn mic on: re-request audio from media devices
+  //     try {
+  //       const audioStream = await navigator.mediaDevices.getUserMedia({
+  //         audio: true,
+  //       });
+  //       // Combine existing video tracks with the new audio tracks
+  //       const videoTracks = mediaStream.getVideoTracks();
+  //       const combinedStream = new MediaStream([
+  //         ...videoTracks,
+  //         ...audioStream.getAudioTracks(),
+  //       ]);
+  //       currentUserVideoRef.current.srcObject = combinedStream;
+  //       setIsMicMuted(false);
+  //     } catch (error) {
+  //       console.error("Error re-enabling microphone:", error);
+  //       // Handle permission or other errors as needed.
+  //     }
+  //   }
+  // };
+
+  // const toggleCamera = () => {
+  //   const mediaStream = currentUserVideoRef.current.srcObject;
+  //   if (mediaStream) {
+  //     mediaStream
+  //       .getVideoTracks()
+  //       .forEach((track) => (track.enabled = !track.enabled));
+  //     setIsCameraOff(!isCameraOff);
+  //   }
+  // };
+
+  // Dont delete it
+  const toggleCamera = async () => {
     const mediaStream = currentUserVideoRef.current.srcObject;
-    if (mediaStream) {
-      mediaStream
-        .getVideoTracks()
-        .forEach((track) => (track.enabled = !track.enabled));
-      setIsCameraOff(!isCameraOff);
+    if (!mediaStream) return;
+
+    if (!isCameraOff) {
+      // Turn off camera: stop all video tracks
+      mediaStream.getVideoTracks().forEach((track) => {
+        track.stop();
+      });
+      // Create a new stream containing only audio tracks (if any)
+      const audioTracks = mediaStream.getAudioTracks();
+      const newStream = new MediaStream(audioTracks);
+      currentUserVideoRef.current.srcObject = newStream;
+      // Optionally, update your local stream state if you have one
+      setLocalStream(newStream);
+      setIsCameraOff(true);
+    } else {
+      // Turn camera on: re-request video from media devices
+      try {
+        const videoStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        // Combine existing audio tracks with the new video tracks
+        const audioTracks = mediaStream.getAudioTracks();
+        const combinedStream = new MediaStream([
+          ...audioTracks,
+          ...videoStream.getVideoTracks(),
+        ]);
+        currentUserVideoRef.current.srcObject = combinedStream;
+        // Optionally, update your local stream state if you have one
+        // setLocalStream(combinedStream);
+        setIsCameraOff(false);
+      } catch (error) {
+        console.error("Error re-enabling camera:", error);
+        // Handle permission denial or errors as needed.
+      }
     }
   };
 
@@ -299,11 +374,7 @@ const InterviewPage = () => {
         }}
       >
         {/* Floating Dots Button */}
-        {!isHovered && (
-          <FloatingButton>
-            {moreIconSVG}
-          </FloatingButton>
-        )}
+        {!isHovered && <FloatingButton>{moreIconSVG}</FloatingButton>}
 
         {/* Bottom Bar (Visible on Hover) */}
         {isHovered && (
@@ -311,11 +382,11 @@ const InterviewPage = () => {
             {[
               {
                 icon: isMicMuted ? micOffSVG : micSVG,
-                onClick: () => setIsMicMuted(!isMicMuted),
+                onClick: () => toggleMic(),
               },
               {
                 icon: isCameraOff ? cameraOffSVG : cameraSVG,
-                onClick: () => setIsCameraOff(!isCameraOff),
+                onClick: () => toggleCamera(),
               },
               { icon: captionsSVG },
               { icon: reactionSVG },

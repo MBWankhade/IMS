@@ -7,8 +7,9 @@ import { FaSearch, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import PostContent from "./PostContent";
 import { useNavigate } from "react-router-dom";
-import { formatDate } from "../utils/utils"; 
+import { formatDate } from "../utils/utils";
 import Navbar from "./Navbar";
+import { mainContaint } from "../utils/colors";
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -28,7 +29,11 @@ const PostSearch = () => {
   const postsPerPage = 5;
 
   // Handle filter changes & reset cache
-  const handleFilterChange = (selectedCompany, selectedRole, selectedPlacementType) => {
+  const handleFilterChange = (
+    selectedCompany,
+    selectedRole,
+    selectedPlacementType
+  ) => {
     setSearchFilters({
       company: selectedCompany,
       role: selectedRole,
@@ -60,21 +65,27 @@ const PostSearch = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/search`, {
-        params: {
-          company: searchFilters.company,
-          role: searchFilters.role,
-          placementType: searchFilters.placementType,
-          page: currentPage,
-          limit: postsPerPage,
-        },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/search`,
+        {
+          params: {
+            company: searchFilters.company,
+            role: searchFilters.role,
+            placementType: searchFilters.placementType,
+            page: currentPage,
+            limit: postsPerPage,
+          },
+          withCredentials: true,
+        }
+      );
 
       // ✅ Store API response in cache
       setCachedResults((prev) => ({
         ...prev,
-        [currentPage]: { posts: response.data.posts, totalPages: response.data.totalPages },
+        [currentPage]: {
+          posts: response.data.posts,
+          totalPages: response.data.totalPages,
+        },
       }));
 
       setSearchResults(response.data.posts);
@@ -107,34 +118,50 @@ const PostSearch = () => {
   const handleBackToSearch = () => {
     setSelectedPost(null);
     navigate("/search");
-  }; 
+  };
 
   const recommendedPosts = searchResults
     .filter((post) => post._id !== selectedPost?._id) // Exclude selected post
-    .slice(0, 5); 
-    
+    .slice(0, 5);
+
   return (
-    <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
-      <ToastContainer position="top-right" autoClose={3000} /> 
-      <Navbar /> 
+    <div className="flex w-full p-20 bg-white shadow-sm h-full1">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (
-          <SinglePost onBack={handleBackToSearch} recommendedPosts={recommendedPosts}/>
+          <SinglePost
+            onBack={handleBackToSearch}
+            recommendedPosts={recommendedPosts}
+          />
         ) : (
           <>
             <div className="bg-white p-8 rounded-lg shadow-md mb-8">
-              <h2 className="text-3xl font-bold mb-6 text-gray-800">Search Interview Experiences</h2>
+              <h2 className="text-3xl font-bold mb-6 text-gray-800">
+                Search Interview Experiences
+              </h2>
               <div className="flex flex-col items-center">
                 <div className="w-full max-w-3xl">
                   <CompanyRoleSelector
                     onCompanyChange={(selectedCompany) =>
-                      handleFilterChange(selectedCompany, searchFilters.role, searchFilters.placementType)
+                      handleFilterChange(
+                        selectedCompany,
+                        searchFilters.role,
+                        searchFilters.placementType
+                      )
                     }
                     onRoleChange={(selectedRole) =>
-                      handleFilterChange(searchFilters.company, selectedRole, searchFilters.placementType)
+                      handleFilterChange(
+                        searchFilters.company,
+                        selectedRole,
+                        searchFilters.placementType
+                      )
                     }
                     onPlacementTypeChange={(selectedPlacementType) =>
-                      handleFilterChange(searchFilters.company, searchFilters.role, selectedPlacementType)
+                      handleFilterChange(
+                        searchFilters.company,
+                        searchFilters.role,
+                        selectedPlacementType
+                      )
                     }
                   />
                 </div>
@@ -146,14 +173,25 @@ const PostSearch = () => {
                     onClick={handleSearchClick}
                     disabled={loading}
                   >
-                    {loading ? <FaSpinner className="w-5 h-5 animate-spin" /> : <><FaSearch className="w-5 h-5" /><span>Search</span></>}
+                    {loading ? (
+                      <FaSpinner className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <>
+                        <FaSearch className="w-5 h-5" />
+                        <span>Search</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
             </div>
 
             {/* Results Count */}
-            {resultsCount > 0 && <div className="text-md text-gray-600 mb-4">Found {resultsCount} results.</div>}
+            {resultsCount > 0 && (
+              <div className="text-md text-gray-600 mb-4">
+                Found {resultsCount} results.
+              </div>
+            )}
 
             {/* Posts List Section */}
             <div className="bg-white p-8 rounded-lg shadow-md">
@@ -165,14 +203,20 @@ const PostSearch = () => {
                 <>
                   <div className="space-y-6">
                     {searchResults.map((post) => (
-                      <div key={post._id} className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer" onClick={() => handlePostClick(post)}>    
-                        <div className="flex justify-between items-center"> 
-                          <h3 className="text-xl font-semibold text-gray-800 mb-2">{post.title}</h3>
+                      <div
+                        key={post._id}
+                        className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                        onClick={() => handlePostClick(post)}
+                      >
+                        <div className="flex justify-between items-center">
+                          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                            {post.title}
+                          </h3>
                           <div className="text-sm text-gray-500">
-                          {formatDate(post.updatedAt)}
-                          </div> 
+                            {formatDate(post.updatedAt)}
+                          </div>
                         </div>
-                        
+
                         <PostContent content={post.content} />
                       </div>
                     ))}
@@ -185,7 +229,9 @@ const PostSearch = () => {
                         key={index + 1}
                         onClick={() => setCurrentPage(index + 1)}
                         className={`mx-1 px-4 py-2 rounded-md ${
-                          currentPage === index + 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                          currentPage === index + 1
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         }`}
                       >
                         {index + 1}
@@ -194,7 +240,9 @@ const PostSearch = () => {
                   </div>
                 </>
               ) : (
-                <div className="text-center text-gray-600 py-8">No posts found matching your criteria.</div>
+                <div className="text-center text-gray-600 py-8">
+                  No posts found matching your criteria.
+                </div>
               )}
             </div>
           </>

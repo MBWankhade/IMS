@@ -1,10 +1,19 @@
-import React, { useContext } from "react";
+import React from "react";
+import { useContext } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Loader } from "semantic-ui-react";
-import Logo from "../../assets/logo-vit.png";
 import { DataContext } from "../../context/DataProvider";
-import { hoverleftBar, leftsideBar } from "../../utils/colors";
-import { sidebarLinks } from "../../utils/constants";
+import {
+  AiOutlineHome,
+  AiOutlineUserSwitch,
+  AiOutlineSearch,
+  AiOutlineMessage,
+  AiOutlineBell,
+} from "react-icons/ai";
+import { HiUsers } from "react-icons/hi2";
+import { Button, Loader } from "semantic-ui-react";
+import { topbarLinks } from "../../utils/constants";
+import Logo from "../../assets/logo-vit.png";
+import { leftsideBar } from "../../utils/colors";
 
 function Navbar() {
   const { user, setUser } = useContext(DataContext);
@@ -36,64 +45,46 @@ function Navbar() {
 
   return (
     <nav
-      className="hidden h-[100vh] md:flex px-6 py-6 flex-col justify-between min-w-[270px]  overflow-y-auto custom-scrollbar text-white"
+      className="md:hidden overflow-x-auto custom-scrollbar h-[4rem]"
       style={{ backgroundColor: `${leftsideBar}` }}
     >
-      <div className="flex flex-col gap-5">
-        <Link to="/" className="flex gap-3 items-center">
-          <img src={Logo} alt="logo" width={40} height={36} />
-        </Link>
+      <div className="flex justify-between items-center p-2">
+        {/* <Link to="/" className="flex gap-3 items-center">
+          <img src={Logo} alt="logo" width={70} height={36} />
+        </Link> */}
 
         {!user?.email ? (
-          <div className="h-14">
+          <div className="h-12">
             <Loader />
           </div>
         ) : (
-          <Link
-            to={`/profile`}
-            className="flex gap-3 items-center hover:text-white"
-          >
+          <Link to={`/profile`} className="flex gap-3 items-center">
             <img
               src={user?.imageUrl || "/assets/icons/profile-placeholder.svg"}
               alt="profile"
-              className="h-14 w-14 rounded-full"
+              className="h-12 w-12 rounded-full"
             />
-            <div className="flex flex-col ">
+            {/* <div className="flex flex-col">
               <p className="body-bold">{user?.name}</p>
-              <p className="small-regular text-light-3 ">
+              <p className="small-regular text-light-3">
                 @{user?.username || "Guest"}
               </p>
-            </div>
+            </div> */}
           </Link>
         )}
 
-        <ul className="flex flex-col gap-6">
-          {sidebarLinks.map((link) => {
+        {/* <ul className="flex gap-6">
+          {topbarLinks.map((link) => {
             const isActive = pathname === link.route;
 
             return (
               <li
                 key={link.label}
-                className="rounded-[18px] text-white base-medium transition group backdrop-blur-md"
-                style={{
-                  backgroundColor: isActive ? hoverleftBar : "",
-                  boxShadow: isActive ? `0px 0px 15px ${hoverleftBar}` : "none", // Active state shadow
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverleftBar;
-                  e.currentTarget.style.boxShadow = `0px 0px 25px ${hoverleftBar}`; // Stronger glow on hover
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = isActive
-                    ? hoverleftBar
-                    : "";
-                  e.currentTarget.style.boxShadow = isActive
-                    ? `0px 0px 15px ${hoverleftBar}`
-                    : "none"; // Restore active shadow or remove
-                }}
+                className={`leftsidebar-link group ${
+                  isActive && "bg-primary-500"
+                }`}
               >
                 <NavLink
-                  component={Link}
                   to={link.route}
                   className="flex gap-4 items-center p-4"
                 >
@@ -104,28 +95,18 @@ function Navbar() {
                       isActive && "invert-white"
                     }`}
                   />
-                  <p className="group-hover:text-white">{link.label}</p>
+                  {link.label}
                 </NavLink>
               </li>
             );
           })}
-        </ul>
+        </ul> */}
+
         <button
-          className={`flex gap-4 items-center p-4 text-white rounded-lg base-medium  transition group`}
+          className="h-12 w-12 rounded-full bg-white text-black flex justify-center items-center"
           onClick={handleLogout}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = hoverleftBar;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "";
-          }}
         >
-          <img
-            src="/assets/icons/logout.svg"
-            alt="logout"
-            className="group-hover:invert-white"
-          />
-          <p className="small-medium lg:base-medium">Logout</p>
+          <img src="/assets/icons/logout.svg" alt="logout" />
         </button>
       </div>
     </nav>
