@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { DataContext } from "./context/DataProvider";
 import { toast, ToastContainer } from "react-toastify";
@@ -62,80 +62,85 @@ function App() {
   }
 
   return (
-    <BrowserRouter>
-      {/* {user && <Navbar />} */}
-      <Routes>
-        {/* Public routes (no user required) */}
-        <Route
-          path="/login"
-          element={<AuthRedirect user={user} Component={Login} />}
-        />
-        <Route
-          path="/signup"
-          element={<AuthRedirect user={user} Component={Signup} />}
-        />
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrowserRouter>
+        {/* {user && <Navbar />} */}
+        <Routes>
+          {/* Public routes (no user required) */}
+          <Route
+            path="/login"
+            element={<AuthRedirect user={user} Component={Login} />}
+          />
+          <Route
+            path="/signup"
+            element={<AuthRedirect user={user} Component={Signup} />}
+          />
 
-        {/* Protected routes (user required) */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute user={user} Component={() => AppLayout(Homepage)} />
-          }
-        />
-        <Route
-          path="/room"
-          element={<ProtectedRoute user={user} Component={MainPage} />}
-        />
-        <Route
-          path="/write"
-          element={
-            <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(AddPostForm)}
-            />
-          }
-        />
-        <Route
-          path="/share-experience"
-          element={
-            <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(ShareExperience)}
-            />
-          }
-        />
-        <Route
-          path="/search"
-          element={
-            <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(PostSearch)}
-            />
-          }
-        />
-        <Route
-          path="/search/:id"
-          element={
-            <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(PostSearch)}
-            />
-          }
-        />
+          {/* Protected routes (user required) */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(Homepage)}
+              />
+            }
+          />
+          <Route
+            path="/room"
+            element={<ProtectedRoute user={user} Component={MainPage} />}
+          />
+          <Route
+            path="/write"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(AddPostForm)}
+              />
+            }
+          />
+          <Route
+            path="/share-experience"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(ShareExperience)}
+              />
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(PostSearch)}
+              />
+            }
+          />
+          <Route
+            path="/search/:id"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(PostSearch)}
+              />
+            }
+          />
 
-        {/* Fallback route for unmatched paths */}
-        {/* <Route
+          {/* Fallback route for unmatched paths */}
+          {/* <Route
           path="*"
           element={<AuthRedirect user={user} Component={Homepage} />}
         /> */}
-      </Routes>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        pauseOnHover
-      />
-    </BrowserRouter>
+        </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          pauseOnHover
+        />
+      </BrowserRouter>
+    </Suspense>
   );
 }
 

@@ -36,13 +36,20 @@ function Navbar() {
 
   return (
     <nav
-      className="hidden h-[100vh] md:flex px-6 py-6 flex-col justify-between min-w-[270px]  overflow-y-auto custom-scrollbar text-white"
+      className="hidden h-[100vh] md:flex px-6 py-6 flex-col justify-between min-w-[270px] max-w-[300px] overflow-y-auto custom-scrollbar text-white"
       style={{ backgroundColor: `${leftsideBar}` }}
     >
       <div className="flex flex-col gap-5">
-        <Link to="/" className="flex gap-3 items-center">
-          <img src={Logo} alt="logo" width={40} height={36} />
-        </Link>
+        <div className="flex  items-center gap-5 mb-10">
+          <div className="border  rounded-full p-2 bg-white flex items-center justify-center">
+            <Link to="/">
+              <img src={Logo} alt="logo" className="w-[40px] h-[40px]" />
+            </Link>
+          </div>
+          <p className="text-gray-400 hover:text-white transition-all duration-300 cursor-pointer">
+            Vishwakarma Institute of Technology.
+          </p>
+        </div>
 
         {!user?.email ? (
           <div className="h-14">
@@ -74,10 +81,10 @@ function Navbar() {
             return (
               <li
                 key={link.label}
-                className="rounded-[18px] text-white base-medium transition group backdrop-blur-md"
+                className="rounded-[18px] text-white base-medium transition group "
                 style={{
                   backgroundColor: isActive ? hoverleftBar : "",
-                  boxShadow: isActive ? `0px 0px 15px ${hoverleftBar}` : "none", // Active state shadow
+                  boxShadow: isActive ? `0px 0px 10px ${hoverleftBar}` : "none",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = hoverleftBar;
@@ -87,9 +94,7 @@ function Navbar() {
                   e.currentTarget.style.backgroundColor = isActive
                     ? hoverleftBar
                     : "";
-                  e.currentTarget.style.boxShadow = isActive
-                    ? `0px 0px 15px ${hoverleftBar}`
-                    : "none"; // Restore active shadow or remove
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               >
                 <NavLink

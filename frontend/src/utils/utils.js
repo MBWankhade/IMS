@@ -425,7 +425,7 @@ export const truncateHTML = (html, maxLength) => {
 export const formatDate = (dateString) => {
   const date = new Date(dateString);
   const options = { day: 'numeric', month: 'long', year: 'numeric' };
-  return `Last Updated: ${date.toLocaleDateString('en-GB', options)}`;
+  return `${date.toLocaleDateString('en-GB', options)}`;
 };
 
 export const getContent= (cardId)=>{

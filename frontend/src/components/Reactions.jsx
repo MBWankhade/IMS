@@ -1,13 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { FaThumbsUp, FaLaugh, FaHeart, FaLightbulb, FaRegStar } from "react-icons/fa";
+import {
+  FaThumbsUp,
+  FaLaugh,
+  FaHeart,
+  FaLightbulb,
+  FaRegStar,
+} from "react-icons/fa";
 import axios from "axios";
 
 const reactions = [
-  { type: "like", icon: <FaThumbsUp className="text-blue-600" />, label: "Like" },
-  { type: "funny", icon: <FaLaugh className="text-yellow-500" />, label: "Funny" },
+  {
+    type: "like",
+    icon: <FaThumbsUp className="text-blue-600" />,
+    label: "Like",
+  },
+  {
+    type: "funny",
+    icon: <FaLaugh className="text-yellow-500" />,
+    label: "Funny",
+  },
   { type: "love", icon: <FaHeart className="text-red-500" />, label: "Love" },
-  { type: "insightful", icon: <FaLightbulb className="text-orange-400" />, label: "Insightful" },
-  { type: "celebrate", icon: <FaRegStar className="text-purple-500" />, label: "Celebrate" },
+  {
+    type: "insightful",
+    icon: <FaLightbulb className="text-orange-400" />,
+    label: "Insightful",
+  },
+  {
+    type: "celebrate",
+    icon: <FaRegStar className="text-purple-500" />,
+    label: "Celebrate",
+  },
 ];
 
 const Reactions = ({ postId }) => {
@@ -24,10 +46,16 @@ const Reactions = ({ postId }) => {
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/reactions`,
           { withCredentials: true }
         );
-        console.log("Fetched reactions:", response.data); // Debugging
         setReactionCounts(response.data.reactionCounts);
-        setTotalReactions(Object.values(response.data.reactionCounts).reduce((sum, count) => sum + count, 0));
-        setSelectedReaction(reactions.find((r) => r.type === response.data.userReaction) || null);
+        setTotalReactions(
+          Object.values(response.data.reactionCounts).reduce(
+            (sum, count) => sum + count,
+            0
+          )
+        );
+        setSelectedReaction(
+          reactions.find((r) => r.type === response.data.userReaction) || null
+        );
       } catch (err) {
         console.error("Error fetching reactions", err);
       }
@@ -39,7 +67,9 @@ const Reactions = ({ postId }) => {
   const handleReaction = async (reactionType) => {
     try {
       // Update selected reaction
-      const newSelectedReaction = reactions.find((r) => r.type === reactionType);
+      const newSelectedReaction = reactions.find(
+        (r) => r.type === reactionType
+      );
       setSelectedReaction(newSelectedReaction);
 
       // Update reaction counts locally
@@ -48,7 +78,10 @@ const Reactions = ({ postId }) => {
 
         // Decrement the previous reaction count (if any)
         if (selectedReaction) {
-          newCounts[selectedReaction.type] = Math.max((newCounts[selectedReaction.type] || 1) - 1, 0);
+          newCounts[selectedReaction.type] = Math.max(
+            (newCounts[selectedReaction.type] || 1) - 1,
+            0
+          );
         }
 
         // Increment the new reaction count
@@ -81,7 +114,11 @@ const Reactions = ({ postId }) => {
         onClick={() => setShowReactions(!showReactions)}
         className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 font-medium transition"
       >
-        {selectedReaction ? selectedReaction.icon : <FaThumbsUp className="text-gray-600" />}
+        {selectedReaction ? (
+          selectedReaction.icon
+        ) : (
+          <FaThumbsUp className="text-gray-600" />
+        )}
         <span>{selectedReaction ? selectedReaction.label : "Like"}</span>
       </button>
 
@@ -108,7 +145,10 @@ const Reactions = ({ postId }) => {
       <div className="flex space-x-2 mt-2">
         {Object.entries(reactionCounts).map(([type, count]) =>
           count > 0 ? (
-            <div key={type} className="flex items-center space-x-1 text-gray-600">
+            <div
+              key={type}
+              className="flex items-center space-x-1 text-gray-600"
+            >
               {reactions.find((r) => r.type === type)?.icon}
               <span>{count}</span>
             </div>
