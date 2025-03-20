@@ -6,6 +6,9 @@ import {
   FaShare,
   FaSpinner,
   FaUserCircle,
+  FaEllipsisH,
+  FaBookmark,
+  FaRegBookmark,
 } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -18,9 +21,6 @@ import Reactions from "../components/Reactions";
 import InputModal from "../components/InputModal";
 import PopupModal from "../components/PopupModal";
 import { DataContext } from "../context/DataProvider";
-import { leftsideBar, mainContaint } from "../utils/colors";
-import { lazy } from "react";
-import Cursor from "quill/blots/cursor";
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
@@ -32,7 +32,8 @@ function Homepage() {
   const [openCommentSection, setOpenCommentSection] = useState(null);
   const [parentCommentCounts, setParentCommentCounts] = useState({});
   const [loadIndex, setLoadIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false); // State to track loading status
+  const [isLoading, setIsLoading] = useState(false);
+  const [savedPosts, setSavedPosts] = useState({});
   const loaderRef = useRef(null);
 
   useEffect(() => {
@@ -95,14 +96,22 @@ function Homepage() {
 
   const toggleCommentSection = (postId) => {
     if (openCommentSection === postId) {
-      setOpenCommentSection(null); // Collapse the comment section
+      setOpenCommentSection(null);
     } else {
-      setOpenCommentSection(postId); // Open the comment section for this post
+      setOpenCommentSection(postId);
     }
   };
 
-  // Load more posts when the loader is in view
-  // Infinite Scroll for More Posts
+  const toggleSavePost = (postId) => {
+    setSavedPosts(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+    
+    // Here you would typically call an API to save/unsave the post
+    toast.success(savedPosts[postId] ? "Post removed from bookmarks" : "Post saved to bookmarks");
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -117,7 +126,7 @@ function Homepage() {
             setVisiblePosts((prev) => [...prev, ...nextPosts]);
             setLoadIndex((prev) => prev + 5);
             setIsLoading(false);
-          }, 1000); // 2-second delay before loading new posts
+          }, 1000);
         }
       },
       { threshold: 1.0 }
@@ -134,224 +143,311 @@ function Homepage() {
     };
   }, [loadIndex, posts, isLoading]);
 
-  return (
-    <>
-      {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} pauseOnHover /> */}
-      <div className="flex flex-1 h-[100vh] ">
-        <div
-          style={{ backgroundColor: `${mainContaint}` }}
-          className="flex flex-col flex-1  gap-10 overflow-scroll py-10 px-0 sm:px-2  lg:p-4 custom-scrollbar"
-        >
-          <div
-            className="m-5 p-4  rounded-lg"
-            style={{
-              // backgroundColor: "rgb(19, 18, 18)",
-              boxShadow: "0px 0px 7px rgb(202, 199, 199)",
-            }}
-          >
-            <div className="flex items-center">
-              {user?.profilePicture ? (
-                <img
-                  src={user?.profilePicture}
-                  alt="Profile"
-                  className="w-12 h-12 mr-5 p-[1px] rounded-full cursor-pointer border-2 border-white hover:border-green-400 transition-all duration-300"
-                />
-              ) : (
-                <FaUserCircle
-                  size={80}
-                  className="w-12 h-12 mr-5 p-[1px] rounded-full cursor-pointer border-2 border-white hover:border-green-400 transition-all duration-300"
-                />
-              )}
-              <button
-                onClick={() => navigate("/share-experience")}
-                className="border border-gray-600 rounded-full cursor-pointer p-2 w-full h-14"
-              >
-                <div className="flex justify-between ">
-                  <p className="ml-2 font-bold">Write for Community</p>
-                  <Icon
-                    name="edit"
-                    size="large"
-                    className="text-green-500 space-x-2"
-                  />
-                </div>
-              </button>
-            </div>
-          </div>
+  // Determine time of day for greeting
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  };
 
-          <div className="w-screen-sm flex flex-col w-full gap-6 md:gap-9 ">
-            {visiblePosts?.map((post) => (
-              <div
-                key={post._id}
-                className="mb-6 p-4  rounded-lg"
-                style={{
-                  // backgroundColor: "rgb(19, 18, 18)",
-                  boxShadow: "0px 0px 7px rgb(202, 199, 199)",
-                }}
-              >
-                {/* Post Header */}
-                <div className="flex items-center mb-4">
-                  <div className="flex justify-center gap-4">
+  return (
+    <div className="flex flex-1 h-screen bg-[#0a0a0a] text-white">
+      {/* Main Content */}
+      <div className="flex flex-col flex-1 gap-6 overflow-auto py-6 px-0 sm:px-4 lg:px-6 custom-scrollbar">
+        {/* Welcome Section */}
+        {user && (
+          <div className="mx-2 sm:mx-4 mb-2">
+            <h1 className="text-xl font-bold text-white">
+              {getGreeting()}, <span className="text-emerald-400">{user.name}</span>
+            </h1>
+            <p className="text-zinc-400 text-sm">Stay updated with the latest community posts</p>
+          </div>
+        )}
+      
+        {/* Create Post Card */}
+        <div className="mx-2 sm:mx-4 p-4 rounded-2xl bg-[#111111] border border-[#222222] shadow-lg transition-all duration-300 hover:shadow-emerald-900/10">
+          <div className="flex items-center">
+            {user?.profilePicture ? (
+              <div className="relative">
+                <img
+                  src={user.profilePicture}
+                  alt="Profile"
+                  className="w-11 h-11 rounded-full cursor-pointer border-2 border-zinc-800 hover:border-emerald-500 transition-all duration-300 object-cover"
+                />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#111111]"></div>
+              </div>
+            ) : (
+              <div className="relative">
+                <FaUserCircle
+                  size={44}
+                  className="text-zinc-400 rounded-full cursor-pointer hover:text-zinc-200 transition-all duration-300"
+                />
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#111111]"></div>
+              </div>
+            )}
+            <button
+              onClick={() => navigate("/share-experience")}
+              className="ml-4 border border-[#2a2a2a] rounded-full cursor-pointer p-3 w-full bg-[#151515] hover:bg-[#1a1a1a] transition-all duration-200 shadow-inner shadow-black/50"
+            >
+              <div className="flex justify-between items-center">
+                <p className="ml-2 font-medium text-zinc-400">What's on your mind?</p>
+                <Icon
+                  name="edit"
+                  size="small"
+                  className="text-emerald-500 mr-2"
+                />
+              </div>
+            </button>
+          </div>
+          
+          <div className="mt-4 pt-4 border-t border-[#222222] flex justify-between">
+            <button className="flex items-center gap-2 text-zinc-400 hover:text-emerald-400 transition-all duration-200 text-sm px-3 py-1 rounded-full hover:bg-emerald-500/10">
+              <Icon name="image" />
+              <span>Photo</span>
+            </button>
+            
+            <button className="flex items-center gap-2 text-zinc-400 hover:text-blue-400 transition-all duration-200 text-sm px-3 py-1 rounded-full hover:bg-blue-500/10">
+              <Icon name="video" />
+              <span>Video</span>
+            </button>
+            
+            <button className="flex items-center gap-2 text-zinc-400 hover:text-purple-400 transition-all duration-200 text-sm px-3 py-1 rounded-full hover:bg-purple-500/10">
+              <Icon name="file alternate" />
+              <span>Document</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Posts Feed */}
+        <div className="w-full flex flex-col gap-5 px-2 sm:px-4">
+          {visiblePosts?.map((post) => (
+            <div
+              key={post._id}
+              className="p-5 rounded-2xl bg-[#111111] border border-[#222222] shadow-lg transition-all duration-300 hover:shadow-[0_4px_20px_rgba(0,0,0,0.6)]"
+            >
+              {/* Post Header */}
+              <div className="flex justify-between mb-4">
+                <div className="flex items-center">
+                  <div className="relative">
                     {post?.user?.profilePicture ? (
                       <img
                         src={post.user.profilePicture}
                         alt="Profile"
-                        className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-white hover:border-blue-400 transition-all duration-300"
+                        className="w-10 h-10 rounded-full cursor-pointer border-2 border-zinc-800 hover:border-emerald-500 transition-all duration-300 object-cover"
                       />
                     ) : (
                       <FaUserCircle
-                        size={30}
-                        className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-white hover:border-blue-400 transition-all duration-300"
+                        size={40}
+                        className="text-zinc-400 rounded-full cursor-pointer hover:text-zinc-200 transition-all duration-300"
                       />
                     )}
+                    <div className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 rounded-full border border-[#111111]"></div>
                   </div>
 
-                  <div>
-                    <p className="font-bold">{post?.user?.name}</p>
-                    <p className="text-sm ">{post.title}</p>
+                  <div className="ml-3">
+                    <p className="font-bold text-white hover:text-emerald-400 cursor-pointer transition-all duration-200">{post?.user?.name}</p>
+                    <p className="text-xs text-zinc-500">{post.title} • 2h ago</p>
                   </div>
                 </div>
-
-                {/* Post Content */}
-                <PostContent content={post.content} />
-
-                {/* Divider Line */}
-                <hr className="my-4 border-gray-200" />
-
-                {/* Post Actions */}
-                <div className="flex justify-between ">
-                  <Reactions postId={post._id} />
-                  <button
-                    onClick={() => toggleCommentSection(post._id)} // Toggle comment section
-                    className="flex items-center space-x-2 hover:text-green-500"
+                
+                <div className="flex items-center gap-2">
+                  <button 
+                    onClick={() => toggleSavePost(post._id)}
+                    className="text-zinc-500 hover:text-emerald-400 transition-all duration-200"
                   >
-                    <FaComment />
-                    <span>{parentCommentCounts[post._id] || 0} Comments</span>
+                    {savedPosts[post._id] ? <FaBookmark /> : <FaRegBookmark />}
                   </button>
-                  <button className="flex items-center space-x-2 hover:text-purple-500">
-                    <FaRetweet />
-                    <span>{post.reposts} Reposts</span>
-                  </button>
-                  <button className="flex items-center space-x-2 hover:text-red-500">
-                    <FaShare />
-                    <span>Send</span>
+                  
+                  <button className="text-zinc-500 hover:text-zinc-300 transition-all duration-200">
+                    <FaEllipsisH />
                   </button>
                 </div>
+              </div>
 
-                {/* Conditionally Render Comments Section */}
-                {openCommentSection === post._id && (
+              {/* Post Content */}
+              <div className="mb-4">
+                <PostContent content={post.content} />
+              </div>
+
+              {/* Engagement Stats */}
+              <div className="flex items-center text-xs text-zinc-500 mb-4">
+                <div className="flex -space-x-1 mr-2">
+                  <div className="w-5 h-5 rounded-full bg-emerald-500 border border-[#111111]"></div>
+                  <div className="w-5 h-5 rounded-full bg-blue-500 border border-[#111111]"></div>
+                  <div className="w-5 h-5 rounded-full bg-purple-500 border border-[#111111]"></div>
+                </div>
+                <span>{post.likes || 0} reactions</span>
+                <span className="mx-2">•</span>
+                <span>{parentCommentCounts[post._id] || 0} comments</span>
+              </div>
+
+              {/* Divider */}
+              <div className="h-px w-full bg-gradient-to-r from-transparent via-zinc-800 to-transparent my-3"></div>
+
+              {/* Post Actions */}
+              <div className="flex justify-between text-zinc-400">
+                <Reactions postId={post._id} />
+                
+                <button
+                  onClick={() => toggleCommentSection(post._id)}
+                  className="flex items-center space-x-2 hover:text-emerald-400 transition-all duration-200 px-2 py-1 rounded-lg hover:bg-emerald-500/10"
+                >
+                  <FaComment />
+                  <span>Comment</span>
+                </button>
+                
+                <button className="flex items-center space-x-2 hover:text-purple-400 transition-all duration-200 px-2 py-1 rounded-lg hover:bg-purple-500/10">
+                  <FaRetweet />
+                  <span>Repost</span>
+                </button>
+                
+                <button className="flex items-center space-x-2 hover:text-blue-400 transition-all duration-200 px-2 py-1 rounded-lg hover:bg-blue-500/10">
+                  <FaShare />
+                  <span>Share</span>
+                </button>
+              </div>
+
+              {/* Conditionally Render Comments Section */}
+              {openCommentSection === post._id && (
+                <div className="mt-4 pt-4 border-t border-[#222222] bg-[#0c0c0c] -mx-5 -mb-5 px-5 pt-2 pb-3 rounded-b-2xl">
                   <Comments postId={post._id} currentUserId={user?._id} />
-                )}
-              </div>
-            ))}
-            {/* Loader */}
-            {/* {isLoading && (
-              <div className="text-center py-4">
-                <div className="spinner-border text-primary" role="status">
-                  <span className="sr-only">Loading...</span>
-                </div>
-              </div>
-            )} */}
-            {/* Load more trigger */}
-            {/* {loadIndex < posts.length && !isLoading && (
-              <div ref={loaderRef} className="text-center py-4">Scroll to load more posts...</div>
-            )} */}
-            {isLoading && (
-              <div className="flex justify-center items-center w-full h-40">
-                <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-              </div>
-            )}
-
-            <div ref={loaderRef}></div>
-          </div>
-        </div>
-
-        <div
-          className="hidden xl:flex flex-col w-72 2xl:w-[350px] px-4 py-10 gap-10 overflow-scroll custom-scrollbar 
-   rounded-lg"
-          style={{
-            backgroundColor: leftsideBar,
-          }}
-        >
-          <div className="sticky top-20 flex flex-col gap-10">
-            {/* Trending Now Section */}
-            <div
-              className="mt-5 p-3 rounded-xl border-[1px] border-[rgba(103,61,243,0.4)] 
-             bg-gradient-to-br from-[#0e0f0e] to-transparent 
-             shadow-[0px_0px_7px_rgb(11,234,164)] transition-all 
-             hover:shadow-[0px_0px_20px_rgba(0,255,180,0.5)] 
-             hover:border-[rgba(237,243,239,0.51)] cursor-pointer"
-            >
-              <h2 className="text-2xl font-extrabold mb-4 text-gray-200 text-center">
-                🔥 Trending Now
-              </h2>
-              <ul className="space-y-2 text-gray-400">
-                <li className="hover:text-white transition-all duration-300 cursor-pointer">
-                  🏆 VIT'24 Interview Experiences
-                </li>
-                <li className="hover:text-white transition-all duration-300 cursor-pointer">
-                  📚 Placement Preparations
-                </li>
-                <li className="hover:text-white transition-all duration-300 cursor-pointer">
-                  🎤 Mock Interviews Results
-                </li>
-                <li className="hover:text-white transition-all duration-300 cursor-pointer">
-                  📊 Weekly Rankings
-                </li>
-              </ul>
-            </div>
-
-            {/* Mock Interviews Section */}
-            <div
-              className="mt-5 p-3 rounded-xl border border-[rgba(9,237,66,0.51)] 
-             bg-gradient-to-br from-[#0e0f0e] to-transparent 
-             shadow-[0px_0px_7px_rgb(11,234,164)] transition-all 
-             hover:shadow-[0px_0px_20px_rgba(9,237,66,0.51)] 
-             hover:border-[rgba(237,243,239,0.51)] cursor-pointer"
-            >
-              <h2 className="text-2xl text-center font-extrabold mb-4 text-gray-200">
-                🎯 Mock Interviews
-              </h2>
-              {user ? (
-                <div className="flex flex-col w-full text-gray-400">
-                  <p className="hover:text-white mb-4 transition-all duration-300 cursor-pointer">
-                    🚀 Boost your interview skills with our tools:
-                  </p>
-                  <div className="space-y-4">
-                    <PopupModal />
-                    <InputModal />
-                  </div>
-                  <p className="text-sm hover:text-white mb-4 transition-all duration-300 cursor-pointer mt-4">
-                    Get feedback, track progress, and ace your interviews!
-                  </p>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center">
-                  <p className="text-gray-400 mb-4">
-                    🚀 Login or sign up to start practicing for mock interviews:
-                  </p>
-                  <div className="flex gap-6">
-                    <button
-                      className="bg-blue-500 font-semibold text-lg text-white px-6 py-2 rounded-xl shadow-lg 
-              hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
-                      onClick={() => navigate("/login")}
-                    >
-                      Login
-                    </button>
-                    <button
-                      className="font-semibold text-lg px-6 py-2 rounded-xl border border-gray-500 shadow-lg 
-              hover:bg-gray-700 hover:text-white transition-all duration-300 transform hover:scale-105"
-                      onClick={() => navigate("/signup")}
-                    >
-                      Signup
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
+          ))}
+          
+          {/* Loading Spinner */}
+          {isLoading && (
+            <div className="flex justify-center items-center w-full h-32">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-full absolute border-4 border-zinc-700 border-opacity-20"></div>
+                <div className="w-12 h-12 rounded-full animate-spin absolute border-4 border-emerald-500 border-t-transparent"></div>
+              </div>
+            </div>
+          )}
+
+          <div ref={loaderRef}></div>
+        </div>
+      </div>
+
+      {/* Right Sidebar */}
+      <div className="hidden xl:flex flex-col w-80 2xl:w-96 px-5 py-6 bg-[#0c0c0c] border-l border-[#222222]">
+        <div className="sticky top-20 flex flex-col gap-6">
+          
+        
+          {/* Trending Now Section */}
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#111111] to-[#080808] border border-[#222222] shadow-lg transition-all duration-300 hover:shadow-emerald-900/5">
+            <h2 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
+              <span className="text-emerald-500">🔥</span> Trending Now
+            </h2>
+            <ul className="space-y-3">
+              <li className="p-2 rounded-lg hover:bg-[#151515] transition-all duration-200 cursor-pointer border border-transparent hover:border-[#222222]">
+                <div className="flex items-center gap-3">
+                  <span className="text-emerald-500 font-bold">01</span>
+                  <div>
+                    <p className="text-zinc-200 font-medium">VIT'24 Interview Experiences</p>
+                    <p className="text-xs text-zinc-500">142 new posts today</p>
+                  </div>
+                </div>
+              </li>
+              <li className="p-2 rounded-lg hover:bg-[#151515] transition-all duration-200 cursor-pointer border border-transparent hover:border-[#222222]">
+                <div className="flex items-center gap-3">
+                  <span className="text-emerald-500 font-bold">02</span>
+                  <div>
+                    <p className="text-zinc-200 font-medium">Placement Preparations</p>
+                    <p className="text-xs text-zinc-500">87 new posts today</p>
+                  </div>
+                </div>
+              </li>
+              <li className="p-2 rounded-lg hover:bg-[#151515] transition-all duration-200 cursor-pointer border border-transparent hover:border-[#222222]">
+                <div className="flex items-center gap-3">
+                  <span className="text-emerald-500 font-bold">03</span>
+                  <div>
+                    <p className="text-zinc-200 font-medium">Mock Interview Results</p>
+                    <p className="text-xs text-zinc-500">56 new posts today</p>
+                  </div>
+                </div>
+              </li>
+              <li className="p-2 rounded-lg hover:bg-[#151515] transition-all duration-200 cursor-pointer border border-transparent hover:border-[#222222]">
+                <div className="flex items-center gap-3">
+                  <span className="text-emerald-500 font-bold">04</span>
+                  <div>
+                    <p className="text-zinc-200 font-medium">Weekly Rankings</p>
+                    <p className="text-xs text-zinc-500">Updated 2 hours ago</p>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          {/* Mock Interviews Section */}
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-[#111111] to-[#080808] border border-[#222222] shadow-lg transition-all duration-300 hover:shadow-emerald-900/5 relative overflow-hidden">
+            <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-emerald-500/10 blur-2xl"></div>
+            
+            <h2 className="text-lg font-bold mb-4 text-white flex items-center gap-2">
+              <span className="text-emerald-500">🎯</span> Mock Interviews
+            </h2>
+            
+            {user ? (
+              <div className="flex flex-col w-full">
+                <p className="mb-4 text-zinc-300 text-sm">
+                  Boost your interview skills with our AI-powered tools:
+                </p>
+                <div className="space-y-3">
+                  <div className="p-3 rounded-lg bg-[#151515] border border-[#222222] hover:border-emerald-500/40 transition-all duration-200 cursor-pointer">
+                    <h4 className="text-sm font-medium text-white mb-1">Technical Interview</h4>
+                    <p className="text-xs text-zinc-500">Practice DSA & system design</p>
+                  </div>
+                  
+                  <div className="p-3 rounded-lg bg-[#151515] border border-[#222222] hover:border-emerald-500/40 transition-all duration-200 cursor-pointer">
+                    <h4 className="text-sm font-medium text-white mb-1">HR Interview</h4>
+                    <p className="text-xs text-zinc-500">Improve soft skills & communication</p>
+                  </div>
+                </div>
+                
+                <button className="mt-4 py-2 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2">
+                  <Icon name="play" />
+                  Start Practice Session
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center">
+                <p className="text-zinc-400 mb-4 text-center text-sm">
+                  Login or sign up to start practicing for mock interviews
+                </p>
+                <div className="flex gap-3 w-full">
+                  <button
+                    className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-all duration-200"
+                    onClick={() => navigate("/login")}
+                  >
+                    Login
+                  </button>
+                  <button
+                    className="flex-1 py-2 bg-[#151515] hover:bg-[#1a1a1a] border border-[#222222] text-white rounded-lg text-sm font-medium transition-all duration-200"
+                    onClick={() => navigate("/signup")}
+                  >
+                    Signup
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {/* Footer Links */}
+          <div className="mt-2 text-xs text-zinc-600">
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <a href="#" className="hover:text-zinc-400 transition-all duration-200">About</a>
+              <a href="#" className="hover:text-zinc-400 transition-all duration-200">Help Center</a>
+              <a href="#" className="hover:text-zinc-400 transition-all duration-200">Privacy</a>
+              <a href="#" className="hover:text-zinc-400 transition-all duration-200">Terms</a>
+              <a href="#" className="hover:text-zinc-400 transition-all duration-200">Careers</a>
+            </div>
+            <p className="mt-3">© 2025 VIT Connect Community</p>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
