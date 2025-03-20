@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { FaSearch, FaSpinner } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import CompanyRoleSelector from "./CompanyRoleSelector";
-import SinglePost from "./SinglePost";
-import { FaSearch, FaSpinner } from "react-icons/fa";
-import axios from "axios";
-import PostContent from "./PostContent";
-import { useNavigate } from "react-router-dom";
-import { formatDate } from "../utils/utils";
-import Navbar from "./Navbar";
 import { mainContaint } from "../utils/colors";
+import { formatDate } from "../utils/utils";
+import CompanyRoleSelector from "./CompanyRoleSelector";
+import PostContent from "./PostContent";
+import SinglePost from "./SinglePost";
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -125,7 +124,11 @@ const PostSearch = () => {
     .slice(0, 5);
 
   return (
-    <div className="flex w-full p-20 bg-white shadow-sm h-full1">
+    <div
+      className="flex w-full py-8 px-1 sm:px-4 lg:px-8  shadow-sm h-full1 overflow-scroll custom-scrollbar"
+      style={{ backgroundColor: `${mainContaint}` }}
+      // style={{ backgroundColor: "white" }}
+    >
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (
@@ -135,10 +138,10 @@ const PostSearch = () => {
           />
         ) : (
           <>
-            <div className="bg-white p-8 rounded-lg shadow-md mb-8">
-              <h2 className="text-3xl font-bold mb-6 text-gray-800">
+            <div className=" p-2 rounded-lg shadow-md mb-8">
+              {/* <h2 className="text-3xl font-bold mb-10 text-center">
                 Search Interview Experiences
-              </h2>
+              </h2> */}
               <div className="flex flex-col items-center">
                 <div className="w-full max-w-3xl">
                   <CompanyRoleSelector
@@ -169,7 +172,7 @@ const PostSearch = () => {
                 {/* Search Button */}
                 <div className="mt-5">
                   <button
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2"
+                    className="bg-gray-800 border-[2px] hover:bg-gray-700  font-semibold py-2 px-6 rounded-lg transition-all duration-300 flex items-center justify-center space-x-2"
                     onClick={handleSearchClick}
                     disabled={loading}
                   >
@@ -188,13 +191,11 @@ const PostSearch = () => {
 
             {/* Results Count */}
             {resultsCount > 0 && (
-              <div className="text-md text-gray-600 mb-4">
-                Found {resultsCount} results.
-              </div>
+              <div className="text-md  mb-4">Found {resultsCount} results.</div>
             )}
 
             {/* Posts List Section */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
+            <div className=" p-0 rounded-lg shadow-md">
               {loading ? (
                 <div className="flex justify-center items-center h-40">
                   <FaSpinner className="w-8 h-8 animate-spin text-blue-600" />
@@ -209,11 +210,11 @@ const PostSearch = () => {
                         onClick={() => handlePostClick(post)}
                       >
                         <div className="flex justify-between items-center">
-                          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                          <h3 className="text-xl font-semibold  mb-2">
                             {post.title}
                           </h3>
-                          <div className="text-sm text-gray-500">
-                            {formatDate(post.updatedAt)}
+                          <div className="text-sm ">
+                            Last Updated: {formatDate(post.updatedAt)}
                           </div>
                         </div>
 
@@ -230,7 +231,7 @@ const PostSearch = () => {
                         onClick={() => setCurrentPage(index + 1)}
                         className={`mx-1 px-4 py-2 rounded-md ${
                           currentPage === index + 1
-                            ? "bg-blue-600 text-white"
+                            ? "bg-blue-600 "
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                         }`}
                       >

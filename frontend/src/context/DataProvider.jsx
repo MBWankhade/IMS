@@ -1,10 +1,5 @@
 import Peer from "peerjs";
-import React, {
-  useState,
-  createContext,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, createContext, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 
 export const DataContext = createContext();
@@ -15,11 +10,10 @@ export const DataProvider = ({ children }) => {
   const [status, setStatus] = useState("");
   const [roomId, setRoomId] = useState("");
   const [peerId, setPeerId] = useState("");
-  const peerInstance = useRef(null);     
-  
- 
+  const peerInstance = useRef(null);
+
   useEffect(() => {
-    const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, { 
+    const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
       withCredentials: true,
     });
 
