@@ -26,6 +26,7 @@ function Homepage() {
   const { setUser, user } = useContext(DataContext);
   const navigate = useNavigate();
   const location = useLocation();
+  console.log("homepage rendered");
 
   const [posts, setPosts] = useState([]);
   const [visiblePosts, setVisiblePosts] = useState([]);
@@ -137,10 +138,10 @@ function Homepage() {
   return (
     <>
       {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} pauseOnHover /> */}
-      <div className="flex flex-1 h-[100vh] ">
+      <div className="flex flex-1 h-full ">
         <div
           style={{ backgroundColor: `${mainContaint}` }}
-          className="flex flex-col flex-1  gap-10 overflow-scroll py-10 px-0 sm:px-2  lg:p-4 custom-scrollbar"
+          className="flex flex-col flex-1  gap-10 overflow-scroll py-2 px-1 sm:px-2  lg:p-4 custom-scrollbar"
         >
           <div
             className="m-5 p-4  rounded-lg"
