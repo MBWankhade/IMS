@@ -8,7 +8,7 @@ const AppLayout = (MainComponent) => {
       <LeftSidebarr />
       <TopBar />
 
-      <section className="flex flex-1 overflow-y-auto h-[calc(100vh-8rem)] md:min-h-screen scrollbar-hidden">
+      <section className="flex flex-1  h-[calc(100vh-8rem)] md:min-h-screen overflow-y-auto scrollbar-hidden">
         <MainComponent />
       </section>
 

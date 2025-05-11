@@ -12,6 +12,9 @@ import PostSearch from "./components/PostSearch";
 import { FaSpinner } from "react-icons/fa";
 import Homepage from "./pages/Homepage";
 import AppLayout from "./components/layout/AppLayout";
+import People from "./pages/People";
+import Saved from "./pages/Saved";
+import CreatePost from "./pages/CreatePost";
 
 import "./App.css";
 
@@ -123,6 +126,28 @@ function App() {
               <ProtectedRoute
                 user={user}
                 Component={() => AppLayout(PostSearch)}
+              />
+            }
+          />
+
+          <Route
+            path="/all-users"
+            element={
+              <ProtectedRoute user={user} Component={() => AppLayout(People)} />
+            }
+          />
+          <Route
+            path="/saved"
+            element={
+              <ProtectedRoute user={user} Component={() => AppLayout(Saved)} />
+            }
+          />
+          <Route
+            path="/create-post"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(CreatePost)}
               />
             }
           />

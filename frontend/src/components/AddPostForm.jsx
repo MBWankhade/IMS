@@ -88,15 +88,13 @@ const AddPostForm = () => {
 
   return (
     <>
-      <div className="h-full w-full p-6 shadow-sm bg-gray-50">
+      <div className="h-full w-full py-8 px-1 sm:px-4 lg:px-16 shadow-sm ">
         <ToastContainer position="top-right" autoClose={3000} />
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-6 rounded-lg shadow-md flex gap-6"
+          className=" h-full w-full p-2 rounded-lg shadow-md flex gap-6"
         >
-          {/* First Div (2/3 width) */}
-          <div className="w-3/4">
-            {/* Post Title */}
+          <div className="w-full">
             <div className="mb-6">
               {cardId === 1 ? (
                 <div>
@@ -132,63 +130,64 @@ const AddPostForm = () => {
               )}
             </div>
 
-            {/* Post Content (Rich Text Editor) */}
             <div className="mb-6">
               <label
                 htmlFor="postContent"
-                className="block text-sm font-medium text-gray-700"
+                className="block text-sm font-medium text-gray-200"
               >
                 Post Content
               </label>
-              <ReactQuill
-                ref={quillRef}
-                value={postContent}
-                onChange={handleChange}
-                modules={{
-                  toolbar: [
-                    [{ header: [1, 2, 3, false] }],
-                    ["bold", "italic", "underline", "strike"],
-                    [{ list: "ordered" }, { list: "bullet" }],
-                    ["link", "image"],
-                    ["blockquote", "code-block"],
-                    ["clean"],
-                  ],
-                }}
-                className="bg-white rounded-md shadow-sm custom-quill-editor"
-              />
+              <div className="mt-1 overflow-scroll custom-scrollbar h-[400px]">
+                <ReactQuill
+                  ref={quillRef}
+                  value={postContent}
+                  onChange={handleChange}
+                  modules={{
+                    toolbar: [
+                      [{ header: [1, 2, 3, false] }],
+                      ["bold", "italic", "underline", "strike"],
+                      [{ list: "ordered" }, { list: "bullet" }],
+                      ["link", "image"],
+                      ["blockquote", "code-block"],
+                      ["clean"],
+                    ],
+                  }}
+                  className="bg-white  text-black rounded-md shadow-sm  custom-quill-editor h-[400px]" //
+                />
+              </div>
             </div>
 
-            <div className="flex">
+            <div className="flex gap-4 justify-between items-center">
               {/* Word and Character Count */}
-              <div className="mb-6 w-1/3">
-                <div className="text-sm text-gray-600">
+              <div className="mb-6">
+                <div className="text-sm text-gray-200">
                   Words: {postContent.split(/\s+/).filter(Boolean).length} |
                   Characters: {postContent.length}
                 </div>
               </div>
 
               {/* Extract Image Size Button */}
-              <div className="mb-6 w-1/3">
+              {/* <div className="mb-6 w-1/3">
                 <button
                   type="button"
                   className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                 >
                   Extract Image Size
                 </button>
-              </div>
+              </div> */}
 
-              <div className="w-1/3">
+              <div className="">
                 {/* Buttons */}
                 <div className="flex justify-end space-x-4">
-                  <button
+                  {/* <button
                     type="button"
                     className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                   >
                     Save for Later
-                  </button>
+                  </button> */}
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    className="px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-blue-700"
                   >
                     Submit Post
                   </button>
@@ -197,9 +196,7 @@ const AddPostForm = () => {
             </div>
           </div>
 
-          {/* Second Div (1/3 width) */}
-          <div className="w-1/4">
-            {/* Checkboxes */}
+          {/* <div className="w-1/4">
             <div className="mb-6 border border-blue-300 rounded-lg p-4">
               <div className="flex items-center mb-4">
                 <input
@@ -233,7 +230,6 @@ const AddPostForm = () => {
               </div>
             </div>
 
-            {/* Illustration Card */}
             <div className="mb-6 p-4 bg-yellow-50 rounded-md">
               <h3 className="text-lg font-bold mb-2">
                 Write an Interview Experience
@@ -254,7 +250,7 @@ const AddPostForm = () => {
                 </a>
               </div>
             </div>
-          </div>
+          </div> */}
         </form>
       </div>
     </>

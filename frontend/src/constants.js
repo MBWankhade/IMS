@@ -58,3 +58,49 @@ export const languages = [
             </button>
           </div>
         </div> */}
+
+
+        // const toggleCamera = async () => {
+  //   const mediaStream = currentUserVideoRef.current.srcObject;
+  //   if (!mediaStream) {
+  //     console, log("no mediastream");
+  //   }
+
+  //   if (!isCameraOff) {
+  //     console.log("turning off camera");
+  //     // Turn off camera: stop all video tracks
+  //     mediaStream.getVideoTracks().forEach((track) => {
+  //       track.stop();
+  //     });
+  //     // Create a new stream containing only audio tracks (if any)
+  //     // const audioTracks = mediaStream.getAudioTracks();
+  //     // const newStream = new MediaStream(audioTracks);
+  //     // currentUserVideoRef.current.srcObject = newStream;
+  //     // // remoteVideoRef.current.srcObject = null;
+  //     // // Optionally, update your local stream state if you have one
+  //     // // // setLocalStream(newStream);
+  //     setIsCameraOff(true);
+  //   } else {
+  //     console.log("turning on camera");
+  //     // Turn camera on: re-request video from media devices
+  //     try {
+  //       const videoStream = await navigator.mediaDevices.getUserMedia({
+  //         video: true,
+  //       });
+  //       // Combine existing audio tracks with the new video tracks
+  //       const audioTracks = mediaStream.getAudioTracks();
+  //       const combinedStream = new MediaStream([
+  //         ...audioTracks,
+  //         ...videoStream.getVideoTracks(),
+  //       ]);
+  //       currentUserVideoRef.current.srcObject = combinedStream;
+  //       // remoteVideoRef.current.srcObject = combinedStream;
+  //       // Optionally, update your local stream state if you have one
+  //       // setLocalStream(combinedStream);
+  //       setIsCameraOff(false);
+  //     } catch (error) {
+  //       console.error("Error re-enabling camera:", error);
+  //       // Handle permission denial or errors as needed.
+  //     }
+  //   }
+  // };
