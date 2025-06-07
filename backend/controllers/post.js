@@ -1,6 +1,6 @@
 import Post from "../models/post.js";
 
-export const createPost = async (req, res) => {
+export const createPost = async (req, res) => { 
   try {
     const newPost = new Post({
       user: req.user._id,

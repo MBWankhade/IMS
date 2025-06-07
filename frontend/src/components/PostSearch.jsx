@@ -56,7 +56,7 @@ const PostSearch = () => {
       setSearchResults(cachedResults[currentPage].posts);
       setTotalPages(cachedResults[currentPage].totalPages); // ✅ Fix missing page numbers
       return;
-    }
+    } 
 
     setLoading(true);
     try {
