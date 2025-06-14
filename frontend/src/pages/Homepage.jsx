@@ -1,25 +1,26 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
-import { DataContext } from "../context/DataProvider";
-import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
-  FaUserCircle,
-  FaThumbsUp,
   FaComment,
-  FaShare,
   FaRetweet,
+  FaShare,
   FaSpinner,
+  FaUserCircle,
 } from "react-icons/fa";
-import { Icon } from "semantic-ui-react";
-import { ToastContainer, toast } from "react-toastify";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
-import axios from "axios";
+import { Icon } from "semantic-ui-react";
+import Comments from "../components/Comments";
+import PostContent from "../components/PostContent";
+import Reactions from "../components/Reactions";
 import InputModal from "../components/InputModal";
 import PopupModal from "../components/PopupModal";
-import Reactions from "../components/Reactions";
-import Comments from "../components/Comments";
-import Navbar from "../components/Navbar"; 
-import PostContent from "../components/PostContent";
+import { DataContext } from "../context/DataProvider";
+import { leftsideBar, mainContaint } from "../utils/colors";
+import { lazy } from "react";
+import Cursor from "quill/blots/cursor";
 
 function Homepage() {
   const { setUser, user } = useContext(DataContext);
@@ -34,19 +35,20 @@ function Homepage() {
   const [isLoading, setIsLoading] = useState(false); // State to track loading status
   const loaderRef = useRef(null);
 
-  // Fetch posts and parent comment counts
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/posts`, { withCredentials: true });
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts`,
+          { withCredentials: true }
+        );
         setTimeout(() => {
           setPosts(res.data);
-          setVisiblePosts(res.data.slice(0, 1));
-          setLoadIndex(1);
+          setVisiblePosts(res.data.slice(0, 5));
+          setLoadIndex(5);
           setIsLoading(false);
-  
-          // Fetch parent comment counts for each post
+
           res.data.forEach((post) => {
             fetchParentCommentCount(post._id);
           });
@@ -56,15 +58,15 @@ function Homepage() {
         setIsLoading(false);
       }
     };
-  
+
     fetchPosts();
   }, []);
 
-  // Fetch parent comment count for a specific post
   const fetchParentCommentCount = async (postId) => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL
+        `${
+          import.meta.env.VITE_BACKEND_URL
         }/api/posts/${postId}/parent-comments-count`,
         { withCredentials: true }
       );
@@ -91,7 +93,6 @@ function Homepage() {
     window.history.replaceState({}, document.title, location.pathname);
   }, [location.state]);
 
-  // Function to toggle comment section
   const toggleCommentSection = (postId) => {
     if (openCommentSection === postId) {
       setOpenCommentSection(null); // Collapse the comment section
@@ -105,12 +106,16 @@ function Homepage() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !isLoading && loadIndex < posts.length) {
+        if (
+          entries[0].isIntersecting &&
+          !isLoading &&
+          loadIndex < posts.length
+        ) {
           setIsLoading(true);
           setTimeout(() => {
-            const nextPosts = posts.slice(loadIndex, loadIndex + 1);
+            const nextPosts = posts.slice(loadIndex, loadIndex + 5);
             setVisiblePosts((prev) => [...prev, ...nextPosts]);
-            setLoadIndex((prev) => prev + 1);
+            setLoadIndex((prev) => prev + 5);
             setIsLoading(false);
           }, 1000); // 2-second delay before loading new posts
         }
@@ -131,59 +136,37 @@ function Homepage() {
 
   return (
     <>
-      {user && <Navbar />}
       {/* <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} pauseOnHover /> */}
-      <div className="flex w-full p-20 shadow-sm bg-gray-50 h-full">
-        {/* Profile Card (Left) */}
+      <div className="flex flex-1 h-[100vh] ">
         <div
-          className="w-1/5 m-5 p-5 bg-white border border-blue-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
-          style={{ height: "250px", overflowY: "auto" }}
+          style={{ backgroundColor: `${mainContaint}` }}
+          className="flex flex-col flex-1  gap-10 overflow-scroll py-10 px-0 sm:px-2  lg:p-4 custom-scrollbar"
         >
-          <div className="flex flex-col items-center">
-            {user?.profilePicture ? (
-              <img
-                src={user.profilePicture}
-                alt="Profile"
-                className="w-20 h-20 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition-all duration-300"
-              />
-            ) : (
-              <FaUserCircle
-                size={80}
-                className="mb-4 cursor-pointer text-blue-300 hover:text-blue-400 transition-colors duration-300"
-              />
-            )}
-            <h2 className="text-xl font-bold text-gray-800 mt-2">
-              {user?.name}
-            </h2>
-            <h2 className="text-sm text-gray-600 mt-1">{user?.email}</h2>
-            <button className="mt-4 p-2 w-full bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300">
-              View Profile
-            </button>
-          </div>
-        </div>
-
-        {/* Main Feed (Middle) */}
-        <div className="flex-1">
-          {/* Write for Community Div */}
-          <div className="m-5 p-5 bg-white border border-blue-300 rounded-lg">
+          <div
+            className="m-5 p-4  rounded-lg"
+            style={{
+              // backgroundColor: "rgb(19, 18, 18)",
+              boxShadow: "0px 0px 7px rgb(202, 199, 199)",
+            }}
+          >
             <div className="flex items-center">
               {user?.profilePicture ? (
                 <img
                   src={user?.profilePicture}
                   alt="Profile"
-                  className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition-all duration-300"
+                  className="w-12 h-12 mr-5 p-[1px] rounded-full cursor-pointer border-2 border-white hover:border-green-400 transition-all duration-300"
                 />
               ) : (
                 <FaUserCircle
                   size={80}
-                  className="mb-4 cursor-pointer text-blue-300 hover:text-blue-400 transition-colors duration-300"
+                  className="w-12 h-12 mr-5 p-[1px] rounded-full cursor-pointer border-2 border-white hover:border-green-400 transition-all duration-300"
                 />
               )}
               <button
                 onClick={() => navigate("/share-experience")}
-                className="border border-blue-300 rounded-full cursor-pointer p-2 w-full h-14"
+                className="border border-gray-600 rounded-full cursor-pointer p-2 w-full h-14"
               >
-                <div className="flex justify-between">
+                <div className="flex justify-between ">
                   <p className="ml-2 font-bold">Write for Community</p>
                   <Icon
                     name="edit"
@@ -195,27 +178,36 @@ function Homepage() {
             </div>
           </div>
 
-          {/* Posts Feed */}
-          <div className="m-5">
+          <div className="w-screen-sm flex flex-col w-full gap-6 md:gap-9 ">
             {visiblePosts?.map((post) => (
-              <div key={post._id} className="mb-6 p-4 border border-blue-300 rounded-lg">
+              <div
+                key={post._id}
+                className="mb-6 p-4  rounded-lg"
+                style={{
+                  // backgroundColor: "rgb(19, 18, 18)",
+                  boxShadow: "0px 0px 7px rgb(202, 199, 199)",
+                }}
+              >
                 {/* Post Header */}
                 <div className="flex items-center mb-4">
-                  {post?.user?.profilePicture ? (
-                    <img
-                      src={post.user.profilePicture}
-                      alt="Profile"
-                      className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-blue-200 hover:border-blue-400 transition-all duration-300"
-                    />
-                  ) : (
-                    <FaUserCircle
-                      size={30}
-                      className="mb-4 cursor-pointer text-blue-300 hover:text-blue-400 transition-colors duration-300"
-                    />
-                  )}
+                  <div className="flex justify-center gap-4">
+                    {post?.user?.profilePicture ? (
+                      <img
+                        src={post.user.profilePicture}
+                        alt="Profile"
+                        className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-white hover:border-blue-400 transition-all duration-300"
+                      />
+                    ) : (
+                      <FaUserCircle
+                        size={30}
+                        className="w-10 h-10 mr-5 rounded-full cursor-pointer border-2 border-white hover:border-blue-400 transition-all duration-300"
+                      />
+                    )}
+                  </div>
+
                   <div>
                     <p className="font-bold">{post?.user?.name}</p>
-                    <p className="text-sm text-gray-500">{post.title}</p>
+                    <p className="text-sm ">{post.title}</p>
                   </div>
                 </div>
 
@@ -226,7 +218,7 @@ function Homepage() {
                 <hr className="my-4 border-gray-200" />
 
                 {/* Post Actions */}
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between ">
                   <Reactions postId={post._id} />
                   <button
                     onClick={() => toggleCommentSection(post._id)} // Toggle comment section
@@ -269,55 +261,85 @@ function Homepage() {
               </div>
             )}
 
-            <div ref={loaderRef} ></div>
+            <div ref={loaderRef}></div>
           </div>
         </div>
 
-        {/* Trending Now Card (Right) */}
-        <div className="w-1/5 m-5">
-          {/* Sticky Container */}
-          <div className="sticky top-20">
-            {/* Trending Now Card */}
-            <div className="p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "200px", overflowY: "auto" }}>
-              <h2 className="text-xl font-bold mb-4">Trending Now</h2>
-              <ul className="list-disc list-inside">
-                <li className="mb-2">VIT'24 Interview Experiences</li>
-                <li className="mb-2">Placement Preparations</li>
-                <li className="mb-2">Mock Interviews Results</li>
-                <li className="mb-2">Weekly Rankings</li>
+        <div
+          className="hidden xl:flex flex-col w-72 2xl:w-[350px] px-4 py-10 gap-10 overflow-scroll custom-scrollbar 
+   rounded-lg"
+          style={{
+            backgroundColor: leftsideBar,
+          }}
+        >
+          <div className="sticky top-20 flex flex-col gap-10">
+            {/* Trending Now Section */}
+            <div
+              className="mt-5 p-3 rounded-xl border-[1px] border-[rgba(103,61,243,0.4)] 
+             bg-gradient-to-br from-[#0e0f0e] to-transparent 
+             shadow-[0px_0px_7px_rgb(11,234,164)] transition-all 
+             hover:shadow-[0px_0px_20px_rgba(0,255,180,0.5)] 
+             hover:border-[rgba(237,243,239,0.51)] cursor-pointer"
+            >
+              <h2 className="text-2xl font-extrabold mb-4 text-gray-200 text-center">
+                🔥 Trending Now
+              </h2>
+              <ul className="space-y-2 text-gray-400">
+                <li className="hover:text-white transition-all duration-300 cursor-pointer">
+                  🏆 VIT'24 Interview Experiences
+                </li>
+                <li className="hover:text-white transition-all duration-300 cursor-pointer">
+                  📚 Placement Preparations
+                </li>
+                <li className="hover:text-white transition-all duration-300 cursor-pointer">
+                  🎤 Mock Interviews Results
+                </li>
+                <li className="hover:text-white transition-all duration-300 cursor-pointer">
+                  📊 Weekly Rankings
+                </li>
               </ul>
             </div>
 
-            {/* Mock Interviews Card */}
-            <div className="mt-5 p-5 bg-white border border-blue-300 rounded-lg" style={{ height: "230px", overflowY: "auto" }}>
-              <h2 className="text-xl font-bold text-gray-800 mb-4">Mock Interviews</h2>
+            {/* Mock Interviews Section */}
+            <div
+              className="mt-5 p-3 rounded-xl border border-[rgba(9,237,66,0.51)] 
+             bg-gradient-to-br from-[#0e0f0e] to-transparent 
+             shadow-[0px_0px_7px_rgb(11,234,164)] transition-all 
+             hover:shadow-[0px_0px_20px_rgba(9,237,66,0.51)] 
+             hover:border-[rgba(237,243,239,0.51)] cursor-pointer"
+            >
+              <h2 className="text-2xl text-center font-extrabold mb-4 text-gray-200">
+                🎯 Mock Interviews
+              </h2>
               {user ? (
-                <div className="flex flex-col">
-                  <div className="mb-4">
-                    <p className="text-gray-600 mb-2">Practice and improve your interview skills with our tools:</p>
-                    <div className="flex gap-4">
-                      <div>
-                        <PopupModal />
-                      </div>
-                      <div>
-                        <InputModal />
-                      </div>
-                    </div>
+                <div className="flex flex-col w-full text-gray-400">
+                  <p className="hover:text-white mb-4 transition-all duration-300 cursor-pointer">
+                    🚀 Boost your interview skills with our tools:
+                  </p>
+                  <div className="space-y-4">
+                    <PopupModal />
+                    <InputModal />
                   </div>
-                  <p className="text-sm text-gray-500">Get feedback, track progress, and ace your interviews!</p>
+                  <p className="text-sm hover:text-white mb-4 transition-all duration-300 cursor-pointer mt-4">
+                    Get feedback, track progress, and ace your interviews!
+                  </p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
-                  <p className="text-gray-600 mb-4">Login or sign up to start practicing for mock interviews:</p>
-                  <div className="flex gap-8">
+                  <p className="text-gray-400 mb-4">
+                    🚀 Login or sign up to start practicing for mock interviews:
+                  </p>
+                  <div className="flex gap-6">
                     <button
-                      className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md hover:bg-blue-500 transition-colors"
+                      className="bg-blue-500 font-semibold text-lg text-white px-6 py-2 rounded-xl shadow-lg 
+              hover:bg-blue-600 transition-all duration-300 transform hover:scale-105"
                       onClick={() => navigate("/login")}
                     >
                       Login
                     </button>
                     <button
-                      className="font-semibold text-lg px-4 py-1 rounded-md border border-gray-300 shadow-md hover:bg-gray-100 transition-colors"
+                      className="font-semibold text-lg px-6 py-2 rounded-xl border border-gray-500 shadow-lg 
+              hover:bg-gray-700 hover:text-white transition-all duration-300 transform hover:scale-105"
                       onClick={() => navigate("/signup")}
                     >
                       Signup

@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 function PopupModal() {
   const { setStatus, peerId, roomId, setRoomId } = useContext(DataContext);
   const [isOpen, setIsOpen] = useState(false);
-
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,11 +15,14 @@ function PopupModal() {
   }, [isOpen, peerId, setRoomId]);
 
   const openModal = () => {
+    console.log("openmodel called");
     setStatus("interviewer");
     setIsOpen(true);
   };
 
-  const closeModal = () => setIsOpen(false);
+  const closeModal = () => {
+    setIsOpen(false);
+  };
   const closeModalAndJoin = () => {
     setIsOpen(false);
     navigate("/room");
@@ -29,10 +31,10 @@ function PopupModal() {
   return (
     <div>
       <button
-        className="bg-blue-400 font-semibold text-lg text-white px-4 py-1 rounded-md shadow-md"
+        className="bg-white w-full font-semibold text-lg text-gray-900 px-4 py-1 rounded-md shadow-md"
         onClick={openModal}
       >
-        Start an Interview
+        Start Interview
       </button>
 
       {isOpen && (

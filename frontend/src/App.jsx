@@ -1,16 +1,19 @@
-import { useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
 import { DataContext } from "./context/DataProvider";
 import { toast, ToastContainer } from "react-toastify";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Homepage from "./pages/Homepage";
 import MainPage from "./pages/MainPage";
 import AddPostForm from "./components/AddPostForm";
 import ShareExperience from "./components/ShareExperience";
 import Navbar from "./components/Navbar";
 import PostSearch from "./components/PostSearch";
 import { FaSpinner } from "react-icons/fa";
+import Homepage from "./pages/Homepage";
+import AppLayout from "./components/layout/AppLayout";
+
+import "./App.css";
 
 function App() {
   const { user, setUser } = useContext(DataContext);
@@ -54,45 +57,90 @@ function App() {
     return (
       <div className="fixed inset-0 flex justify-center items-center bg-white">
         <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-     </div> 
-    ); 
+      </div>
+    );
   }
 
   return (
-    <BrowserRouter>
-      {/* {user && <Navbar />} */}
-      <Routes>
-        {/* Public routes (no user required) */}
-        <Route
-          path="/login"
-          element={<AuthRedirect user={user} Component={Login} />}
-        />
-        <Route
-          path="/signup"
-          element={<AuthRedirect user={user} Component={Signup} />}
-        />
+    <Suspense fallback={<div>Loading...</div>}>
+      <BrowserRouter>
+        {/* {user && <Navbar />} */}
+        <Routes>
+          {/* Public routes (no user required) */}
+          <Route
+            path="/login"
+            element={<AuthRedirect user={user} Component={Login} />}
+          />
+          <Route
+            path="/signup"
+            element={<AuthRedirect user={user} Component={Signup} />}
+          />
 
-        {/* Protected routes (user required) */}
-        <Route path="/" element={<ProtectedRoute user={user} Component={Homepage} />} />
-        <Route path="/room" element={<ProtectedRoute user={user} Component={MainPage} />} />
-        <Route path="/write" element={<ProtectedRoute user={user} Component={AddPostForm} />} />
-        <Route path="/share-experience" element={<ProtectedRoute user={user} Component={ShareExperience} />} /> 
-        <Route path="/search" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
-        <Route path="/search/:id" element={<ProtectedRoute user={user} Component={PostSearch} />} /> 
+          {/* Protected routes (user required) */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(Homepage)}
+              />
+            }
+          />
+          <Route
+            path="/room"
+            element={<ProtectedRoute user={user} Component={MainPage} />}
+          />
+          <Route
+            path="/write"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(AddPostForm)}
+              />
+            }
+          />
+          <Route
+            path="/share-experience"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(ShareExperience)}
+              />
+            }
+          />
+          <Route
+            path="/search"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(PostSearch)}
+              />
+            }
+          />
+          <Route
+            path="/search/:id"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(PostSearch)}
+              />
+            }
+          />
 
-        {/* Fallback route for unmatched paths */}
-        <Route
+          {/* Fallback route for unmatched paths */}
+          {/* <Route
           path="*"
           element={<AuthRedirect user={user} Component={Homepage} />}
+        /> */}
+        </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          pauseOnHover
         />
-      </Routes>
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        pauseOnHover
-      />
-    </BrowserRouter>
+      </BrowserRouter>
+    </Suspense>
   );
 }
 
