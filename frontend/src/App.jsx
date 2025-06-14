@@ -9,6 +9,7 @@ import AddPostForm from "./components/AddPostForm";
 import ShareExperience from "./components/ShareExperience";
 import Navbar from "./components/Navbar";
 import PostSearch from "./components/PostSearch";
+import SinglePost from "./components/SinglePost";
 import { FaSpinner } from "react-icons/fa";
 import Homepage from "./pages/Homepage";
 import AppLayout from "./components/layout/AppLayout";
@@ -59,7 +60,9 @@ function App() {
         <FaSpinner className="animate-spin text-blue-500 text-4xl" />
       </div>
     );
-  }
+  } 
+
+  
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -122,7 +125,7 @@ function App() {
             element={
               <ProtectedRoute
                 user={user}
-                Component={() => AppLayout(PostSearch)}
+                Component={() => AppLayout(SinglePost)}
               />
             }
           />

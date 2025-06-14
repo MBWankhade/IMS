@@ -10,6 +10,7 @@ export const DataProvider = ({ children }) => {
   const [status, setStatus] = useState("");
   const [roomId, setRoomId] = useState("");
   const [peerId, setPeerId] = useState("");
+  const [recommendedPosts, setRecommendedPosts] = useState([]);
   const peerInstance = useRef(null);
 
   useEffect(() => {
@@ -45,6 +46,8 @@ export const DataProvider = ({ children }) => {
         peerInstance,
         peerId,
         socket,
+        recommendedPosts,
+        setRecommendedPosts,
       }}
     >
       {children}
