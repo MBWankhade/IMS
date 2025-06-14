@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { DataContext } from "../context/DataProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import PostContent from "./PostContent";
 import axios from "axios";
 import { formatDate } from "../utils/utils";
 import { FaSpinner } from "react-icons/fa";
 
-const SinglePost = ({ recommendedPosts, onBack }) => {
+const SinglePost = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { recommendedPosts } = useContext(DataContext); 
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -51,12 +53,14 @@ const SinglePost = ({ recommendedPosts, onBack }) => {
   }
 
   return (
-    <div>
+    <div
+      className="px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10"
+    >
       {/* Back Button and Single Post Details */}
       <button
         type="button"
         class="bg-black border text-white rounded-md border-r border-gray-100 hover:bg-red-700 hover:text-white mb-6 px-4 py-2"
-        onClick={onBack}
+        onClick={()=> navigate("/search")}
       >
         <div class="flex flex-row align-middle">
           <svg
@@ -89,32 +93,35 @@ const SinglePost = ({ recommendedPosts, onBack }) => {
       </div>
 
       {/* Recommended Posts */}
-      <div className="border py-4 px-2 sm:px-4 lg:px-8 rounded-lg shadow-md">
-        <h3 className="text-2xl font-semibold  mb-6">Recommended Posts</h3>
-        <div className="space-y-6">
-          {filteredRecommendedPosts?.map((recommendedPost) => (
-            <div
-              key={recommendedPost._id}
-              className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => {
-                navigate(`/search/${recommendedPost._id}`);
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-            >
-              <div className="flex justify-between items-center">
-                <h4 className="text-xl font-semibold  mb-2">
-                  {recommendedPost.title}
-                </h4>
-                <div className="text-sm text-gray-500">
-                  {formatDate(recommendedPost.updatedAt)}
-                </div>
-              </div>
-              <PostContent content={recommendedPost.content} />{" "}
-              {/* Use the new component */}
+      {filteredRecommendedPosts?.length > 0 && (
+  <div className="border py-4 px-2 sm:px-4 lg:px-8 rounded-lg shadow-md">
+    <h3 className="text-2xl font-semibold mb-6">Recommended Posts</h3>
+    <div className="space-y-6">
+      {filteredRecommendedPosts.map((recommendedPost) => (
+        <div
+          key={recommendedPost._id}
+          className="p-6 border border-gray-200 rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+          onClick={() => {
+            navigate(`/search/${recommendedPost._id}`);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+        >
+          <div className="flex justify-between items-center">
+            <h4 className="text-xl font-semibold mb-2">
+              {recommendedPost.title}
+            </h4>
+            <div className="text-sm text-gray-500">
+              {formatDate(recommendedPost.updatedAt)}
             </div>
-          ))}
+          </div>
+          <PostContent content={recommendedPost.content} />
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };

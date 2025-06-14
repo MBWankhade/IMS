@@ -9,6 +9,8 @@ import { formatDate } from "../utils/utils";
 import CompanyRoleSelector from "./CompanyRoleSelector";
 import PostContent from "./PostContent";
 import SinglePost from "./SinglePost";
+import { useContext } from "react";
+import { DataContext } from "../context/DataProvider";
 
 const PostSearch = () => {
   const [searchFilters, setSearchFilters] = useState({
@@ -23,7 +25,8 @@ const PostSearch = () => {
   const [totalPages, setTotalPages] = useState(1); // ✅ Ensure this updates correctly
   const [loading, setLoading] = useState(false);
   const [searchTriggered, setSearchTriggered] = useState(false);
-  const [cachedResults, setCachedResults] = useState({}); // ✅ Store cached results
+  const [cachedResults, setCachedResults] = useState({}); // ✅ Store cached results 
+  const { setRecommendedPosts } = useContext(DataContext)
   const navigate = useNavigate();
   const postsPerPage = 5;
 
@@ -60,7 +63,7 @@ const PostSearch = () => {
       setSearchResults(cachedResults[currentPage].posts);
       setTotalPages(cachedResults[currentPage].totalPages); // ✅ Fix missing page numbers
       return;
-    }
+    } 
 
     setLoading(true);
     try {
@@ -109,9 +112,15 @@ const PostSearch = () => {
 
   // Handle post click
   const handlePostClick = (post) => {
+    const recs = searchResults
+      .filter((p) => p._id !== post._id)
+      .slice(0, 5);
+  
+    setRecommendedPosts(recs);
     setSelectedPost(post);
-    navigate(`/search/${post._id}`);
+    navigate(`/search/${post._id}`); 
   };
+  
 
   // Handle back to search
   const handleBackToSearch = () => {
@@ -119,9 +128,8 @@ const PostSearch = () => {
     navigate("/search");
   };
 
-  const recommendedPosts = searchResults
-    .filter((post) => post._id !== selectedPost?._id) // Exclude selected post
-    .slice(0, 5);
+
+    
 
   return (
     <div
@@ -132,10 +140,7 @@ const PostSearch = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (
-          <SinglePost
-            onBack={handleBackToSearch}
-            recommendedPosts={recommendedPosts}
-          />
+          <SinglePost/>
         ) : (
           <>
             <div className=" p-2 rounded-lg shadow-md mb-8">
