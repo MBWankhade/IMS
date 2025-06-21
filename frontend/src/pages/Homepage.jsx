@@ -22,11 +22,40 @@ import { leftsideBar, mainContaint } from "../utils/colors";
 import { lazy } from "react";
 import Cursor from "quill/blots/cursor";
 
+/**
+ * Homepage component displays the main feed of posts, trending topics, and mock interview tools.
+ * 
+ * Features:
+ * - Fetches and displays a list of posts with infinite scroll.
+ * - Shows user profile and allows navigation to share experience.
+ * - Displays trending topics and mock interview tools in a sidebar.
+ * - Handles login/signup success notifications.
+ * - Allows users to view and toggle comments for each post.
+ * - Shows loading spinner while fetching posts.
+ * 
+ * Context:
+ * - Uses DataContext for user state management.
+ * 
+ * State:
+ * - posts: Array of all fetched posts.
+ * - visiblePosts: Array of posts currently visible in the feed.
+ * - openCommentSection: ID of the post with an open comment section.
+ * - parentCommentCounts: Object mapping post IDs to their parent comment counts.
+ * - loadIndex: Index for loading more posts.
+ * - isLoading: Boolean indicating if posts are being loaded.
+ * 
+ * Effects:
+ * - Fetches posts and parent comment counts on mount.
+ * - Handles login/signup toast notifications.
+ * - Implements infinite scroll using IntersectionObserver.
+ * 
+ * @component
+ */
 function Homepage() {
-  const { setUser, user } = useContext(DataContext);
+  // const { setUser, user } = useContext(DataContext);
+  const { user } = useContext(DataContext);
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("homepage rendered");
 
   const [posts, setPosts] = useState([]);
   const [visiblePosts, setVisiblePosts] = useState([]);
@@ -76,14 +105,6 @@ function Homepage() {
       console.error("Error fetching parent comment count:", error);
     }
   };
-
-  useEffect(() => {
-    if (localStorage.getItem("googleLoginSuccess")) {
-      toast.success(`Google Login successful! Welcome back ${user?.name}.`);
-      localStorage.removeItem("googleLoginSuccess");
-      setUser(user);
-    }
-  }, []);
 
   useEffect(() => {
     if (location.state?.loginSuccess) {

@@ -1,8 +1,10 @@
 import Peer from "peerjs";
 import React, { useState, createContext, useEffect, useRef } from "react";
 import { io } from "socket.io-client";
+import { useMemo } from "react";
 
 export const DataContext = createContext();
+export const InterviewValueContext = createContext(); 
 
 export const DataProvider = ({ children }) => {
   console.log("DataProvider called");
@@ -13,6 +15,24 @@ export const DataProvider = ({ children }) => {
   const [peerId, setPeerId] = useState("");
   const [recommendedPosts, setRecommendedPosts] = useState([]);
   const peerInstance = useRef(null);
+  // Create a new context for call-related values
+
+  const interviewValueContext = useMemo(() => ({
+    status,
+    setStatus,
+    roomId,
+    setRoomId,
+    peerInstance,
+    peerId,
+    socket,
+  }), [status, roomId, peerInstance, peerId, socket]);
+
+  const contextValue = useMemo(() => ({
+    user,
+    setUser,
+    recommendedPosts,
+    setRecommendedPosts,
+  }), [user, recommendedPosts]);
 
   useEffect(() => {
     const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
@@ -36,22 +56,10 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   return (
-    <DataContext.Provider
-      value={{
-        user,
-        setUser,
-        status,
-        setStatus,
-        roomId,
-        setRoomId,
-        peerInstance,
-        peerId,
-        socket,
-        recommendedPosts,
-        setRecommendedPosts,
-      }}
-    >
-      {children}
+    <DataContext.Provider value={contextValue}>
+      <InterviewValueContext.Provider value={interviewValueContext}>
+        {children}
+      </InterviewValueContext.Provider>
     </DataContext.Provider>
   );
 };
