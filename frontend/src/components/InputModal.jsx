@@ -1,9 +1,9 @@
 import React, { useContext, useState } from "react";
-import { DataContext } from "../context/DataProvider";
 import { useNavigate } from "react-router-dom";
+import { InterviewValueContext } from "../context/DataProvider";
 
 function InputModal() {
-  const { setStatus, setRoomId } = useContext(DataContext);
+  const { setStatus, setRoomId } = useContext(InterviewValueContext);
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();

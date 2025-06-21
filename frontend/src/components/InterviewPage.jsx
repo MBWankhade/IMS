@@ -5,6 +5,7 @@ import Notepad from "./Notepad";
 import CodeEditor from "./CodeEditor";
 import { Box, Paper, IconButton } from "@mui/material";
 import { styled } from "@mui/system";
+import { InterviewValueContext } from "../context/DataProvider";
 import {
   exitFullScreenSVG,
   fullScreenSVG,
@@ -95,7 +96,7 @@ const BottomBarContainer = styled(Box)({
 });
 
 const InterviewPage = () => {
-  const { roomId, peerInstance, status, socket } = useContext(DataContext);
+  const { roomId, peerInstance, status, socket } = useContext(InterviewValueContext);
   const remoteVideoRef = useRef(null);
   const currentUserVideoRef = useRef(null);
   const [isCodeEditorFullScreen, setIsCodeEditorFullScreen] = useState(false);
