@@ -1,10 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
-import { DataContext } from "../context/DataProvider";
+import { DataContext, InterviewValueContext } from "../context/DataProvider";
 import { FaCopy } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function PopupModal() {
-  const { setStatus, peerId, roomId, setRoomId } = useContext(DataContext);
+  const { setStatus, peerId, roomId, setRoomId } = useContext(InterviewValueContext);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   console.log("PopUPModal Rendered", isOpen);
@@ -35,7 +35,7 @@ function PopupModal() {
         className="bg-white w-full font-semibold text-lg text-gray-900 px-4 py-1 rounded-md shadow-md"
         onClick={openModal}
       >
-        Start Interview
+        Start Interviews
       </button>
 
       {isOpen && (
