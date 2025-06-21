@@ -5,6 +5,7 @@ import { io } from "socket.io-client";
 export const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
+  console.log("DataProvider called");
   const [user, setUser] = useState(null);
   const [socket, setSocket] = useState(null);
   const [status, setStatus] = useState("");

@@ -63,7 +63,7 @@ const CompanyRoleSelector = ({
             }}
             onFocus={() => setShowCompanyDropdown(true)}
             onBlur={() => setTimeout(() => setShowCompanyDropdown(false), 200)}
-            placeholder="Select or type a company"
+            placeholder="Select or type company"
             className="w-full p-2 border border-gray-600 bg-gray-200 text-gray-800 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
             autoComplete="off"
@@ -108,7 +108,7 @@ const CompanyRoleSelector = ({
             }}
             onFocus={() => setShowRoleDropdown(true)}
             onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)}
-            placeholder="Select or type a role"
+            placeholder="Select or type role"
             className="w-full p-2 border border-gray-600 bg-gray-200 text-gray-800 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             required
             autoComplete="off"

@@ -7,6 +7,7 @@ function PopupModal() {
   const { setStatus, peerId, roomId, setRoomId } = useContext(DataContext);
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  console.log("PopUPModal Rendered", isOpen);
 
   useEffect(() => {
     if (isOpen && peerId) {

@@ -133,7 +133,7 @@ const PostSearch = () => {
 
   return (
     <div
-      className="flex w-full py-8 px-1 sm:px-4 lg:px-8  shadow-sm h-full1 overflow-scroll custom-scrollbar"
+      className="flex w-full py-8 px-1 sm:px-4 lg:px-8  shadow-sm h-full overflow-scroll custom-scrollbar"
       style={{ backgroundColor: `${mainContaint}` }}
       // style={{ backgroundColor: "white" }}
     >
