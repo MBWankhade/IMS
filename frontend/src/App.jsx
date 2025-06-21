@@ -14,6 +14,7 @@ import AppLayout from "./components/layout/AppLayout";
 import People from "./pages/People";
 import Saved from "./pages/Saved";
 import CreatePost from "./pages/CreatePost";
+import ShareExperience from "./components/ShareExperience";
 
 import "./App.css";
 
@@ -87,6 +88,15 @@ function App() {
             <ProtectedRoute user={user} Component={() => AppLayout(Homepage)} />
           }
         />
+        <Route
+            path="/share-experience"
+            element={
+              <ProtectedRoute
+                user={user}
+                Component={() => AppLayout(ShareExperience)}
+              />
+            }
+          />
         <Route
           path="/room"
           element={<ProtectedRoute user={user} Component={MainPage} />}

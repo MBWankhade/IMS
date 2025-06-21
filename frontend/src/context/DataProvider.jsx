@@ -7,7 +7,6 @@ export const DataContext = createContext();
 export const InterviewValueContext = createContext(); 
 
 export const DataProvider = ({ children }) => {
-  console.log("DataProvider called");
   const [user, setUser] = useState(null);
   const [socket, setSocket] = useState(null);
   const [status, setStatus] = useState("");
@@ -15,7 +14,6 @@ export const DataProvider = ({ children }) => {
   const [peerId, setPeerId] = useState("");
   const [recommendedPosts, setRecommendedPosts] = useState([]);
   const peerInstance = useRef(null);
-  // Create a new context for call-related values
 
   const interviewValueContext = useMemo(() => ({
     status,
@@ -25,7 +23,7 @@ export const DataProvider = ({ children }) => {
     peerInstance,
     peerId,
     socket,
-  }), [status, roomId, peerInstance, peerId, socket]);
+  }), [status, roomId, peerId, socket]);
 
   const contextValue = useMemo(() => ({
     user,
@@ -35,11 +33,11 @@ export const DataProvider = ({ children }) => {
   }), [user, recommendedPosts]);
 
   useEffect(() => {
-    const socket = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
+    const socketIo = io(`${import.meta.env.VITE_BACKEND_URL}/`, {
       withCredentials: true,
     });
 
-    setSocket(socket);
+    setSocket(socketIo);
 
     const storedUser = localStorage.getItem("token");
     if (storedUser) {
@@ -53,6 +51,12 @@ export const DataProvider = ({ children }) => {
     });
 
     peerInstance.current = peer;
+
+    // Cleanup on unmount
+    return () => {
+      socketIo.disconnect();
+      peer.destroy();
+    };
   }, []);
 
   return (
