@@ -286,12 +286,12 @@ function Homepage() {
                         </span>
                       </button>
                       
-                      <button className="group/action flex items-center space-x-2 text-white/70 hover:text-green-400 transition-all duration-300 hover:scale-110">
+                      {/* <button className="group/action flex items-center space-x-2 text-white/70 hover:text-green-400 transition-all duration-300 hover:scale-110">
                         <div className="p-2 rounded-full group-hover/action:bg-green-400/20 transition-all duration-300">
                           <FaRetweet className="text-sm" />
                         </div>
                         <span className="text-sm font-medium">{post.reposts || 0}</span>
-                      </button>
+                      </button> */}
                       
                       <button className="group/action flex items-center space-x-2 text-white/70 hover:text-pink-400 transition-all duration-300 hover:scale-110">
                         <div className="p-2 rounded-full group-hover/action:bg-pink-400/20 transition-all duration-300">
