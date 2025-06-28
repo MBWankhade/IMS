@@ -26,6 +26,11 @@ const postSchema = new mongoose.Schema(
     ],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment", default: [] }],
     reposts: { type: Number, default: 0 },
+    aiScore: {
+      type: Number,
+      default: null,
+    },
+
   },
   { timestamps: true }
 );

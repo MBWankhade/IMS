@@ -46,6 +46,7 @@ const AddPostForm = () => {
 
       // If postType is 1 (Interview Experience), include company, role, and placementType
       if (postType === 1) {
+        console.log(postData)
         postData.company = company;
         postData.role = role;
         postData.placementType = placementType;
