@@ -124,10 +124,14 @@ const AddPostForm = () => {
               {cardId === 1 ? (
                 <div>
                   <CompanyRoleSelector
+                    company={company}
+                    role={role}
+                    placementType={placementType}
                     onCompanyChange={(selectedCompany) => setCompany(selectedCompany)}
                     onRoleChange={(selectedRole) => setRole(selectedRole)}
                     onPlacementTypeChange={(selectedPlacementType) => setPlacementType(selectedPlacementType)}
                   />
+
                 </div>
               ) : (
                 <div>
