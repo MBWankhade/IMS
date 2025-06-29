@@ -1,35 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  FaThumbsUp,
-  FaLaugh,
-  FaHeart,
-  FaLightbulb,
-  FaRegStar,
-} from "react-icons/fa";
-import axios from "axios";
+import { Lightbulb } from "lucide-react";
 
 const reactions = [
   {
-    type: "like",
-    icon: <FaThumbsUp className="text-blue-600" />,
-    label: "Like",
-  },
-  {
-    type: "funny",
-    icon: <FaLaugh className="text-yellow-500" />,
-    label: "Funny",
-  },
-  { type: "love", icon: <FaHeart className="text-red-500" />, label: "Love" },
-  {
     type: "insightful",
-    icon: <FaLightbulb className="text-orange-400" />,
+    icon: <Lightbulb className="text-orange-400" />,
     label: "Insightful",
-  },
-  {
-    type: "celebrate",
-    icon: <FaRegStar className="text-purple-500" />,
-    label: "Celebrate",
-  },
+  }
 ];
 
 const Reactions = ({ postId }) => {
@@ -37,24 +14,27 @@ const Reactions = ({ postId }) => {
   const [selectedReaction, setSelectedReaction] = useState(null);
   const [reactionCounts, setReactionCounts] = useState({});
   const [totalReactions, setTotalReactions] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Fetch reactions when the component mounts or postId changes
   useEffect(() => {
     const fetchReactions = async () => {
       try {
-        const response = await axios.get(
+        // Replace with your actual axios call
+        const response = await fetch(
           `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/reactions`,
-          { withCredentials: true }
+          { credentials: 'include' }
         );
-        setReactionCounts(response.data.reactionCounts);
+        const data = await response.json();
+        setReactionCounts(data.reactionCounts);
         setTotalReactions(
-          Object.values(response.data.reactionCounts).reduce(
+          Object.values(data.reactionCounts).reduce(
             (sum, count) => sum + count,
             0
           )
         );
         setSelectedReaction(
-          reactions.find((r) => r.type === response.data.userReaction) || null
+          reactions.find((r) => r.type === data.userReaction) || null
         );
       } catch (err) {
         console.error("Error fetching reactions", err);
@@ -63,42 +43,85 @@ const Reactions = ({ postId }) => {
     fetchReactions();
   }, [postId]);
 
-  // Handle reaction selection
+  // Handle reaction selection/deselection
   const handleReaction = async (reactionType) => {
     try {
-      // Update selected reaction
-      const newSelectedReaction = reactions.find(
-        (r) => r.type === reactionType
-      );
-      setSelectedReaction(newSelectedReaction);
+      // Trigger animation
+      setIsAnimating(true);
+      setTimeout(() => setIsAnimating(false), 300);
 
-      // Update reaction counts locally
-      setReactionCounts((prevCounts) => {
-        const newCounts = { ...prevCounts };
-
-        // Decrement the previous reaction count (if any)
-        if (selectedReaction) {
-          newCounts[selectedReaction.type] = Math.max(
-            (newCounts[selectedReaction.type] || 1) - 1,
+      // Check if clicking the same reaction (toggle off)
+      const isToggleOff = selectedReaction && selectedReaction.type === reactionType;
+      
+      if (isToggleOff) {
+        // Remove reaction
+        setSelectedReaction(null);
+        
+        // Update reaction counts locally
+        setReactionCounts((prevCounts) => {
+          const newCounts = { ...prevCounts };
+          newCounts[reactionType] = Math.max(
+            (newCounts[reactionType] || 1) - 1,
             0
           );
-        }
+          return newCounts;
+        });
 
-        // Increment the new reaction count
-        newCounts[reactionType] = (newCounts[reactionType] || 0) + 1;
-        return newCounts;
-      });
+        // Update total reactions
+        setTotalReactions((prevTotal) => Math.max(prevTotal - 1, 0));
 
-      // Update total reactions
-      setTotalReactions((prevTotal) => prevTotal + (selectedReaction ? 0 : 1));
+        // Send removal to backend
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/react`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ reactionType: null })
+          }
+        );
+        const data = await response.json();
+        console.log("Reaction removal response:", data);
+      } else {
+        // Add new reaction
+        const newSelectedReaction = reactions.find(
+          (r) => r.type === reactionType
+        );
+        setSelectedReaction(newSelectedReaction);
 
-      // Send the reaction to the backend
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/react`,
-        { reactionType },
-        { withCredentials: true }
-      );
-      console.log("Reaction response:", response.data); // Debugging
+        // Update reaction counts locally
+        setReactionCounts((prevCounts) => {
+          const newCounts = { ...prevCounts };
+
+          // Decrement the previous reaction count (if any)
+          if (selectedReaction) {
+            newCounts[selectedReaction.type] = Math.max(
+              (newCounts[selectedReaction.type] || 1) - 1,
+              0
+            );
+          }
+
+          // Increment the new reaction count
+          newCounts[reactionType] = (newCounts[reactionType] || 0) + 1;
+          return newCounts;
+        });
+
+        // Update total reactions
+        setTotalReactions((prevTotal) => prevTotal + (selectedReaction ? 0 : 1));
+
+        // Send the reaction to the backend
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_URL}/api/posts/${postId}/react`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ reactionType })
+          }
+        );
+        const data = await response.json();
+        console.log("Reaction response:", data);
+      }
 
       // Refetch reactions to ensure data consistency
       fetchReactions();
@@ -108,60 +131,35 @@ const Reactions = ({ postId }) => {
   };
 
   return (
-    <div className="relative inline-block">
-      {/* Reaction Button */}
-      <button
-        onClick={() => setShowReactions(!showReactions)}
-        className="flex items-center space-x-2 text-gray-600 hover:text-blue-600 font-medium transition"
-      >
-        {selectedReaction ? (
-          selectedReaction.icon
-        ) : (
-          <FaThumbsUp className="text-gray-600" />
-        )}
-        <span>{selectedReaction ? selectedReaction.label : "Like"}</span>
-      </button>
-
-      {/* Reaction Popup */}
-      {showReactions && (
-        <div className="absolute bottom-10 left-0 flex space-x-2 bg-white p-2 border rounded-xl shadow-lg z-10">
-          {reactions.map((reaction) => (
-            <button
-              key={reaction.type}
-              onClick={() => {
-                handleReaction(reaction.type);
-                setShowReactions(false);
-              }}
-              className="flex flex-col items-center p-2 hover:scale-110 transition-transform"
-            >
-              {reaction.icon}
-              <span className="text-xs text-gray-500">{reaction.label}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Reaction Counts */}
-      <div className="flex space-x-2 mt-2">
-        {Object.entries(reactionCounts).map(([type, count]) =>
-          count > 0 ? (
-            <div
-              key={type}
-              className="flex items-center space-x-1 text-gray-600"
-            >
-              {reactions.find((r) => r.type === type)?.icon}
-              <span>{count}</span>
+    <div className="flex flex-col space-y-2">
+      {/* Main reaction button with count */}
+      <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => handleReaction("insightful")}
+            className={`p-1 rounded-full transition-all duration-200 ${
+              selectedReaction 
+                ? 'text-orange-500 bg-orange-50 hover:bg-orange-100' 
+                : 'text-gray-600 hover:text-orange-400 hover:bg-gray-50'
+            }`}
+          >
+            <div className={`relative ${isAnimating ? 'animate-bounce' : ''}`}>
+              <Lightbulb 
+                className={`w-6 h-6 transition-all duration-200 ${
+                  selectedReaction ? 'text-orange-500 fill-orange-500' : 'text-gray-600'
+                } ${isAnimating ? 'scale-125' : 'scale-100'} hover:scale-110`} 
+              />
             </div>
-          ) : null
-        )}
-      </div>
-
-      {/* Total Reactions */}
-      {totalReactions > 0 && (
-        <div className="mt-2 text-gray-600 font-medium">
-          {totalReactions} {totalReactions === 1 ? "reaction" : "reactions"}
+          </button>
+          
+          {/* Count next to button */}
+          {totalReactions > 0 && (
+            <span className="text-sm font-medium text-gray-1000">
+              {totalReactions.toLocaleString()}
+            </span>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

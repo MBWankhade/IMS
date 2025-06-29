@@ -1,169 +1,66 @@
-import React, { useState } from "react";
-import { companies } from "../utils/utils";
-
-const roles = [
-  "Software Engineer",
-  "Product Manager",
-  "Data Scientist",
-  "DevOps Engineer",
-  "UI/UX Designer",
-  "Business Analyst",
-  "Marketing Manager",
-  "Sales Executive",
-  "HR Manager",
-  "Finance Analyst",
-];
-
-const placementTypes = [
-  "Placement",
-  "Internship",
-  "Placement And Internship",
-  "Internship + Performance based PPO",
-  "Industrial Training",
-  "Apprenticeship",
-];
+import React from "react";
 
 const CompanyRoleSelector = ({
+  company,
+  role,
+  placementType,
   onCompanyChange,
   onRoleChange,
   onPlacementTypeChange,
 }) => {
-  const [company, setCompany] = useState("");
-  const [role, setRole] = useState("");
-  const [placementType, setPlacementType] = useState("");
-  const [showCompanyDropdown, setShowCompanyDropdown] = useState(false);
-  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
-
-  const filteredCompanies = companies.filter((c) =>
-    c.toLowerCase().includes(company.toLowerCase())
-  );
-  const filteredRoles = roles.filter((r) =>
-    r.toLowerCase().includes(role.toLowerCase())
-  );
-
   return (
-    <div className="flex space-x-4">
+    <div className="space-y-4">
       {/* Company Selector */}
-      <div className="flex-1">
-        <label
-          htmlFor="company"
-          className="block text-sm font-medium text-gray-300"
+      <div>
+        <label className="block text-sm font-medium text-white mb-1">Company *</label>
+        <select
+          value={company}
+          onChange={(e) => onCompanyChange(e.target.value)}
+          className="w-full bg-gray-700 text-white rounded-lg p-3"
+          required
         >
-          Company <small className="text-red-500">*</small>
-        </label>
-        <div className="relative mt-1">
-          <input
-            id="company"
-            type="text"
-            value={company}
-            onChange={(e) => {
-              setCompany(e.target.value);
-              onCompanyChange(e.target.value); // Notify parent component
-              setShowCompanyDropdown(true);
-            }}
-            onFocus={() => setShowCompanyDropdown(true)}
-            onBlur={() => setTimeout(() => setShowCompanyDropdown(false), 200)}
-            placeholder="Select or type company"
-            className="w-full p-2 border border-gray-600 bg-gray-200 text-gray-800 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            required
-            autoComplete="off"
-          />
-          {showCompanyDropdown && (
-            <div className="absolute z-10 mt-1 w-full border border-gray-400 bg-black text-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-              {filteredCompanies.map((comp, index) => (
-                <div
-                  key={index}
-                  className="p-2 hover:bg-gray-500 cursor-pointer"
-                  onClick={() => {
-                    setCompany(comp);
-                    onCompanyChange(comp); // Notify parent component
-                    setShowCompanyDropdown(false);
-                  }}
-                >
-                  {comp}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          <option value="">Select Company</option>
+          <option value="Accenture">Accenture</option>
+          <option value="TCS">TCS</option>
+          <option value="Infosys">Infosys</option>
+          <option value="Wipro">Wipro</option>
+          <option value="Cognizant">Cognizant</option>
+        </select>
       </div>
 
       {/* Role Selector */}
-      <div className="flex-1">
-        <label
-          htmlFor="role"
-          className="block text-sm font-medium text-gray-300"
+      <div>
+        <label className="block text-sm font-medium text-white mb-1">Role *</label>
+        <select
+          value={role}
+          onChange={(e) => onRoleChange(e.target.value)}
+          className="w-full bg-gray-700 text-white rounded-lg p-3"
+          required
         >
-          Role <small className="text-red-500">*</small>
-        </label>
-        <div className="relative mt-1">
-          <input
-            id="role"
-            type="text"
-            value={role}
-            onChange={(e) => {
-              setRole(e.target.value);
-              onRoleChange(e.target.value); // Notify parent component
-              setShowRoleDropdown(true);
-            }}
-            onFocus={() => setShowRoleDropdown(true)}
-            onBlur={() => setTimeout(() => setShowRoleDropdown(false), 200)}
-            placeholder="Select or type role"
-            className="w-full p-2 border border-gray-600 bg-gray-200 text-gray-800 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            required
-            autoComplete="off"
-          />
-          {showRoleDropdown && (
-            <div className="absolute z-10 mt-1 w-full border border-gray-400 bg-black text-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
-              {filteredRoles.map((rl, index) => (
-                <div
-                  key={index}
-                  className="p-2 hover:bg-gray-500 cursor-pointer"
-                  onClick={() => {
-                    setRole(rl);
-                    onRoleChange(rl); // Notify parent component
-                    setShowRoleDropdown(false);
-                  }}
-                >
-                  {rl}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          <option value="">Select Role</option>
+          <option value="Software Engineer">Software Engineer</option>
+          <option value="Data Analyst">Data Analyst</option>
+          <option value="System Engineer">System Engineer</option>
+          <option value="Full Stack Developer">Full Stack Developer</option>
+          <option value="QA Engineer">QA Engineer</option>
+        </select>
       </div>
 
-      {/* Placement Type Dropdown */}
-      <div className="flex-1">
-        <label
-          htmlFor="placementType"
-          className="block text-sm font-medium text-gray-300"
+      {/* Placement Type Selector */}
+      <div>
+        <label className="block text-sm font-medium text-white mb-1">Placement Type *</label>
+        <select
+          value={placementType}
+          onChange={(e) => onPlacementTypeChange(e.target.value)}
+          className="w-full bg-gray-700 text-white rounded-lg p-3"
+          required
         >
-          Placement Type <small className="text-red-500">*</small>
-        </label>
-        <div className="relative mt-1">
-          <select
-            id="placementType"
-            value={placementType}
-            onChange={(e) => {
-              setPlacementType(e.target.value);
-              onPlacementTypeChange(e.target.value); // Notify parent component
-            }}
-            className="w-full p-2 border border-gray-600 bg-gray-200 text-gray-800 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-            required
-          >
-            <option value="">Not Selected</option>
-            {placementTypes.map((type, index) => (
-              <option
-                className="border-gray-400 bg-black text-gray-200"
-                key={index}
-                value={type}
-              >
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
+          <option value="">Select Placement Type</option>
+          <option value="On-Campus">On-Campus</option>
+          <option value="Off-Campus">Off-Campus</option>
+          <option value="Referral">Referral</option>
+          <option value="Internship to Full-Time">Internship to Full-Time</option>
+        </select>
       </div>
     </div>
   );

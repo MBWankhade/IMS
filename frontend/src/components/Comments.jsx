@@ -147,96 +147,119 @@ const Comments = ({ postId, currentUserId }) => {
     const commentsToRender = showAllComments ? filteredComments : filteredComments.slice(0, 7);
 
     return commentsToRender.map((comment) => (
-      <div key={comment._id} className="p-2 border-b">
-        <div className="flex items-start space-x-2">
-          <img
-            src={comment.user?.profilePicture || "/default-avatar.png"}
-            alt="Profile"
-            className="w-8 h-8 rounded-full"
-          />
-          <div>
-            <p className="font-bold">{comment.user?.name || "Anonymous"}</p>
+      <div key={comment._id} className="group">
+        <div className="flex items-start space-x-3 p-4 hover:bg-gray-800/30 rounded-xl transition-all duration-200">
+          <div className="relative">
+            <img
+              src={comment.user?.profilePicture || "/default-avatar.png"}
+              alt="Profile"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-700/50"
+            />
+            <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"></div>
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center space-x-2 mb-2">
+              <h4 className="font-semibold text-white text-sm">
+                {comment.user?.name || "Anonymous"}
+              </h4>
+              <span className="text-gray-400 text-xs">•</span>
+              <span className="text-gray-400 text-xs">
+                {new Date(comment.createdAt).toLocaleString()}
+              </span>
+            </div>
+
             {editingCommentId === comment._id ? (
-              <>
+              <div className="space-y-3">
                 <textarea
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
-                  className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  rows="3"
                 />
-                <button
-                  onClick={() => handleSaveEdit(comment._id)}
-                  className="mt-2 p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingCommentId(null);
-                    setEditContent("");
-                  }}
-                  className="mt-2 ml-2 p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <p className="text-gray-700">{comment.content}</p>
-            )}
-            <div className="flex space-x-4 text-sm text-gray-500">
-              <button
-                onClick={() => handleLikeComment(comment._id)}
-                className="hover:text-blue-500"
-              >
-                Like ({comment.likes || 0})
-              </button>
-              <button
-                onClick={() => setReplyingTo(comment._id)}
-                className="hover:text-blue-500"
-              >
-                Reply
-              </button>
-              {comment.user?._id === currentUserId && (
-                <>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleSaveEdit(comment._id)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
+                  >
+                    Save
+                  </button>
                   <button
                     onClick={() => {
-                      setEditingCommentId(comment._id);
-                      setEditContent(comment.content);
+                      setEditingCommentId(null);
+                      setEditContent("");
                     }}
-                    className="hover:text-blue-500"
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
                   >
-                    Edit
+                    Cancel
                   </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-100 text-sm leading-relaxed mb-3">
+                  {comment.content}
+                </p>
+
+                <div className="flex items-center space-x-6 text-sm text-gray-400">
                   <button
-                    onClick={() => handleDeleteComment(comment._id)}
-                    className="hover:text-red-500"
+                    onClick={() => handleLikeComment(comment._id)}
+                    className="hover:text-red-400 transition-colors duration-200"
                   >
-                    Delete
+                    ❤️ Like ({comment.likes || 0})
                   </button>
-                </>
-              )}
-            </div>
-            <p className="text-xs text-gray-400">
-              {new Date(comment.createdAt).toLocaleString()}
-            </p>
+
+                  <button
+                    onClick={() => setReplyingTo(comment._id)}
+                    className="hover:text-blue-400 transition-colors duration-200"
+                  >
+                    💬 Reply
+                  </button>
+
+                  {comment.user?._id === currentUserId && (
+                    <>
+                      <button
+                        onClick={() => {
+                          setEditingCommentId(comment._id);
+                          setEditContent(comment.content);
+                        }}
+                        className="hover:text-yellow-400 transition-colors duration-200"
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteComment(comment._id)}
+                        className="hover:text-red-400 transition-colors duration-200"
+                      >
+                        🗑️ Delete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {replyingTo === comment._id && (
           <div className="mt-2 ml-10">
-            <textarea
-              value={replyContent[comment._id] || ""}
-              onChange={(e) =>
-                setReplyContent({ ...replyContent, [comment._id]: e.target.value })
-              }
-              placeholder="Write a reply..."
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-              onClick={() => handleAddComment(comment._id)}
-              className="mt-2 p-2 w-full rounded-lg text-white bg-blue-500 hover:bg-blue-600"
-            >
-              Reply
-            </button>
+            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <textarea
+                value={replyContent[comment._id] || ""}
+                onChange={(e) =>
+                  setReplyContent({ ...replyContent, [comment._id]: e.target.value })
+                }
+                placeholder="Write a reply..."
+                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows="3"
+              />
+              <button
+                onClick={() => handleAddComment(comment._id)}
+                className="mt-2 p-2 w-full rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-200"
+              >
+                Reply
+              </button>
+            </div>
           </div>
         )}
 
@@ -248,13 +271,24 @@ const Comments = ({ postId, currentUserId }) => {
   };
 
   return (
-    <div className="mt-4">
+    <div className="bg-gray-900 rounded-2xl p-6 space-y-6">
+      {/* Comments Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-bold text-white">
+          Comments
+        </h3>
+      </div>
+
       {/* Scrollable comments container */}
-      <div className="space-y-2 max-h-96 overflow-y-auto">
+      <div className="space-y-2 max-h-96 overflow-y-auto custom-scrollbar">
         {comments?.length > 0 ? (
           renderComments(comments)
         ) : (
-          <p className="text-gray-500">No comments yet. Be the first to comment!</p>
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">💬</div>
+            <p className="text-gray-400 text-lg">No comments yet</p>
+            <p className="text-gray-500 text-sm">Be the first to comment!</p>
+          </div>
         )}
         {/* Add a ref to the bottom of the comments section */}
         <div ref={commentsEndRef} />
@@ -264,30 +298,50 @@ const Comments = ({ postId, currentUserId }) => {
       {comments?.length > 7 && !showAllComments && (
         <button
           onClick={() => setShowAllComments(true)}
-          className="mt-2 p-2 w-full text-blue-500 hover:bg-blue-50 rounded-lg"
+          className="w-full py-3 text-blue-400 hover:text-blue-300 bg-gray-800/50 hover:bg-gray-800 rounded-lg text-sm font-medium transition-all duration-200 border border-gray-700/50"
         >
           Show more comments
         </button>
       )}
 
       {/* Add new comment section */}
-      <div className="mt-4">
-        <textarea
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Write a comment..."
-          className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          onClick={() => handleAddComment()}
-          className={`mt-2 p-2 w-full rounded-lg text-white ${
-            loading ? "bg-gray-400" : "bg-blue-500 hover:bg-blue-600"
-          }`}
-          disabled={loading}
-        >
-          {loading ? "Posting..." : "Comment"}
-        </button>
+      <div className="border-t border-gray-700/50 pt-6">
+        <div className="space-y-3">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="w-full p-4 bg-gray-800 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+            rows="3"
+          />
+          <button
+            onClick={() => handleAddComment()}
+            className={`w-full p-3 rounded-xl text-white font-medium transition-all duration-200 ${
+              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+            disabled={loading}
+          >
+            {loading ? "Posting..." : "Comment"}
+          </button>
+        </div>
       </div>
+
+      <style jsx>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #374151;
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #6B7280;
+          border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #9CA3AF;
+        }
+      `}</style>
     </div>
   );
 };
