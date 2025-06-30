@@ -8,7 +8,285 @@ import { getContent } from "../utils/utils";
 import CompanyRoleSelector from "./CompanyRoleSelector";
 import Navbar from "./Navbar";
 import { DataContext } from "../context/DataProvider";
-import { FileText, Send, Users, UserX } from "lucide-react";
+import { FileText, Send, Users, UserX, X, AlertTriangle, CheckCircle, ArrowRight, Star, MessageCircle, ChevronDown, ChevronUp, Eye, EyeOff } from "lucide-react";
+
+// Quality Feedback Modal Component
+const QualityFeedbackModal = ({ isOpen, onClose, feedbackData, onKeepFeedbackVisible }) => {
+  if (!isOpen || !feedbackData) return null;
+
+  const { message, aiFeedback } = feedbackData;
+  const { score, issues, suggestions } = aiFeedback;
+
+  const getScoreColor = (score) => {
+    if (score >= 7) return 'text-green-500';
+    if (score >= 4) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  const getScoreBarColor = (score) => {
+    if (score >= 7) return 'bg-green-500';
+    if (score >= 4) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  const handleKeepVisible = () => {
+    onKeepFeedbackVisible();
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-700 shadow-2xl">
+        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-500/20 rounded-lg">
+              <AlertTriangle className="w-6 h-6 text-orange-500" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">Post Quality Review</h2>
+              <p className="text-gray-400 text-sm">Your post needs improvement before publishing</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-400" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-6">
+          <div className="bg-gray-900/50 rounded-lg p-4 border border-gray-700">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Star className="w-5 h-5 text-yellow-500" />
+                <span className="text-white font-semibold">Quality Score</span>
+              </div>
+              <span className={`text-2xl font-bold ${getScoreColor(score)}`}>
+                {score}/10
+              </span>
+            </div>
+            
+            <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+              <div 
+                className={`h-2 rounded-full transition-all duration-500 ${getScoreBarColor(score)}`}
+                style={{ width: `${(score / 10) * 100}%` }}
+              ></div>
+            </div>
+            
+            <p className="text-gray-400 text-sm">
+              {score < 4 ? 'Needs significant improvement' : 
+               score < 7 ? 'Good start, but could be better' : 
+               'Great quality!'}
+            </p>
+          </div>
+
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <MessageCircle className="w-5 h-5 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h3 className="text-red-400 font-semibold mb-1">Feedback</h3>
+                <p className="text-gray-300">{message}</p>
+              </div>
+            </div>
+          </div>
+
+          {issues && issues.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-orange-500" />
+                Issues Found ({issues.length})
+              </h3>
+              <div className="space-y-2">
+                {issues.map((issue, index) => (
+                  <div key={index} className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <p className="text-gray-300 text-sm">{issue}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {suggestions && suggestions.length > 0 && (
+            <div className="space-y-3">
+              <h3 className="text-white font-semibold flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                Suggestions for Improvement ({suggestions.length})
+              </h3>
+              <div className="space-y-2">
+                {suggestions.map((suggestion, index) => (
+                  <div key={index} className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                    <div className="flex items-start gap-3">
+                      <ArrowRight className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-300 text-sm">{suggestion}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+            <h4 className="text-blue-400 font-semibold mb-2">💡 Quick Tips</h4>
+            <ul className="text-gray-300 text-sm space-y-1">
+              <li>• Be specific and detailed in your experiences</li>
+              <li>• Include actual questions and scenarios you encountered</li>
+              <li>• Replace template placeholders with real information</li>
+              <li>• Add actionable tips that others can use</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="p-6 border-t border-gray-700 bg-gray-900/50">
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            >
+              Close
+            </button>
+            <button
+              onClick={handleKeepVisible}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+            >
+              <Eye className="w-4 h-4" />
+              Keep Feedback Visible
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Persistent Quality Feedback Panel Component
+const QualityFeedbackPanel = ({ feedbackData, onClose, isCollapsed, onToggleCollapse }) => {
+  if (!feedbackData) return null;
+
+  const { message, aiFeedback } = feedbackData;
+  const { score, issues, suggestions } = aiFeedback;
+
+  const getScoreColor = (score) => {
+    if (score >= 7) return 'text-green-500';
+    if (score >= 4) return 'text-yellow-500';
+    return 'text-red-500';
+  };
+
+  const getScoreBarColor = (score) => {
+    if (score >= 7) return 'bg-green-500';
+    if (score >= 4) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-orange-900/30 to-red-900/30 backdrop-blur-sm rounded-xl border border-orange-500/20 overflow-hidden">
+      {/* Header - Always Visible */}
+      <div className="p-4 border-b border-orange-500/20">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-orange-500/20 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-orange-500" />
+            </div>
+            <div>
+              <h3 className="text-white font-semibold">Quality Feedback</h3>
+              <div className="flex items-center gap-3">
+                <span className={`font-bold ${getScoreColor(score)}`}>
+                  Score: {score}/10
+                </span>
+                <div className="w-16 bg-gray-700 rounded-full h-1.5">
+                  <div 
+                    className={`h-1.5 rounded-full transition-all duration-500 ${getScoreBarColor(score)}`}
+                    style={{ width: `${(score / 10) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onToggleCollapse}
+              className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+              title={isCollapsed ? "Expand feedback" : "Collapse feedback"}
+            >
+              {isCollapsed ? (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-700/50 rounded-lg transition-colors"
+              title="Hide feedback"
+            >
+              <EyeOff className="w-4 h-4 text-gray-400" />
+            </button>
+          </div>
+        </div>
+        
+        {isCollapsed && (
+          <p className="text-gray-300 text-sm mt-2 line-clamp-2">{message}</p>
+        )}
+      </div>
+
+      {/* Expandable Content */}
+      {!isCollapsed && (
+        <div className="p-4 space-y-4">
+          <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-3">
+            <div className="flex items-start gap-3">
+              <MessageCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+              <div>
+                <h4 className="text-red-400 font-semibold mb-1 text-sm">Feedback</h4>
+                <p className="text-gray-300 text-sm">{message}</p>
+              </div>
+            </div>
+          </div>
+
+          {issues && issues.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-white font-semibold text-sm flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-orange-500" />
+                Issues ({issues.length})
+              </h4>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {issues.map((issue, index) => (
+                  <div key={index} className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-2">
+                    <div className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5 flex-shrink-0"></div>
+                      <p className="text-gray-300 text-xs">{issue}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {suggestions && suggestions.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-white font-semibold text-sm flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                Suggestions ({suggestions.length})
+              </h4>
+              <div className="space-y-2 max-h-32 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <div key={index} className="bg-green-900/20 border border-green-500/30 rounded-lg p-2">
+                    <div className="flex items-start gap-2">
+                      <ArrowRight className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-gray-300 text-xs">{suggestion}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AddPostForm = () => {
   const { user } = useContext(DataContext);
@@ -29,6 +307,14 @@ const AddPostForm = () => {
   const [submitAsAnonymous, setSubmitAsAnonymous] = useState(false);
   const [showGuidelines, setShowGuidelines] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Quality feedback modal states
+  const [showQualityModal, setShowQualityModal] = useState(false);
+  const [qualityFeedback, setQualityFeedback] = useState(null);
+  
+  // Persistent feedback panel states
+  const [showPersistentFeedback, setShowPersistentFeedback] = useState(false);
+  const [isPersistentFeedbackCollapsed, setIsPersistentFeedbackCollapsed] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,8 +350,23 @@ const AddPostForm = () => {
       );
 
       toast.success("Post created successfully!");
+      
+      // Clear feedback on successful submission
+      setQualityFeedback(null);
+      setShowPersistentFeedback(false);
+      
     } catch (err) {
-      toast.error("Failed to create post.");
+      // Check if the error response contains quality feedback
+      if (err.response && err.response.data && err.response.data.aiFeedback) {
+        // Show quality feedback modal
+        setQualityFeedback(err.response.data);
+        setShowQualityModal(true);
+        // Hide persistent feedback when modal is shown
+        setShowPersistentFeedback(false);
+      } else {
+        // Show generic error for other types of errors
+        toast.error("Failed to create post.");
+      }
       console.error("Error creating post", err);
     } finally {
       setIsSubmitting(false);
@@ -75,6 +376,16 @@ const AddPostForm = () => {
       setRole("");
       setPlacementType("");
     }
+  };
+
+  const handleKeepFeedbackVisible = () => {
+    setShowPersistentFeedback(true);
+    setIsPersistentFeedbackCollapsed(false);
+  };
+
+  const handleClosePersistentFeedback = () => {
+    setShowPersistentFeedback(false);
+    setQualityFeedback(null);
   };
 
   const handleChange = (value) => {
@@ -120,6 +431,16 @@ const AddPostForm = () => {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content Area */}
           <div className="lg:col-span-3 space-y-6">
+            {/* Persistent Quality Feedback Panel */}
+            {showPersistentFeedback && qualityFeedback && (
+              <QualityFeedbackPanel
+                feedbackData={qualityFeedback}
+                onClose={handleClosePersistentFeedback}
+                isCollapsed={isPersistentFeedbackCollapsed}
+                onToggleCollapse={() => setIsPersistentFeedbackCollapsed(!isPersistentFeedbackCollapsed)}
+              />
+            )}
+
             {/* Title/Company Section */}
             <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
               {cardId === 1 ? (
@@ -345,6 +666,14 @@ const AddPostForm = () => {
           </div>
         </form>
       </div>
+
+      {/* Quality Feedback Modal */}
+      <QualityFeedbackModal
+        isOpen={showQualityModal}
+        onClose={() => setShowQualityModal(false)}
+        feedbackData={qualityFeedback}
+        onKeepFeedbackVisible={handleKeepFeedbackVisible}
+      />
     </div>
   );
 };
