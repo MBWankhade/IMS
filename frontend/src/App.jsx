@@ -13,6 +13,7 @@ import SinglePost from "./components/SinglePost";
 import { FaSpinner } from "react-icons/fa";
 import Homepage from "./pages/Homepage";
 import AppLayout from "./components/layout/AppLayout";
+import LandingPage from "./components/LandingPage";
 
 import "./App.css";
 
@@ -80,13 +81,15 @@ function App() {
           />
 
           {/* Protected routes (user required) */}
+          {/* Conditional root route */}
           <Route
             path="/"
             element={
-              <ProtectedRoute
-                user={user}
-                Component={() => AppLayout(Homepage)}
-              />
+              user ? (
+                <ProtectedRoute user={user} Component={() => AppLayout(Homepage)} />
+              ) : (
+                <LandingPage />
+              )
             }
           />
           <Route
@@ -152,7 +155,7 @@ function ProtectedRoute({ user, Component }) {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login", { replace: true }); // ✅ Ensure proper redirection
+      navigate("/", { replace: true }); // ✅ Ensure proper redirection
     }
   }, [user, navigate]);
 

@@ -28,7 +28,7 @@ function Navbar() {
       await res.json();
       setUser(null);
       localStorage.removeItem("token");
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       console.error("Logout Error:", error);
     }

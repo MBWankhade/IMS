@@ -4,7 +4,7 @@ import { DataContext } from "../context/DataProvider";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline"; 
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'; 
 
 function Login() {
   const { setUser } = useContext(DataContext);

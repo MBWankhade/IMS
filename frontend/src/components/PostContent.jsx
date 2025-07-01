@@ -30,7 +30,7 @@ const PostContent = ({ content }) => {
           className="text-blue-600 hover:underline"
         >
           ...Read more
-        </button>
+        </button>  
       )} 
       {location.pathname === "/" && (
         <div dangerouslySetInnerHTML={{ __html: imagesHTML }} className="mt-2"/>
