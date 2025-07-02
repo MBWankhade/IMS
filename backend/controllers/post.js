@@ -141,35 +141,36 @@ export const getAllPosts=async (req, res) => {
 
 export const searchPosts = async (req, res) => {
   try {
-    let { company, role, placementType, page = 1, limit = 5 } = req.query;
+    let { query = "", page = 1, limit = 5 } = req.query;
 
-    // Convert page and limit to numbers
-    page = Math.max(parseInt(page) || 1, 1); // Ensure page is at least 1
-    limit = Math.max(parseInt(limit) || 5, 1); // Ensure limit is at least 1
-
-    // Build the filter object only if values are provided
-    const filters = {};
-    if (company && company.trim()) filters.company = new RegExp(company.trim(), "i");
-    if (role && role.trim()) filters.role = new RegExp(role.trim(), "i");
-    
-    // ✅ Fix for Placement Type (Use exact match)
-    if (placementType && placementType.trim()) {
-      filters.placementType = placementType.trim(); // Direct match instead of regex
-    }
-
-    // Calculate pagination values
+    // Convert to numbers and sanitize
+    page = Math.max(parseInt(page) || 1, 1);
+    limit = Math.max(parseInt(limit) || 5, 1);
     const skip = (page - 1) * limit;
 
-    // Fetch paginated posts
-    const posts = await Post.find(filters)
-      .populate("user", "name email profilePicture") // Populate user details
-      .sort({ createdAt: -1 }) // Sort latest first
+    // If query is empty, return early with empty results
+    if (!query.trim()) {
+      return res.status(200).json({
+        posts: [],
+        totalPages: 0,
+        currentPage: page,
+        totalPosts: 0,
+      });
+    }
+
+    // Text search filter
+    const filters = { $text: { $search: query.trim() } };
+
+    // Fetch matching posts with relevance score
+    const posts = await Post.find(filters, { score: { $meta: "textScore" } })
+      .populate("user", "name email profilePicture")
+      .sort({ score: { $meta: "textScore" }, createdAt: -1 })
       .skip(skip)
       .limit(limit);
 
-    // Count total matching posts
+    // Count total matching documents
     const totalPosts = await Post.countDocuments(filters);
-    const totalPages = Math.max(Math.ceil(totalPosts / limit), 1); // Ensure at least 1 page exists
+    const totalPages = Math.max(Math.ceil(totalPosts / limit), 1);
 
     res.status(200).json({
       posts,

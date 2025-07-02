@@ -40,6 +40,17 @@ postSchema.index({ user: 1, createdAt: -1 });
 postSchema.index({ "reactions.user": 1 });
 postSchema.index({ comments: 1 });   
 
+postSchema.index(
+  {
+    title: "text",
+    company: "text",
+    role: "text",
+    placementType: "text",
+    content: "text"
+  }
+);
+
+
 
 
 const Post = mongoose.models.Post || mongoose.model("Post", postSchema);
