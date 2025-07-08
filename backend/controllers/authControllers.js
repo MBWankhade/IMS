@@ -153,3 +153,20 @@ export const getMyProfile= async (req,res)=>{
         return res.status(500).send({message:"Internal server error"});
     }
 }
+
+export const completeProfile = async (req, res) => {
+  try {
+    const { college, branch, prn, batch } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { college, branch, prn, batch },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    res.status(200).json({ message: "Profile updated", user: updatedUser });
+  } catch (error) {
+    console.error("Error completing profile:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
