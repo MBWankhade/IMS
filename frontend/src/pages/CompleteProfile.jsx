@@ -1,98 +1,67 @@
-import React, { useContext, useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { DataContext } from "../context/DataProvider";
-import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { EyeIcon, EyeOffIcon } from "@heroicons/react/outline";
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-const displayImage = "/src/assets/displayImage.jpg";
-
-function Signup() {
-  const { setUser } = useContext(DataContext);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const CompleteProfile = () => {
+  const { user } = useContext(DataContext);
+  const [formData, setFormData] = useState({
+    college: "",
+    branch: "",
+    prn: "",
+    batch: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignup = async () => {
-    if (!name || !email || !username || !password || !confirmPassword) {
+  useEffect(() => {
+    if (!user) navigate("/login");
+  }, [user, navigate]);
+
+  const handleChange = (e) => {
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validation
+    if (!formData.college || !formData.branch || !formData.prn || !formData.batch) {
       toast.error("All fields are required.");
-      return;
-    }
-    if (password !== confirmPassword) {
-      toast.error("Password and Confirm Password do not match.");
-      return;
-    }
-    if (password.length < 8) {
-      toast.error("Password must be at least 8 characters long.");
       return;
     }
 
     setIsLoading(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Required for browser to accept cookie
-        body: JSON.stringify({ name, email, username, password, confirmPassword }),
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/complete-profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        toast.error(data.message);
-        return;
+      if (res.ok) {
+        toast.success("Profile updated successfully!");
+        setTimeout(() => navigate("/"), 1500);
+      } else {
+        toast.error(data.message || "Failed to update profile");
       }
-
-      toast.success("Signup successful!");
-      setUser(data.data);
-      localStorage.setItem("token", data.token);
-      navigate("/complete-profile", { state: { signupSuccess: true } });
     } catch (error) {
-      toast.error(error.message);
       console.error(error);
+      toast.error("Server error. Try again later.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleLogin = async (credentialResponse) => {
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/google-login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        setUser(data.user);
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("googleLoginSuccess", "true");
-
-        toast.success("Google Login successful!");
-        navigate("/complete-profile");
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error("Google login failed. Please try again.");
-      console.log(error);
-    }
-  };
-
   return (
-    <div className="h-screen flex overflow-hidden">
+    <div className="min-h-screen flex overflow-hidden">
       {/* Enhanced animated background */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.3),transparent)] animate-pulse"></div>
@@ -112,9 +81,9 @@ function Signup() {
           border: '1px solid rgba(255, 255, 255, 0.1)'
         }}
       />
-      
-      {/* Left side: Custom designed hero section */}
-      <div className="hidden md:block w-1/2 relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
+
+      {/* Left side: Hero section */}
+      <div className="hidden lg:block w-1/2 relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
         {/* Animated background elements */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
@@ -136,39 +105,39 @@ function Signup() {
           <div className="mb-8 relative">
             <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-purple-500/25 rotate-3 hover:rotate-6 transition-transform duration-300">
               <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
               </svg>
             </div>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full animate-bounce"></div>
+            <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-400 rounded-full animate-bounce"></div>
           </div>
 
           {/* Main heading */}
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent leading-tight">
-            Master Your
+            Complete Your
             <br />
             <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-              Interview Skills
+              Profile
             </span>
           </h1>
 
           {/* Description */}
           <p className="text-gray-300 text-lg leading-relaxed mb-8 max-w-md">
-            Join thousands of students who've transformed their career prospects with our comprehensive interview preparation platform.
+            Just a few more details to personalize your interview preparation experience and get started.
           </p>
 
           {/* Feature highlights */}
           <div className="space-y-4 text-left">
             <div className="flex items-center space-x-3 text-gray-300">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span className="text-sm">AI-Powered Mock Interviews</span>
+              <span className="text-sm">Personalized Content</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
               <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse animation-delay-1000"></div>
-              <span className="text-sm">Real-time Performance Analytics</span>
+              <span className="text-sm">Academic Integration</span>
             </div>
             <div className="flex items-center space-x-3 text-gray-300">
               <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse animation-delay-2000"></div>
-              <span className="text-sm">Industry-Specific Preparation</span>
+              <span className="text-sm">Progress Tracking</span>
             </div>
           </div>
 
@@ -188,141 +157,94 @@ function Signup() {
         <div className="absolute top-1/3 right-8 w-2 h-2 bg-green-400 rounded-full animate-float animation-delay-1000"></div>
       </div>
 
-      {/* Right side: Full height form section */}
-      <div className="w-full md:w-1/2 relative bg-gray-900 overflow-y-auto">
-        <div className="min-h-full flex flex-col justify-center px-8 py-6">
+      {/* Right side: Form section */}
+      <div className="w-full lg:w-1/2 relative bg-gray-900 overflow-y-auto">
+        <div className="min-h-full flex flex-col justify-center px-8 py-12">
           <div className="w-full max-w-md mx-auto">
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Welcome to MockInt
+                Almost There!
               </h1>
-              <p className="text-gray-300 text-sm">Create your account and unlock your potential</p>
+              <p className="text-gray-300 text-sm">Complete your profile to get started</p>
             </div>
 
-            {/* Google Login */}
-            <div className="flex flex-col items-center mb-5">
-              <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-                <div className="transform hover:scale-105 transition-transform duration-200">
-                  <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => toast.error("Google login failed.")}
-                    cookiePolicy={"single_host_origin"}
-                    uxMode="redirect"
-                    text="continue_with"
-                    theme="filled_black"
-                    width="300"
-                  />
-                </div>
-              </GoogleOAuthProvider>
+            {/* Welcome message */}
+            <div className="mb-6 p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl border border-purple-500/20">
+              <p className="text-gray-300 text-sm text-center">
+                Welcome, <span className="text-purple-400 font-semibold">{user?.name || 'User'}</span>! 
+                Let's set up your academic profile.
+              </p>
             </div>
 
-            {/* Divider */}
-            <div className="flex items-center my-5">
-              <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
-              <span className="mx-4 text-gray-400 text-sm font-medium">Or continue with email</span>
-              <div className="flex-grow h-px bg-gradient-to-r from-transparent via-gray-500 to-transparent"></div>
-            </div>
-
-            {/* Form fields */}
-            <div className="space-y-4">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div className="group">
-                <label className="block text-gray-300 mb-2 font-medium text-sm">Full Name</label>
+                <label className="block text-gray-300 mb-2 font-medium text-sm">College/University</label>
                 <input
                   type="text"
-                  placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  name="college"
+                  placeholder="Enter your college or university name"
+                  value={formData.college}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
                            focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
                            border border-gray-600 hover:border-gray-500 transition-all duration-200"
+                  required
                 />
               </div>
 
               <div className="group">
-                <label className="block text-gray-300 mb-2 font-medium text-sm">Email Address</label>
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
-                           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
-                           border border-gray-600 hover:border-gray-500 transition-all duration-200"
-                />
-              </div>
-
-              <div className="group">
-                <label className="block text-gray-300 mb-2 font-medium text-sm">Username</label>
+                <label className="block text-gray-300 mb-2 font-medium text-sm">Branch/Department</label>
                 <input
                   type="text"
-                  placeholder="Choose a username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  name="branch"
+                  placeholder="e.g., Computer Science, Electronics, etc."
+                  value={formData.branch}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
                            focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
                            border border-gray-600 hover:border-gray-500 transition-all duration-200"
+                  required
                 />
               </div>
 
               <div className="group">
-                <label className="block text-gray-300 mb-2 font-medium text-sm">Password</label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Create a strong password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
-                             focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
-                             border border-gray-600 hover:border-gray-500 transition-all duration-200 pr-12"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
-                    tabIndex={-1}
-                  >
-                    {!showPassword ? (
-                      <EyeOffIcon className="h-5 w-5" />
-                    ) : (
-                      <EyeIcon className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+                <label className="block text-gray-300 mb-2 font-medium text-sm">PRN/Roll Number</label>
+                <input
+                  type="text"
+                  name="prn"
+                  placeholder="Enter your PRN or Roll Number"
+                  value={formData.prn}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
+                           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
+                           border border-gray-600 hover:border-gray-500 transition-all duration-200"
+                  required
+                />
               </div>
 
               <div className="group">
-                <label className="block text-gray-300 mb-2 font-medium text-sm">Confirm Password</label>
-                <div className="relative">
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
-                             focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
-                             border border-gray-600 hover:border-gray-500 transition-all duration-200 pr-12"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-200"
-                    tabIndex={-1}
-                  >
-                    {!showConfirmPassword ? (
-                      <EyeOffIcon className="h-5 w-5" />
-                    ) : (
-                      <EyeIcon className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+                <label className="block text-gray-300 mb-2 font-medium text-sm">Batch/Year</label>
+                <input
+                  type="number"
+                  name="batch"
+                  placeholder="e.g., 2024, 2025, etc."
+                  value={formData.batch}
+                  onChange={handleChange}
+                  min="2020"
+                  max="2030"
+                  className="w-full px-4 py-3 rounded-xl bg-gray-800 text-white placeholder-gray-400 
+                           focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-gray-700
+                           border border-gray-600 hover:border-gray-500 transition-all duration-200"
+                  required
+                />
               </div>
 
               {/* Submit button */}
               <button
-                onClick={handleSignup}
+                type="submit"
                 disabled={isLoading}
-                className="w-full py-4 mt-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 
+                className="w-full py-4 mt-8 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 
                          hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 
                          rounded-xl text-white font-bold shadow-lg shadow-purple-500/25 
                          transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40
@@ -336,24 +258,29 @@ function Signup() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Creating Account...
+                      Updating Profile...
                     </>
                   ) : (
-                    "Create Account"
+                    <>
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                      Complete Profile
+                    </>
                   )}
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
+            </form>
 
-              <p className="text-center text-gray-300 mt-6">
-                Already have an account?{" "}
-                <Link 
-                  to="/login" 
-                  className="text-transparent bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text hover:from-purple-300 hover:to-pink-300 font-semibold transition-all duration-200 hover:underline"
-                >
-                  Sign In
-                </Link>
-              </p>
+            {/* Progress indicator */}
+            <div className="mt-8 text-center">
+              <div className="flex justify-center space-x-2 mb-2">
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+              </div>
+              <p className="text-gray-400 text-xs">Step 2 of 3 - Profile Setup</p>
             </div>
           </div>
         </div>
@@ -372,6 +299,9 @@ function Signup() {
         }
         .animation-delay-2000 {
           animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
         }
         .animation-delay-200 {
           animation-delay: 0.2s;
@@ -395,6 +325,6 @@ function Signup() {
       `}</style>
     </div>
   );
-}
+};
 
-export default Signup;
+export default CompleteProfile;

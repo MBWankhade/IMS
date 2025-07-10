@@ -15,6 +15,7 @@ import People from "./pages/People";
 import Saved from "./pages/Saved";
 import CreatePost from "./pages/CreatePost";
 import ShareExperience from "./components/ShareExperience";
+import CompleteProfile from "./pages/completeProfile";
 
 import "./App.css";
 
@@ -60,13 +61,13 @@ function App() {
   };
 
   // Show loading spinner while fetching profile
-  // if (loading) {
-  //   return (
-  //     <div className="fixed inset-0 flex justify-center items-center bg-white">
-  //       <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-  //     </div>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex justify-center items-center bg-white">
+        <FaSpinner className="animate-spin text-blue-500 text-4xl" />
+      </div>
+    );
+  }
 
   // Main app routes
   return (
@@ -149,6 +150,12 @@ function App() {
             />
           }
         />
+        <Route
+          path="/complete-profile"
+          element={<CompleteProfile />}
+        />
+
+        
       </Routes>
       {/* Toast notifications */}
       <ToastContainer
@@ -160,6 +167,7 @@ function App() {
     </BrowserRouter>
   );
 }
+
 
 // Protects routes: redirects to login if user is not authenticated
 function ProtectedRoute({ user, Component }) {

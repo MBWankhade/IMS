@@ -70,7 +70,12 @@ export const logout = (req, res) => {
 
 export const signup = async (req, res) => {
     try {
-      let configurationForCookies;
+      const configurationForCookies = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      };
+
         const { name, email, username, password, confirmPassword } = req.body;
 
         // Check if required fields are provided
