@@ -16,6 +16,7 @@ import Saved from "./pages/Saved";
 import CreatePost from "./pages/CreatePost";
 import ShareExperience from "./components/ShareExperience";
 import CompleteProfile from "./pages/completeProfile";
+import Profile from "./pages/Profile";
 
 import "./App.css";
 
@@ -154,7 +155,10 @@ function App() {
           path="/complete-profile"
           element={<CompleteProfile />}
         />
-
+        <Route
+          path="/profile"
+          element={<ProtectedRoute user={user} Component={() => AppLayout(Profile)} />}
+        />
         
       </Routes>
       {/* Toast notifications */}
