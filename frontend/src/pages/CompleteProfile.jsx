@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const CompleteProfile = () => {
   const { user } = useContext(DataContext);
+  const { setUser } = useContext(DataContext);
   const [formData, setFormData] = useState({
     college: "",
     branch: "",
@@ -48,6 +49,7 @@ const CompleteProfile = () => {
 
       if (res.ok) {
         toast.success("Profile updated successfully!");
+        setUser(data.user)
         setTimeout(() => navigate("/"), 1500);
       } else {
         toast.error(data.message || "Failed to update profile");
