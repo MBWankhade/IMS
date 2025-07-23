@@ -74,7 +74,7 @@ const CompleteProfile = () => {
 
       <ToastContainer 
         position="top-right" 
-        autoClose={3000} 
+        autoClose={1499} 
         hideProgressBar={false} 
         theme="dark"
         toastStyle={{
