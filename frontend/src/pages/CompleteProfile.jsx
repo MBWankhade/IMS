@@ -48,9 +48,14 @@ const CompleteProfile = () => {
       const data = await res.json();
 
       if (res.ok) {
-        toast.success("Profile updated successfully!");
+        toast.success("Profile updated successfully!", {
+          autoClose: 2000,
+          closeOnClick: true,
+        });
         setUser(data.user)
-        setTimeout(() => navigate("/"), 1500);
+        setTimeout(() => {
+          navigate("/");
+        }, 2500);
       } else {
         toast.error(data.message || "Failed to update profile");
       }

@@ -15,7 +15,7 @@ import People from "./pages/People";
 import Saved from "./pages/Saved";
 import CreatePost from "./pages/CreatePost";
 import ShareExperience from "./components/ShareExperience";
-import CompleteProfile from "./pages/completeProfile";
+import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
 
 import "./App.css";
@@ -162,12 +162,12 @@ function App() {
         
       </Routes>
       {/* Toast notifications */}
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
         pauseOnHover
-      />
+      /> */}
     </BrowserRouter>
   );
 }
