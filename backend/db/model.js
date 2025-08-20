@@ -28,6 +28,20 @@ const userSchema = new Schema({
       profilePicture: {
         type: String, // Stores Google profile picture
       },
+      college: {
+        type: String,
+      },
+      branch: {
+        type: String,
+      },
+      prn: {
+        type: String,
+        unique: true,
+        sparse: true, // Allows uniqueness check only when present
+      },
+      batch: {
+        type: Number,
+      },
 });
 
 const User = mongoose.model("User", userSchema);
