@@ -185,17 +185,17 @@ export const editProfile = async (req, res) =>{
 
     //check if email is already taken
     if(email){
-      const existingEmail = User.findOne({email, _id : {$ne : req.user.id}});
+      const existingEmail = await User.findOne({email, _id : {$ne : req.user.id}});
       if(existingEmail){
-        return res.status(409).json({ message : "Email already exist"})
+        return res.status(409).json({ message : "Email already exist", userId: req.user.id})
       }
     }
 
     //check for duplicate username 
     if(username){
-      const existingUsername = User.findOne({ username, _id : { $ne : req.user.id }});
+      const existingUsername = await User.findOne({ username, _id : { $ne : req.user.id }});
       if(existingUsername){
-        return res.status(409).json({ message : "username already exist"})
+        return res.status(409).json({ message : "Username already exist"})
       }
     }
 
