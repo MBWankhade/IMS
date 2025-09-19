@@ -50,10 +50,8 @@ const Profile = () => {
       if(!res.ok) throw new Error(data.message);
 
       setUser(data.user);  
-      toast.success("success");
-      setTimeout(() => {
-        setIsEditOpen(false);
-      }, 5000)
+      setIsEditOpen(false);
+      
       
 
     } catch(err){
