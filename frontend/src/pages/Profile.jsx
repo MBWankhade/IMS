@@ -1,8 +1,16 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { DataContext } from "../context/DataProvider";
+import { ToastContainer, toast } from "react-toastify";
 
 const Profile = () => {
-  const { user } = useContext(DataContext);
+  const { user, setUser } = useContext(DataContext);
+  const [ isEditOpen, setIsEditOpen ] = useState(false);
+  const [ formData, setFormData ] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    username: user?.username || "",
+    profilePicture: user?.profilePicture || ""
+  });
 
   if (!user) {
     return (
@@ -24,6 +32,35 @@ const Profile = () => {
     { label: "PRN", value: user.prn, icon: "📋" },
     { label: "Batch", value: user.batch, icon: "📅" },
   ];
+
+  const handleSave = async () => {
+    
+    try{
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/edit-profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include",
+        body: JSON.stringify(formData)
+      })
+
+      const data = await res.json();
+
+      if(!res.ok) throw new Error(data.message);
+
+      setUser(data.user);  
+      toast.success("success");
+      setTimeout(() => {
+        setIsEditOpen(false);
+      }, 5000)
+      
+
+    } catch(err){
+      console.error(err);
+      toast.error(err.message)
+    }
+  }
 
   return (
     <div className="relative w-full min-h-screen overflow-x-hidden">
@@ -49,11 +86,19 @@ const Profile = () => {
           {/* Profile Header */}
           <div className="text-center mb-8">
             <div className="relative inline-block mb-6">
-              <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-purple-500/25 rotate-3 hover:rotate-6 transition-transform duration-300 mx-auto">
-                <span className="text-4xl text-white font-bold">
-                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
-                </span>
-              </div>
+              {user?.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt="Profile"
+                  className="w-32 h-32 rounded-full object-cover shadow-2xl shadow-purple-500/25 rotate-3 hover:rotate-6 transition-transform duration-300 mx-auto"
+                />
+              ) : (
+                <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-blue-600 rounded-full flex items-center justify-center shadow-2xl shadow-purple-500/25 rotate-3 hover:rotate-6 transition-transform duration-300 mx-auto">
+                  <span className="text-4xl text-white font-bold">
+                    {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                  </span>
+                </div>
+              )}
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-green-400 rounded-full flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-full"></div>
               </div>
@@ -90,7 +135,10 @@ const Profile = () => {
 
             {/* Action Buttons */}
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <button className="flex-1 py-3 px-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 rounded-xl text-white font-bold shadow-lg shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40 relative overflow-hidden group">
+              <button 
+                onClick={() => setIsEditOpen(true)}
+                className="flex-1 py-3 px-6 bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 rounded-xl text-white font-bold shadow-lg shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40 relative overflow-hidden group"
+              >
                 <span className="relative z-10">Edit Profile</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
@@ -123,6 +171,119 @@ const Profile = () => {
           </div>
         </div>
       </div>
+
+      
+
+
+       {/* Edit Profile Modal */}
+      {isEditOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+          <div className="bg-gray-900/80 backdrop-blur-xl text-white rounded-2xl p-8 w-full max-w-md shadow-2xl border border-gray-700/50">
+            <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent">
+              Edit Profile
+            </h2>
+
+            <div className="space-y-5">
+              {/* Name */}
+              <div className="flex items-center space-x-4 p-4 rounded-xl bg-gray-800/50 border border-gray-600/50 hover:border-purple-500/50 hover:bg-gray-700/50 transition-all duration-200">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                  👤
+                </div>
+                <div className="flex-1">
+                  <label className="block text-gray-400 text-sm font-medium mb-1">Name</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-transparent text-white text-lg font-medium focus:outline-none placeholder-gray-500"
+                    placeholder="Enter name"
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div className="flex items-center space-x-4 p-4 rounded-xl bg-gray-800/50 border border-gray-600/50 hover:border-purple-500/50 hover:bg-gray-700/50 transition-all duration-200">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                  📧
+                </div>
+                <div className="flex-1">
+                  <label className="block text-gray-400 text-sm font-medium mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-transparent text-white text-lg font-medium focus:outline-none placeholder-gray-500"
+                    placeholder="Enter email"
+                  />
+                </div>
+              </div>
+
+              {/* Username */}
+              <div className="flex items-center space-x-4 p-4 rounded-xl bg-gray-800/50 border border-gray-600/50 hover:border-purple-500/50 hover:bg-gray-700/50 transition-all duration-200">
+                <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                  🔖
+                </div>
+                <div className="flex-1">
+                  <label className="block text-gray-400 text-sm font-medium mb-1">Username</label>
+                  <input
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                    className="w-full bg-transparent text-white text-lg font-medium focus:outline-none placeholder-gray-500"
+                    placeholder="Enter username"
+                  />
+                </div>
+              </div>
+
+              {/* Profile Picture */}
+              <div className="flex items-center space-x-4 p-4 rounded-xl bg-gray-800/50 border border-gray-600/50 hover:border-purple-500/50 hover:bg-gray-700/50 transition-all duration-200">
+                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center text-white shadow-lg">
+                  🖼️
+                </div>
+                <div className="flex-1">
+                  <label className="block text-gray-400 text-sm font-medium mb-1">Profile Picture</label>
+                  <input
+                    type="text"
+                    value={formData.profilePicture}
+                    onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
+                    className="w-full bg-transparent text-white text-lg font-medium focus:outline-none placeholder-gray-500"
+                    placeholder="Enter image URL"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={() => setIsEditOpen(false)}
+                className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 font-bold"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        hideProgressBar={false} 
+        theme="dark"
+        toastStyle={{
+          background: 'rgba(17, 24, 39, 0.9)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)'
+        }}
+      />
+
 
       {/* Animations */}
       <style jsx>{`

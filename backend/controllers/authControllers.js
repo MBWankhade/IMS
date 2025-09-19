@@ -175,3 +175,42 @@ export const completeProfile = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+
+//update profile 
+
+export const editProfile = async (req, res) =>{
+  try{
+    const { name, username, email, profilePicture } = req.body;
+
+    //check if email is already taken
+    if(email){
+      const existingEmail = await User.findOne({email, _id : {$ne : req.user.id}});
+      if(existingEmail){
+        return res.status(409).json({ message : "Email already exist", userId: req.user.id})
+      }
+    }
+
+    //check for duplicate username 
+    if(username){
+      const existingUsername = await User.findOne({ username, _id : { $ne : req.user.id }});
+      if(existingUsername){
+        return res.status(409).json({ message : "Username already exist"})
+      }
+    }
+
+    //update fields and save user 
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id, 
+      { name, username, email, profilePicture },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    res.status(200).json({ message : "profile updated successfully", user : updatedUser})
+  } catch(error){
+    console.error("Error editing profile: ", error);
+    res.status(500).json({ message : "Internal server error" })
+  }
+}
+
+
