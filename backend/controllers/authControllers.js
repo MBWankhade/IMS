@@ -44,16 +44,12 @@ export const login = async (req, res) => {
     // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
     res.cookie("token", token, configurationForCookies);
 
+    const {password: _, ...safeUser} = user.toObject();
 
     // Return user data along with token
     return res.status(200).json({
       message: "Login success",
-      user: {
-        id: user._id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-      },
+      user: safeUser,
       token,
     });
   } catch (error) {
