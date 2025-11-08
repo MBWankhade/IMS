@@ -143,7 +143,7 @@ function Navbar() {
                     <FaStar key={star} className="text-yellow-400 text-xs" />
                   ))}
                 </div>
-                <span className="text-xs text-white/60">Pro Member</span>
+                {/* <span className="text-xs text-white/60">Pro Member</span> */}
               </div>
             </div>
             <FaChevronRight className="text-white/40 group-hover:text-white/80 transition-colors" />
@@ -238,7 +238,7 @@ function Navbar() {
         </ul>
 
         {/* Quick Stats */}
-        <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 backdrop-blur-sm border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300">
+        {/* <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 rounded-2xl p-4 backdrop-blur-sm border border-purple-400/20 hover:border-purple-400/40 transition-all duration-300">
           <h3 className="text-white font-bold mb-3 flex items-center space-x-2">
             <BiTrendingUp className="text-green-400" />
             <span>Quick Stats</span>
@@ -257,7 +257,7 @@ function Navbar() {
               <span className="text-purple-400 font-bold text-sm">87%</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Bottom Section - Logout */}
@@ -283,7 +283,7 @@ function Navbar() {
         {/* Footer */}
         <div className="mt-6 pt-4 border-t border-white/10">
           <p className="text-xs text-white/40 text-center">
-            © 2024 VIT Connect
+            © 2025 IMS Connect
           </p>
           <p className="text-xs text-white/30 text-center mt-1">
             Empowering Students

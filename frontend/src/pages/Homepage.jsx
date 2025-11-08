@@ -30,6 +30,7 @@ import InputModal from "../components/InputModal";
 import PopupModal from "../components/PopupModal";
 import { DataContext } from "../context/DataProvider";
 import { leftsideBar, mainContaint } from "../utils/colors";
+import { ToastContainer } from "react-toastify";
 
 /**
  * Enhanced Homepage component with modern UI design
@@ -157,6 +158,17 @@ function Homepage() {
 
   return (
     <>
+    <ToastContainer 
+        position="top-right" 
+        hideProgressBar={false} 
+        theme="dark"
+        toastStyle={{
+          background: 'rgba(17, 24, 39, 0.9)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          zIndex: 10000,
+        }}
+      />
       <div className="flex flex-1 h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         {/* Main Content */}
         <div
@@ -255,10 +267,10 @@ function Homepage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center space-x-2 text-white/40">
+                    {/* <div className="flex items-center space-x-2 text-white/40">
                       <FaEye className="text-sm" />
                       <span className="text-xs">1.2k</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Post Content */}
@@ -301,9 +313,8 @@ function Homepage() {
                       </button>
                     </div>
                     
-                    <div className="flex items-center space-x-2">
+                    {/* <div className="flex items-center space-x-2">
                       <div className="flex -space-x-2">
-                        {/* Mock avatars for likes */}
                         {[1, 2, 3].map((i) => (
                           <div
                             key={i}
@@ -312,7 +323,8 @@ function Homepage() {
                         ))}
                       </div>
                       <span className="text-xs text-white/60">+127 others</span>
-                    </div>
+                    </div> */}
+                    
                   </div>
 
                   {/* Comments Section */}
@@ -350,7 +362,7 @@ function Homepage() {
         >
           <div className="sticky top-8 flex flex-col gap-8">
             {/* Trending Section */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-lg border border-orange-400/30 shadow-2xl hover:shadow-orange-500/25 transition-all duration-500 hover:scale-[1.02]">
+            {/* <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20 backdrop-blur-lg border border-orange-400/30 shadow-2xl hover:shadow-orange-500/25 transition-all duration-500 hover:scale-[1.02]">
               <div className="absolute inset-0 bg-gradient-to-r from-orange-600/10 to-red-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
               <div className="relative z-10 p-6">
@@ -386,10 +398,10 @@ function Homepage() {
                   ))}
                 </ul>
               </div>
-            </div>
+            </div> */}
 
             {/* Mock Interviews Section */}
-            <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/20 to-blue-500/20 backdrop-blur-lg border border-green-400/30 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 hover:scale-[1.02]">
+            {/* <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500/20 to-blue-500/20 backdrop-blur-lg border border-green-400/30 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 hover:scale-[1.02]">
               <div className="absolute inset-0 bg-gradient-to-r from-green-600/10 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               
               <div className="relative z-10 p-6">
@@ -456,7 +468,7 @@ function Homepage() {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
