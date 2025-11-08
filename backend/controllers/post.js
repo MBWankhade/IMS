@@ -1,4 +1,5 @@
 import Post from "../models/post.js";
+import PendingPost from "../models/pendingPost.js";
 import sanitizeHtml from "sanitize-html";
 
 export const createPost = async (req, res) => {
@@ -20,6 +21,24 @@ export const createPost = async (req, res) => {
       allowedSchemes: ["data", "http", "https"],
       disallowedTagsMode: "discard",
     });
+
+    //Here i want to save the post irrespective of its validation result. It will be forwarded to admin for review if it fails validation.
+    try {
+      const newPendingPost = new PendingPost({
+        user: req.user._id,
+        content: cleanContent,
+        company,
+        role,
+        placementType,
+        title,
+        postType
+      });
+      await newPendingPost.save();
+      console.log("Pending post saved for review.");
+    } catch (pendingErr) {
+      console.error("Error saving pending post:", pendingErr);
+      // Do not interrupt main flow
+    }
 
     // Step 3: Prepare Gemini validation prompt
     const validationPrompt = `
@@ -82,7 +101,7 @@ Score: X.XX/10
     const scoreMatch = geminiText.match(/Score:\s*(\d+(\.\d+)?)/i);
     const score = scoreMatch ? parseFloat(scoreMatch[1]) : null;
 
-    if (geminiText.startsWith("❌") || !score || score < 8.0) {
+    if (geminiText.startsWith("❌") || !score || score < 6.0) {
       const issuesMatch = geminiText.match(/Issues:\n([\s\S]*?)\n\n/);
       const suggestionsMatch = geminiText.match(/Suggestions:\n([\s\S]*?)\n\n?/);
 
@@ -132,6 +151,15 @@ Score: X.XX/10
 export const getAllPosts=async (req, res) => {
     try {
       const posts = await Post.find().populate("user", "name email profilePicture").sort({ createdAt: -1 });
+      res.status(200).json(posts);
+    } catch (error) {
+      res.status(500).json({ message: "Error getting posts", error });
+    }
+} 
+
+export const getAllPendingPosts = async (req, res) => {
+    try {
+      const posts = await PendingPost.find().populate("user", "name email profilePicture").sort({ createdAt: -1 });
       res.status(200).json(posts);
     } catch (error) {
       res.status(500).json({ message: "Error getting posts", error });

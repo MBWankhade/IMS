@@ -365,7 +365,11 @@ const AddPostForm = () => {
         setShowPersistentFeedback(false);
       } else {
         // Show generic error for other types of errors
-        toast.error("Failed to create post.");
+        if (err && err.response && err.response.data && err.response.data.message) {
+          toast.error(err.response.data.message);
+        } else {
+          toast.error("Failed to create post.");
+        }
       }
       console.error("Error creating post", err);
     } finally {
@@ -548,7 +552,7 @@ const AddPostForm = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Publishing Options */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
+            {/* <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-6 border border-gray-700/50">
               <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                 Publishing Options
@@ -606,7 +610,7 @@ const AddPostForm = () => {
                   </div>
                 </label>
               </div>
-            </div>
+            </div> */}
 
             {/* Guidelines for Interview Experience */}
             {cardId === 1 && (

@@ -45,8 +45,8 @@ function Login() {
       if (res.ok) {
         setUser(data.user);
         localStorage.setItem("token", data.token);
-        navigate("/", { state: { loginSuccess: true } });
         toast.success("Login successful! Welcome back.");
+        navigate("/", { state: { loginSuccess: true } });
       } else {
         toast.error(data.message);
       }
@@ -99,17 +99,7 @@ function Login() {
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000} 
-        hideProgressBar={false} 
-        theme="dark"
-        toastStyle={{
-          background: 'rgba(17, 24, 39, 0.9)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)'
-        }}
-      />
+      
 
       {/* Left side: Login form section */}
       <div className="w-full md:w-1/2 relative bg-gray-900 overflow-y-auto">

@@ -17,6 +17,7 @@ import CreatePost from "./pages/CreatePost";
 import ShareExperience from "./components/ShareExperience";
 import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
+import AdminHomePage from "./components/AdminHomePage";
 
 import "./App.css";
 
@@ -159,7 +160,16 @@ function App() {
           path="/profile"
           element={<ProtectedRoute user={user} Component={() => AppLayout(Profile)} />}
         />
-        
+        <Route
+          path="/admin-route/ims-startupfounders/pending-posts"
+          element={
+            <ProtectedRoute
+              user={user}
+              Component={() => AdminHomePage()}
+            />
+          }
+        />
+
       </Routes>
       {/* Toast notifications */}
       {/* <ToastContainer

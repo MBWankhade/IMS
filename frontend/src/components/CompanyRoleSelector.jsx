@@ -13,55 +13,58 @@ const CompanyRoleSelector = ({
       {/* Company Selector */}
       <div>
         <label className="block text-sm font-medium text-white mb-1">Company *</label>
-        <select
-          value={company}
-          onChange={(e) => onCompanyChange(e.target.value)}
-          className="w-full bg-gray-700 text-white rounded-lg p-3"
-          required
-        >
-          <option value="">Select Company</option>
-          <option value="Accenture">Accenture</option>
-          <option value="TCS">TCS</option>
-          <option value="Infosys">Infosys</option>
-          <option value="Wipro">Wipro</option>
-          <option value="Cognizant">Cognizant</option>
-        </select>
+        <div>
+          <input
+            type="text"
+            value={company}
+            onChange={(e) => onCompanyChange(e.target.value)}
+            className="w-full bg-gray-700 text-white rounded-lg p-3"
+            placeholder="Enter Company Name"
+            required
+          />
+        </div>
       </div>
 
       {/* Role Selector */}
       <div>
         <label className="block text-sm font-medium text-white mb-1">Role *</label>
-        <select
+        <input
+          list="role-options"
           value={role}
           onChange={(e) => onRoleChange(e.target.value)}
           className="w-full bg-gray-700 text-white rounded-lg p-3"
+          placeholder="Select or type Role"
           required
-        >
-          <option value="">Select Role</option>
-          <option value="Software Engineer">Software Engineer</option>
-          <option value="Data Analyst">Data Analyst</option>
-          <option value="System Engineer">System Engineer</option>
-          <option value="Full Stack Developer">Full Stack Developer</option>
-          <option value="QA Engineer">QA Engineer</option>
-        </select>
+        />
+        <datalist id="role-options">
+          <option value="Software Engineer" />
+          <option value="Data Analyst" />
+          <option value="System Engineer" />
+          <option value="Full Stack Developer" />
+          <option value="QA Engineer" />
+        </datalist>
       </div>
 
       {/* Placement Type Selector */}
+
       <div>
         <label className="block text-sm font-medium text-white mb-1">Placement Type *</label>
-        <select
+        <input
+          list="placement-type-options"
           value={placementType}
           onChange={(e) => onPlacementTypeChange(e.target.value)}
           className="w-full bg-gray-700 text-white rounded-lg p-3"
+          placeholder="Select or type Placement Type"
           required
-        >
-          <option value="">Select Placement Type</option>
-          <option value="On-Campus">On-Campus</option>
-          <option value="Off-Campus">Off-Campus</option>
-          <option value="Referral">Referral</option>
-          <option value="Internship to Full-Time">Internship to Full-Time</option>
-        </select>
+        />
+        <datalist id="placement-type-options">
+          <option value="On-Campus" />
+          <option value="Off-Campus" />
+          <option value="Referral" />
+          <option value="Internship to Full-Time" />
+        </datalist>
       </div>
+
     </div>
   );
 };
