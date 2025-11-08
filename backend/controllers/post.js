@@ -1,5 +1,5 @@
 import Post from "../models/post.js";
-import PendingPost from "../models/pendingPost.js";
+import PendingPost from "../models/pendingpost.js";
 import sanitizeHtml from "sanitize-html";
 
 export const createPost = async (req, res) => {
