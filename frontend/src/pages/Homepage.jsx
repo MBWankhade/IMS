@@ -255,11 +255,11 @@ function Homepage() {
                           <p className="font-bold text-white/90 hover:text-white transition-colors">
                             {post?.user?.name}
                           </p>
-                          <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                          {/* <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
                           <span className="text-sm text-white/60 flex items-center space-x-1">
                             <FaClock className="text-xs" />
                             <span>{formatTimeAgo(post.createdAt)}</span>
-                          </span>
+                          </span> */}
                         </div>
                         <p className="text-sm text-purple-300 font-medium mt-1">
                           {post.title}
