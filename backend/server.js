@@ -18,16 +18,18 @@ const server = createServer(app);
 
 
 // Allowed Origins
-const allowedOrigins = [
-  "https://imsapp-palx.onrender.com", 
-  "https://im-sapp.vercel.app",
-  "http://localhost:5173"
-];
+// const allowedOrigins = [
+//   "https://imsapp-palx.onrender.com", 
+//   "https://im-sapp.vercel.app",
+//   "http://localhost:5173"
+// ];
+
+const allowedOrigin = process.env?.ALLOWED_ORIGINS.split(",");
 
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
   cors: {
-    origin: allowedOrigins,
+    origin: allowedOrigin,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,  // Allow credentials like cookies 
   },
@@ -44,7 +46,7 @@ connectdb();
 // CORS middleware for Express
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: allowedOrigin,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
