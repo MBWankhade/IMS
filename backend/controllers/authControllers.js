@@ -159,6 +159,11 @@ export const completeProfile = async (req, res) => {
   try {
     const { college, branch, prn, batch } = req.body;
 
+    const user = await User.findOne({ prn: prn });
+    if (user) {
+      return res.status(409).json({ message: "PRN already exists. Please check your PRN." });
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
       { college, branch, prn, batch },
