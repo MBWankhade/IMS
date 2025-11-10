@@ -44,16 +44,12 @@ export const login = async (req, res) => {
     // Set cookie (Optional, only needed if you're using HTTP cookies for auth)
     res.cookie("token", token, configurationForCookies);
 
+    const {password: _, ...safeUser} = user.toObject();
 
     // Return user data along with token
     return res.status(200).json({
       message: "Login success",
-      user: {
-        id: user._id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-      },
+      user: safeUser,
       token,
     });
   } catch (error) {
@@ -162,6 +158,11 @@ export const getMyProfile= async (req,res)=>{
 export const completeProfile = async (req, res) => {
   try {
     const { college, branch, prn, batch } = req.body;
+
+    const user = await User.findOne({ prn: prn });
+    if (user) {
+      return res.status(409).json({ message: "PRN already exists. Please check your PRN." });
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,

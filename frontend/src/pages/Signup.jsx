@@ -64,13 +64,14 @@ function Signup() {
     }
   };
 
-  const handleGoogleLogin = async (credentialResponse) => {
+  const handleGoogleSignup = async (credentialResponse) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/google-login`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/google-signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
       const data = await res.json();
@@ -78,15 +79,17 @@ function Signup() {
       if (res.ok) {
         setUser(data.user);
         localStorage.setItem("token", data.token);
-        localStorage.setItem("googleLoginSuccess", "true");
-
-        toast.success("Google Login successful!");
+        localStorage.setItem("googleSignupSuccess", "true");
+        toast.success("Google Signup successful!");
         navigate("/complete-profile");
+      } else if (data.needsLogin) {
+        toast.info("Account already exists. Redirecting to login...");
+        navigate("/login");
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Google login failed. Please try again.");
+      toast.error("Google signup failed. Please try again.");
       console.log(error);
     }
   };
@@ -204,8 +207,8 @@ function Signup() {
               <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
                 <div className="transform hover:scale-105 transition-transform duration-200">
                   <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => toast.error("Google login failed.")}
+                    onSuccess={handleGoogleSignup}
+                    onError={() => toast.error("Google signup failed.")}
                     cookiePolicy={"single_host_origin"}
                     uxMode="redirect"
                     text="continue_with"
