@@ -56,7 +56,7 @@ function App() {
         setUser(null);
       }
     } catch (error) {
-      toast.error("Failed to Get Profile");
+      toast.error("Unable to load your profile. Please check your connection or try logging in again.");
       setUser(null);
     } finally {
       setLoading(false); // Hide loading spinner
@@ -171,12 +171,18 @@ function App() {
 
       </Routes>
       {/* Toast notifications */}
-      {/* <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable
         pauseOnHover
-      /> */}
+        theme="dark" // "light", "dark", or "colored"
+        limit={3} // prevent toast spam
+      />
     </BrowserRouter>
   );
 }
