@@ -77,9 +77,11 @@ function Login() {
         setUser(data.user);
         localStorage.setItem("token", data.token);
         localStorage.setItem("googleLoginSuccess", "true");
-
         toast.success("Google Login successful!");
         navigate("/");
+      } else if (data.needsSignup) {
+        toast.info(data.message);
+        navigate("/signup");
       } else {
         toast.error(data.message);
       }

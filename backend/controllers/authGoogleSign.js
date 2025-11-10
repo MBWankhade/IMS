@@ -13,55 +13,60 @@ const generateJWTToken = (user) => {
   );
 };
 
+const handleGoogleAuth = async (token) => {
+  const ticket = await client.verifyIdToken({
+    idToken: token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  return {
+    email: payload.email,
+    name: payload.name,
+    picture: payload.picture,
+    googleId: payload.sub
+  };
+};
+
+const setupCookieConfig = () => {
+  if (process.env?.NODE_ENV === "production") {
+    return {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      domain: "imsapp-4lhx.onrender.com",
+    };
+  }
+  return {
+    httpOnly: true,
+    secure: false,
+  };
+};
+
 export const googleLogin = async (req, res) => {
-  const { token } = req.body; 
+  const { token } = req.body;
 
   try {
-    // Verify Google token
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload(); 
-    const { email, name, picture, sub: googleId } = payload;
-
+    const { email, name, picture, googleId } = await handleGoogleAuth(token);
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Create a new user
-      user = new User({
-        username: email,
-        email,
-        name,
-        profilePicture: picture,
-        googleId,
+      return res.status(401).json({
+        success: false,
+        message: "Account not found. Please sign up first.",
+        needsSignup: true
       });
-      await user.save();
-    } else if (!user.googleId) {
-      // Link Google account if user already exists
+    }
+
+    // Link Google account if user exists but hasn't linked yet
+    if (!user.googleId) {
       user.googleId = googleId;
       await user.save();
     }
 
-    if (process.env?.NODE_ENV === "production") {
-      configurationForCookies = {
-        httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-        secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
-        sameSite: "none", // Allows cookies to be sent with top-level navigations
-        path: "/", // Makes the cookie accessible across all routes,
-        domain: "imsapp-4lhx.onrender.com",
-      };
-    } else {
-      configurationForCookies = {
-        httpOnly: true,
-        secure: false,
-      }; 
-    }
-
-    // Generate JWT token
     const jwtToken = generateJWTToken(user);
-    res.cookie("token", token, configurationForCookies);
+    res.cookie("token", token, setupCookieConfig());
 
     res.status(200).json({
       success: true,
@@ -70,13 +75,62 @@ export const googleLogin = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
-        profilePicture: user.profilePicture, 
+        profilePicture: user.profilePicture,
       },
-      token: jwtToken, // Send token separately
+      token: jwtToken,
     });
 
   } catch (error) {
     console.error("Google login error:", error.message || error);
+    res.status(400).json({
+      success: false,
+      message: "Invalid Google Token or authentication failed",
+    });
+  }
+};
+
+export const googleSignup = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const { email, name, picture, googleId } = await handleGoogleAuth(token);
+    let user = await User.findOne({ email });
+
+    if (user) {
+      return res.status(400).json({
+        success: false,
+        message: "Account already exists. Please login instead.",
+        needsLogin: true
+      });
+    }
+
+    // Create new user
+    user = new User({
+      username: email, // Using email as username initially
+      email,
+      name,
+      profilePicture: picture,
+      googleId,
+    });
+    await user.save();
+
+    const jwtToken = generateJWTToken(user);
+    res.cookie("token", token, setupCookieConfig());
+
+    res.status(200).json({
+      success: true,
+      message: "Google signup successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePicture: user.profilePicture,
+      },
+      token: jwtToken,
+    });
+
+  } catch (error) {
+    console.error("Google signup error:", error.message || error);
     res.status(400).json({
       success: false,
       message: "Invalid Google Token or authentication failed",
