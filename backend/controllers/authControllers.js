@@ -32,7 +32,7 @@ export const login = async (req, res) => {
         secure: true, // Allow cookies to be sent over HTTP (not just HTTPS)
         sameSite: "none", // Allows cookies to be sent with top-level navigations
         path: "/", // Makes the cookie accessible across all routes,
-        domain: "imsapp-4lhx.onrender.com",
+        domain: process.env.COOKIE_DOMAIN // Set your domain here
       };
     } else {
       configurationForCookies = {
