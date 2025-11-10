@@ -30,7 +30,7 @@ import Reactions from "../components/Reactions";
 // import PopupModal from "../components/PopupModal";
 import { DataContext } from "../context/DataProvider";
 import { leftsideBar, mainContaint } from "../utils/colors";
-import { ToastContainer } from "react-toastify";
+// import { ToastContainer } from "react-toastify";
 
 /**
  * Enhanced Homepage component with modern UI design
@@ -158,7 +158,7 @@ function Homepage() {
 
   return (
     <>
-    <ToastContainer 
+    {/* <ToastContainer 
         position="top-right" 
         hideProgressBar={false} 
         theme="dark"
@@ -168,7 +168,7 @@ function Homepage() {
           border: '1px solid rgba(255, 255, 255, 0.1)',
           zIndex: 10000,
         }}
-      />
+      /> */}
       <div className="flex flex-1 h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         {/* Main Content */}
         <div

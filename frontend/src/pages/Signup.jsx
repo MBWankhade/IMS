@@ -52,7 +52,7 @@ function Signup() {
         return;
       }
 
-      toast.success("Signup successful!");
+      toast.success("Signup successful! Welcome aboard.");
       setUser(data.data);
       localStorage.setItem("token", data.token);
       navigate("/complete-profile", { state: { signupSuccess: true } });
@@ -80,7 +80,7 @@ function Signup() {
         setUser(data.user);
         localStorage.setItem("token", data.token);
         localStorage.setItem("googleSignupSuccess", "true");
-        toast.success("Google Signup successful!");
+        toast.success("Signup successful! Welcome aboard.");
         navigate("/complete-profile");
       } else if (data.needsLogin) {
         toast.info("Account already exists. Redirecting to login...");
@@ -104,7 +104,7 @@ function Signup() {
         <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
       </div>
 
-      <ToastContainer 
+      {/* <ToastContainer 
         position="top-right" 
         autoClose={3000} 
         hideProgressBar={false} 
@@ -114,7 +114,7 @@ function Signup() {
           backdropFilter: 'blur(16px)',
           border: '1px solid rgba(255, 255, 255, 0.1)'
         }}
-      />
+      /> */}
       
       {/* Left side: Custom designed hero section */}
       <div className="hidden md:block w-1/2 relative bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
