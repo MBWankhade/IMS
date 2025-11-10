@@ -18,6 +18,7 @@ import ShareExperience from "./components/ShareExperience";
 import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
 import AdminHomePage from "./components/AdminHomePage";
+import EnhancedLoadingScreen from "./pages/EnhancedLoadingScreen";
 
 import "./App.css";
 
@@ -65,9 +66,7 @@ function App() {
   // Show loading spinner while fetching profile
   if (loading) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-white">
-        <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-      </div>
+      <EnhancedLoadingScreen />
     );
   }
 
@@ -147,9 +146,9 @@ function App() {
           path="/create-post"
           element={
             <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(CreatePost)}
-            />
+                user={user}
+                Component={() => AppLayout(ShareExperience)}
+              />
           }
         />
         <Route

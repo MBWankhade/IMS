@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import profileLogo from "/assets/icons/profile-placeholder.svg";
 
 const Comments = ({ postId, currentUserId }) => {
   const [comments, setComments] = useState([]);
@@ -151,7 +152,7 @@ const Comments = ({ postId, currentUserId }) => {
         <div className="flex items-start space-x-3 p-4 hover:bg-gray-800/30 rounded-xl transition-all duration-200">
           <div className="relative">
             <img
-              src={comment.user?.profilePicture || "/default-avatar.png"}
+              src={comment.user?.profilePicture || profileLogo}
               alt="Profile"
               className="w-10 h-10 rounded-full object-cover ring-2 ring-gray-700/50"
             />
