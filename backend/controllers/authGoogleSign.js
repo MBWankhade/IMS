@@ -71,12 +71,7 @@ export const googleLogin = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Google login successful",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profilePicture,
-      },
+      user: user,
       token: jwtToken,
     });
 
