@@ -3,13 +3,12 @@ import User from "../db/model.js";
 import jwt from "jsonwebtoken";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-let configurationForCookies;
 
 const generateJWTToken = (user) => {
   return jwt.sign(
     { id: user._id, email: user.email, profilePicture:user.profilePicture },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }
+    { expiresIn: "7d" }
   );
 };
 
@@ -29,20 +28,24 @@ const handleGoogleAuth = async (token) => {
 };
 
 const setupCookieConfig = () => {
-  if (process.env?.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production") {
     return {
       httpOnly: true,
       secure: true,
       sameSite: "none",
       path: "/",
-      domain: "imsapp-4lhx.onrender.com",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     };
   }
   return {
     httpOnly: true,
     secure: false,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   };
 };
+
 
 export const googleLogin = async (req, res) => {
   const { token } = req.body;
@@ -66,7 +69,7 @@ export const googleLogin = async (req, res) => {
     }
 
     const jwtToken = generateJWTToken(user);
-    res.cookie("token", token, setupCookieConfig());
+    res.cookie("token", jwtToken, setupCookieConfig());
 
     res.status(200).json({
       success: true,
@@ -110,7 +113,7 @@ export const googleSignup = async (req, res) => {
     await user.save();
 
     const jwtToken = generateJWTToken(user);
-    res.cookie("token", token, setupCookieConfig());
+    res.cookie("token", jwtToken, setupCookieConfig());
 
     res.status(200).json({
       success: true,
