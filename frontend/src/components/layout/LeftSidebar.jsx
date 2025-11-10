@@ -132,17 +132,17 @@ function Navbar() {
                 <p className="font-bold text-white/90 group-hover:text-white transition-colors truncate">
                   {user?.name}
                 </p>
-                <FaCrown className="text-yellow-400 text-sm animate-pulse" />
+                {/* <FaCrown className="text-yellow-400 text-sm animate-pulse" /> */}
               </div>
               <p className="text-sm text-purple-300 group-hover:text-purple-200 transition-colors truncate">
                 @{user?.username || "Guest"}
               </p>
               <div className="flex items-center space-x-1 mt-1">
-                <div className="flex space-x-1">
+                {/* <div className="flex space-x-1">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <FaStar key={star} className="text-yellow-400 text-xs" />
                   ))}
-                </div>
+                </div> */}
                 {/* <span className="text-xs text-white/60">Pro Member</span> */}
               </div>
             </div>

@@ -24,7 +24,7 @@ const server = createServer(app);
 //   "http://localhost:5173"
 // ];
 
-const allowedOrigin = process.env?.ALLOWED_ORIGINS.split(",");
+const allowedOrigin = process.env?.ALLOWED_ORIGINS?.split(",");
 
 // Initialize Socket.IO with CORS
 const io = new Server(server, {
