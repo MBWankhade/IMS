@@ -270,7 +270,7 @@ const Profile = () => {
         </div>
       )}
 
-      <ToastContainer 
+      {/* <ToastContainer 
         position="top-right" 
         autoClose={3000} 
         hideProgressBar={false} 
@@ -280,7 +280,7 @@ const Profile = () => {
           backdropFilter: 'blur(16px)',
           border: '1px solid rgba(255, 255, 255, 0.1)'
         }}
-      />
+      /> */}
 
 
       {/* Animations */}

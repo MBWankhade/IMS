@@ -2,7 +2,7 @@ import React, { useContext, useRef, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, } from "react-toastify";
 import { useLocation } from "react-router-dom";
 import { getContent } from "../utils/utils";
 import CompanyRoleSelector from "./CompanyRoleSelector";
@@ -349,7 +349,7 @@ const AddPostForm = () => {
         { withCredentials: true }
       );
 
-      toast.success("Post created successfully!");
+      toast.success("Your post has been published! Thank you for sharing your experience.");
       
       // Clear feedback on successful submission
       setQualityFeedback(null);
@@ -368,7 +368,7 @@ const AddPostForm = () => {
         if (err && err.response && err.response.data && err.response.data.message) {
           toast.error(err.response.data.message);
         } else {
-          toast.error("Failed to create post.");
+          toast.error("Unable to create post. Please try again later. If there was a server glitch, your post may have been saved and sent for admin approval.");
         }
       }
       console.error("Error creating post", err);
@@ -411,7 +411,7 @@ const AddPostForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
@@ -654,7 +654,7 @@ const AddPostForm = () => {
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-semibold">
-                    {submitAsAnonymous ? '?' : user?.name?.charAt(0) || 'U'}
+                    {submitAsAnonymous ? '?' : user?.name?.charAt(0) ||  'U'}
                   </span>
                 </div>
                 <div>

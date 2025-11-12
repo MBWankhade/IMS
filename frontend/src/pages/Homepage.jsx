@@ -19,18 +19,18 @@ import {
 } from "react-icons/fa";
 import { HiSparkles, HiTrendingUp } from "react-icons/hi";
 import { useLocation, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "semantic-ui-css/semantic.min.css";
 import { Icon } from "semantic-ui-react";
 import Comments from "../components/Comments";
 import PostContent from "../components/PostContent";
 import Reactions from "../components/Reactions";
-import InputModal from "../components/InputModal";
-import PopupModal from "../components/PopupModal";
+// import InputModal from "../components/InputModal";
+// import PopupModal from "../components/PopupModal";
 import { DataContext } from "../context/DataProvider";
 import { leftsideBar, mainContaint } from "../utils/colors";
-import { ToastContainer } from "react-toastify";
+// import { ToastContainer } from "react-toastify";
 
 /**
  * Enhanced Homepage component with modern UI design
@@ -91,26 +91,26 @@ function Homepage() {
     }
   };
 
-  useEffect(() => {
-    if (location.state?.loginSuccess) {
-      toast.success(`Login successful! Welcome back ${user?.name}`, {
-        icon: "🎉",
-        style: {
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          color: "white",
-        },
-      });
-    } else if (location.state?.signupSuccess) {
-      toast.success(`Signup successful! Welcome aboard ${user?.name}`, {
-        icon: "🚀",
-        style: {
-          background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
-          color: "white",
-        },
-      });
-    }
-    window.history.replaceState({}, document.title, location.pathname);
-  }, [location.state]);
+  // useEffect(() => {
+  //   if (location.state?.loginSuccess) {
+  //     toast.success(`Login successful! Welcome back ${user?.name}`, {
+  //       icon: "🎉",
+  //       style: {
+  //         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  //         color: "white",
+  //       },
+  //     });
+  //   } else if (location.state?.signupSuccess) {
+  //     toast.success(`Signup successful! Welcome aboard ${user?.name}`, {
+  //       icon: "🚀",
+  //       style: {
+  //         background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+  //         color: "white",
+  //       },
+  //     });
+  //   }
+  //   window.history.replaceState({}, document.title, location.pathname);
+  // }, [location.state]);
 
   const toggleCommentSection = (postId) => {
     if (openCommentSection === postId) {
@@ -158,7 +158,7 @@ function Homepage() {
 
   return (
     <>
-    <ToastContainer 
+    {/* <ToastContainer 
         position="top-right" 
         hideProgressBar={false} 
         theme="dark"
@@ -168,7 +168,7 @@ function Homepage() {
           border: '1px solid rgba(255, 255, 255, 0.1)',
           zIndex: 10000,
         }}
-      />
+      /> */}
       <div className="flex flex-1 h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         {/* Main Content */}
         <div
@@ -306,10 +306,10 @@ function Homepage() {
                       </button> */}
                       
                       <button className="group/action flex items-center space-x-2 text-white/70 hover:text-pink-400 transition-all duration-300 hover:scale-110">
-                        <div className="p-2 rounded-full group-hover/action:bg-pink-400/20 transition-all duration-300">
+                        {/* <div className="p-2 rounded-full group-hover/action:bg-pink-400/20 transition-all duration-300">
                           <FaShare className="text-sm" />
                         </div>
-                        <span className="text-sm font-medium">Share</span>
+                        <span className="text-sm font-medium">Share</span> */}
                       </button>
                     </div>
                     
@@ -347,7 +347,7 @@ function Homepage() {
                   <div className="absolute top-0 left-0 w-16 h-16 border-4 border-transparent border-l-purple-500 rounded-full animate-spin"></div>
                   <div className="absolute top-2 left-2 w-12 h-12 border-4 border-transparent border-l-pink-500 rounded-full animate-spin animate-reverse"></div>
                 </div>
-                <p className="text-white/60 font-medium">Loading amazing content...</p>
+                <p className="text-white/60 font-medium">Preparing insightful interview experiences and tips...</p>
               </div>
             )}
 

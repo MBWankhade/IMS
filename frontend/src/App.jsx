@@ -18,6 +18,7 @@ import ShareExperience from "./components/ShareExperience";
 import CompleteProfile from "./pages/CompleteProfile";
 import Profile from "./pages/Profile";
 import AdminHomePage from "./components/AdminHomePage";
+import EnhancedLoadingScreen from "./pages/EnhancedLoadingScreen";
 
 import "./App.css";
 
@@ -55,7 +56,7 @@ function App() {
         setUser(null);
       }
     } catch (error) {
-      toast.error("Failed to Get Profile");
+      toast.error("Unable to load your profile. Please check your connection or try logging in again.");
       setUser(null);
     } finally {
       setLoading(false); // Hide loading spinner
@@ -65,9 +66,7 @@ function App() {
   // Show loading spinner while fetching profile
   if (loading) {
     return (
-      <div className="fixed inset-0 flex justify-center items-center bg-white">
-        <FaSpinner className="animate-spin text-blue-500 text-4xl" />
-      </div>
+      <EnhancedLoadingScreen />
     );
   }
 
@@ -147,9 +146,9 @@ function App() {
           path="/create-post"
           element={
             <ProtectedRoute
-              user={user}
-              Component={() => AppLayout(CreatePost)}
-            />
+                user={user}
+                Component={() => AppLayout(ShareExperience)}
+              />
           }
         />
         <Route
@@ -172,12 +171,18 @@ function App() {
 
       </Routes>
       {/* Toast notifications */}
-      {/* <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        pauseOnFocusLoss={false}
+        draggable
         pauseOnHover
-      /> */}
+        theme="dark" // "light", "dark", or "colored"
+        limit={3} // prevent toast spam
+      />
     </BrowserRouter>
   );
 }

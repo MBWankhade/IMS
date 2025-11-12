@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaSearch, FaSpinner } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { mainContaint } from "../utils/colors";
 import { formatDate } from "../utils/utils";
@@ -95,10 +95,10 @@ const PostSearch = () => {
       setTotalPages(response.data.totalPages); // ✅ Fix missing page numbers
 
       if (searchTriggered && currentPage === 1) {
-        toast.info(`Found ${response.data.totalPosts} results.`);
+        toast.info(`Search complete! Found ${response.data.totalPosts} result${response.data.totalPosts === 1 ? "" : "s"}.`);
       }
     } catch (err) {
-      toast.error("Failed to fetch posts.");
+      toast.error("Unable to fetch posts. Please check your connection or try again later.");
       console.error("Error fetching posts", err);
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ const PostSearch = () => {
       style={{ backgroundColor: `${mainContaint}` }}
       // style={{ backgroundColor: "white" }}
     >
-      <ToastContainer position="top-right" autoClose={3000} />
+      {/* <ToastContainer position="top-right" autoClose={3000} /> */}
       <div className="max-w-7xl mx-auto w-full">
         {selectedPost ? (
           <SinglePost/>

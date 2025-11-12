@@ -45,7 +45,7 @@ function Login() {
       if (res.ok) {
         setUser(data.user);
         localStorage.setItem("token", data.token);
-        toast.success("Login successful! Welcome back.");
+        toast.success("Login successful! Great to see you again.");
         navigate("/", { state: { loginSuccess: true } });
       } else {
         toast.error(data.message);
@@ -77,7 +77,7 @@ function Login() {
         setUser(data.user);
         localStorage.setItem("token", data.token);
         localStorage.setItem("googleLoginSuccess", "true");
-        toast.success("Google Login successful!");
+        toast.success("Login successful! Great to see you again.");
         navigate("/");
       } else if (data.needsSignup) {
         toast.info(data.message);
@@ -181,14 +181,14 @@ function Login() {
               </div>
 
               {/* Forgot password link */}
-              <div className="text-right">
+              {/* <div className="text-right">
                 <Link 
                   to="/forgot-password" 
                   className="text-sm text-purple-400 hover:text-purple-300 transition-colors duration-200"
                 >
                   Forgot Password?
                 </Link>
-              </div>
+              </div> */}
 
               {/* Submit button */}
               <button
